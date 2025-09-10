@@ -19,7 +19,8 @@ import AdminRoute from "./components/AdminRoute";
 import PolicyPage from "./pages/privacypolicy";
 import Categories from "./pages/admin/categories";
 import UserOrdersPage from "./pages/UserOrdersPage"; // ✅ user orders page
-import AIChat from "./pages/AIChat"; // ✅ import AI Chat page
+import AIChat from "./pages/AIChat";
+import ContactPage from "./pages/Contact"; // ✅ import AI Chat page
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/privacy-policy" element={<PolicyPage />} />
+          <Route path="/contact" element={<ContactPage />} />  {/* Contact page route */}
 
           {/* User Orders */}
           <Route path="/orders" element={<UserOrdersPage />} />

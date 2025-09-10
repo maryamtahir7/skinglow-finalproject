@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Phone, Mail, Rocket, Heart, ShoppingCart } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Heart, ShoppingCart, User as UserIcon, LogOut, LogIn, UserPlus } from "lucide-react";
 import { useUser } from "../context/UserContext";
 import { logout } from "../backend/auth";
 import { getCart, getWishlist } from "../backend/database";
@@ -11,12 +10,12 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
 
-  const navItems = ["Home", "Products", "About", "Orders"];
+  const navItems = ["Home", "Products", "About", "Orders", "Contact"];
 
-  // Fetch cart + wishlist counts
   const fetchCounts = async () => {
     if (!user) return;
     try {
@@ -34,7 +33,6 @@ export default function Navbar() {
     fetchCounts();
   }, [user]);
 
-  // Logout handler
   const handleLogout = async () => {
     try {
       await logout();
@@ -45,19 +43,17 @@ export default function Navbar() {
     }
   };
 
-  // Navigate to AI Chat page
   const handleAIChat = () => {
     navigate("/ai-chat");
   };
 
-  // Nav link component (desktop + mobile)
   const NavItem = ({ item, isMobile = false }) => (
     <Link
       to={item === "Orders" ? "/orders" : `/${item.toLowerCase()}`}
       className={`relative group transition-all duration-300 ease-out ${
         isMobile
-          ? "text-lg font-medium hover:text-white block py-3 px-4 rounded-lg hover:bg-white/5"
-          : "hover:text-white"
+          ? "text-lg font-medium text-gray-200 hover:text-violet-300 block py-3 px-4 rounded-lg hover:bg-violet-800/40"
+          : "hover:text-violet-300 text-gray-300"
       }`}
       onClick={() => setIsMobileMenuOpen(false)}
     >
@@ -85,7 +81,7 @@ export default function Navbar() {
       </Link>
 
       {/* Desktop Navigation */}
-      <ul className="hidden md:flex gap-10 text-lg text-gray-300 font-semibold tracking-wide">
+      <ul className="hidden md:flex gap-10 text-lg font-semibold tracking-wide">
         {navItems.map((item) => (
           <li key={item}>
             <NavItem item={item} />
@@ -124,31 +120,51 @@ export default function Navbar() {
           💬
         </button>
 
-        {/* Auth Buttons */}
-        {!user ? (
-          <>
-            <Link to="/login">
-              <Button className="bg-white/5 border border-white/20 text-violet-300 hover:bg-violet-400 hover:text-white rounded-full px-6 py-2 transition-all duration-300 font-semibold backdrop-blur-sm hover:shadow-lg">
-                Login
-              </Button>
-            </Link>
-            <Link to="/signup">
-              <Button className="bg-gradient-to-r from-violet-500 to-fuchsia-500 hover:from-violet-600 hover:to-fuchsia-600 text-white font-bold rounded-full px-8 py-2 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-violet-500/25">
-                Sign Up
-              </Button>
-            </Link>
-          </>
-        ) : (
-          <>
-            <span className="text-sm text-gray-200">Hi, {user.name || user.email}</span>
-            <Button
-              onClick={handleLogout}
-              className="bg-red-600/80 hover:bg-red-700 text-white rounded-full px-6 shadow-md transition-all duration-300"
-            >
-              Logout
-            </Button>
-          </>
-        )}
+        {/* User Menu */}
+        <div className="relative">
+          <button
+            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+            className="w-10 h-10 rounded-full bg-gradient-to-r from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold shadow hover:scale-105 transition"
+          >
+            {user ? user.name?.charAt(0).toUpperCase() || "U" : <UserIcon className="w-5 h-5" />}
+          </button>
+
+          {/* Dropdown Menu */}
+          {isUserMenuOpen && (
+            <div className="absolute right-0 mt-3 w-48 bg-white text-gray-800 rounded-lg shadow-lg overflow-hidden z-50">
+              {!user ? (
+                <>
+                  <Link
+                    to="/login"
+                    className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 transition"
+                    onClick={() => setIsUserMenuOpen(false)}
+                  >
+                    <LogIn className="w-4 h-4 text-violet-600" /> Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100 transition"
+                    onClick={() => setIsUserMenuOpen(false)}
+                  >
+                    <UserPlus className="w-4 h-4 text-fuchsia-600" /> Sign Up
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <div className="px-4 py-3 text-sm text-gray-700 border-b">
+                    Hi, <span className="font-semibold">{user.name || user.email}</span>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 w-full px-4 py-3 text-left hover:bg-gray-100 transition text-red-600"
+                  >
+                    <LogOut className="w-4 h-4" /> Logout
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Mobile Menu Button */}
@@ -176,73 +192,6 @@ export default function Navbar() {
           </div>
         </button>
       </div>
-
-      {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-50">
-          {/* Overlay */}
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-
-          {/* Slide-in Menu */}
-          <div className="absolute right-0 top-0 h-full w-80 bg-gradient-to-br from-gray-900 via-violet-900 to-fuchsia-900 shadow-2xl transform transition-transform duration-300">
-            <div className="p-6">
-              {/* Mobile Header */}
-              <div className="flex items-center justify-between mb-8 pb-6 border-b border-white/10">
-                <Link to="/" className="flex items-center gap-3 text-xl font-black text-violet-400">
-                  <img src="/MT-Store.png" alt="MT-Stores Logo" className="w-10 h-10 rounded-md" />
-                  MT-STORES
-                </Link>
-                <button
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 rounded-lg hover:bg-white/10 transition-colors duration-300"
-                >
-                  <span className="text-2xl text-gray-400">&times;</span>
-                </button>
-              </div>
-
-              {/* Mobile Navigation */}
-              <ul className="flex flex-col gap-2 border-b border-white/10 pb-6 mb-6">
-                {navItems.map((item) => (
-                  <li key={item}>
-                    <NavItem item={item} isMobile />
-                  </li>
-                ))}
-              </ul>
-
-              {/* Wishlist, Cart & AI Chat */}
-              <div className="flex gap-4 mb-6">
-                <Link to="/wishlist" className="relative">
-                  <Heart className="h-7 w-7 text-pink-400" />
-                  {wishlistCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </Link>
-                <Link to="/cart" className="relative">
-                  <ShoppingCart className="h-7 w-7 text-yellow-400" />
-                  {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-yellow-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
-                      {cartCount}
-                    </span>
-                  )}
-                </Link>
-                {/* Mobile AI Chat */}
-                <button
-                  onClick={handleAIChat}
-                  className="p-2 bg-violet-600 hover:bg-violet-700 rounded-full text-white flex items-center justify-center transition-all duration-300"
-                  title="AI Chat"
-                >
-                  💬
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </nav>
   );
 }
