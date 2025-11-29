@@ -6,7 +6,9 @@ import SignupForm from "./pages/signup";
 import AddProductForm from "./pages/admin/addproduct";
 import AdminProducts from "./pages/admin/allproducts";
 import AdminPage from "./pages/admin/adminpage";
-import OrdersPage from "./pages/admin/OrdersPage"; // ✅ fixed casing
+import OrdersPage from "./pages/admin/OrdersPage"; 
+import ReportsPage from "./pages/admin/ReportsPage";
+import StocksPage from "./pages/admin/StocksPage";// ✅ fixed casing
 import Homepage from "./pages/homepage";
 import ProductsPage from "./pages/products";
 import ProductDetailPage from "./pages/productdetail";
@@ -55,6 +57,8 @@ function App() {
           <Route path="/admin/products" element={<AdminProducts />} />
           <Route path="/admin/categories" element={<Categories />} />
           <Route path="/admin/orders" element={<OrdersPage />} />
+          <Route path="/admin/reports" element={<ReportsPage />} />
+          <Route path="/admin/stock" element={<StocksPage />} />
         </Route>
       </Routes>
     </Router>

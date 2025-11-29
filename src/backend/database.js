@@ -1,7 +1,7 @@
 import { databases } from "./appwrite";
 import { Query } from "appwrite";
 
-// --------------------- PRODUCTS ---------------------
+/* --------------------- PRODUCTS --------------------- */
 export async function addProduct(product) {
   return databases.createDocument(
     import.meta.env.VITE_APPWRITE_DATABASE_ID,
@@ -43,7 +43,7 @@ export async function deleteProduct(productId) {
   );
 }
 
-// --------------------- CATEGORIES ---------------------
+/* --------------------- CATEGORIES --------------------- */
 export async function addCategory(category) {
   return databases.createDocument(
     import.meta.env.VITE_APPWRITE_DATABASE_ID,
@@ -85,7 +85,7 @@ export async function deleteCategory(categoryId) {
   );
 }
 
-// --------------------- HELPERS ---------------------
+/* --------------------- HELPERS --------------------- */
 export async function getProductsByIds(ids = []) {
   if (!Array.isArray(ids) || !ids.length) return { documents: [] };
 
@@ -104,7 +104,7 @@ export async function getProductsByIds(ids = []) {
   return { documents: products.filter(Boolean) };
 }
 
-// --------------------- CART ---------------------
+/* --------------------- CART --------------------- */
 export async function getCart(userId) {
   return databases.listDocuments(
     import.meta.env.VITE_APPWRITE_DATABASE_ID,
@@ -169,7 +169,7 @@ export async function clearCart(userId) {
   );
 }
 
-// --------------------- WISHLIST ---------------------
+/* --------------------- WISHLIST --------------------- */
 export async function getWishlist(userId) {
   return databases.listDocuments(
     import.meta.env.VITE_APPWRITE_DATABASE_ID,
@@ -203,7 +203,7 @@ export async function removeFromWishlist(wishlistItemId) {
   );
 }
 
-// --------------------- ORDERS ---------------------
+/* --------------------- ORDERS --------------------- */
 export async function createOrder({
   userId,
   items,
@@ -266,5 +266,75 @@ export async function deleteOrder(orderId) {
     import.meta.env.VITE_APPWRITE_DATABASE_ID,
     import.meta.env.VITE_APPWRITE_ORDERS_ID,
     String(orderId)
+  );
+}
+
+/* --------------------- STOCK --------------------- */
+export async function addStock(stock) {
+  return databases.createDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_STOCK_ID,
+    "unique()",
+    stock
+  );
+}
+
+export async function getStocks() {
+  return databases.listDocuments(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_STOCK_ID,
+    [Query.orderDesc("$createdAt")]
+  );
+}
+
+export async function updateStock(stockId, updates) {
+  return databases.updateDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_STOCK_ID,
+    String(stockId),
+    updates
+  );
+}
+
+export async function deleteStock(stockId) {
+  return databases.deleteDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_STOCK_ID,
+    String(stockId)
+  );
+}
+
+/* --------------------- REPORTS --------------------- */
+export async function addReport(report) {
+  return databases.createDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_REPORTS_ID,
+    "unique()",
+    report
+  );
+}
+
+export async function getReports() {
+  return databases.listDocuments(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_REPORTS_ID,
+    [Query.orderDesc("$createdAt")]
+  );
+}
+
+export async function updateReport(reportId, updates) {
+  return databases.updateDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_REPORTS_ID,
+    String(reportId),
+    updates
+  );
+}
+
+export async function deleteReport(reportId) {
+  return databases.deleteDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_REPORTS_ID,
+    String(reportId)
   );
 }
