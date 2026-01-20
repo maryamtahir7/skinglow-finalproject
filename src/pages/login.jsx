@@ -1,155 +1,168 @@
-import React from "react"
-import { useForm } from "react-hook-form"
-import { FcGoogle } from "react-icons/fc"
-import { Mail, Lock } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-
-import { login, loginWithGoogle, getCurrentUser } from "../backend/auth"
-import { useUser } from "../context/UserContext"
-import { useNavigate } from "react-router-dom"
+// src/pages/login.jsx
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../backend/auth";
+import { useUser } from "../context/UserContext";
+import { Button } from "@/components/ui/button";
+import { Sparkles, Mail, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function LoginForm() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm()
+  const navigate = useNavigate();
+  const { setUser } = useUser();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const { setUser } = useUser()
-  const navigate = useNavigate()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
 
-  const onSubmit = async (data) => {
     try {
-      await login(data.email, data.password)
-      const user = await getCurrentUser()
-
-      if (user) {
-        setUser(user)
-        localStorage.setItem("userId", user.$id)
-        localStorage.setItem("userName", user.name)
-        localStorage.setItem("userEmail", user.email)
-        navigate("/")
-      } else {
-        alert("Login failed, please try again.")
-      }
+      const session = await login(formData.email, formData.password);
+      setUser(session.user);
+      navigate("/");
     } catch (err) {
-      console.error("Login error:", err)
-      alert(err.message || "Something went wrong")
+      console.error(err);
+      setError("Invalid email or password");
+    } finally {
+      setLoading(false);
     }
-  }
-
-  const handleGoogleLogin = async () => {
-    try {
-      await loginWithGoogle()
-    } catch (err) {
-      console.error("Google login error:", err)
-      alert(err.message || "Google login failed")
-    }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-pink-50 p-4">
-      <Card className="w-full max-w-md bg-white shadow-lg rounded-2xl border border-gray-100">
-        {/* Header */}
-        <CardHeader className="pb-2 text-center">
-          <CardTitle className="text-2xl font-bold text-gray-800">
-            Welcome Back
-          </CardTitle>
-          <p className="text-sm text-gray-500 mt-1">Log in to your account</p>
-        </CardHeader>
+    <div className="min-h-screen bg-background flex font-sans">
 
-        <CardContent className="p-6">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* Email */}
-            <div>
-              <Label htmlFor="email" className="text-gray-700 font-medium">
-                Email
-              </Label>
-              <div className="relative mt-1">
-                <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                <Input
-                  id="email"
+      {/* Left Side - Brand / Visuals (Hidden on mobile) */}
+      <div className="hidden lg:flex lg:w-1/2 bg-primary/5 relative overflow-hidden flex-col justify-between p-12 text-primary">
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-50 to-sage-50 opacity-50" />
+
+        {/* Abstract shapes */}
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-orange-100 rounded-full blur-3xl opacity-40 -translate-x-1/2 -translate-y-1/2"></div>
+
+        {/* Content */}
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-primary" />
+            </div>
+            <span className="text-2xl font-bold tracking-tight text-foreground">SkinGlow</span>
+          </div>
+
+          <h1 className="text-5xl font-bold leading-tight mb-6 text-foreground">
+            Your Glow, <br /> Our Priority.
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-md">
+            Access your personalized routine, track orders, and discover new favorites—all in one place.
+          </p>
+        </div>
+
+        <div className="relative z-10 space-y-4">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-primary" />
+            <span className="font-medium text-foreground">Vegan & Cruelty-Free</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-primary" />
+            <span className="font-medium text-foreground">Dermatologist Tested</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-primary" />
+            <span className="font-medium text-foreground">Sustainable Packaging</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Form */}
+      <div className="flex-1 flex flex-col justify-center items-center p-6 lg:p-12 relative">
+        <div className="w-full max-w-md space-y-8">
+          <div className="text-center lg:text-left">
+            <div className="lg:hidden flex justify-center mb-6">
+              <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                <Sparkles className="w-7 h-7" />
+              </div>
+            </div>
+            <h2 className="text-3xl font-bold text-foreground">Welcome Back</h2>
+            <p className="text-muted-foreground mt-2">Please enter your details to sign in.</p>
+          </div>
+
+          {error && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm flex items-center gap-2 border border-red-100 animate-in fade-in slide-in-from-top-2">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-foreground ml-1">Email</label>
+              <div className="relative group">
+                <Mail className="w-5 h-5 text-muted-foreground absolute left-4 top-3.5 group-focus-within:text-primary transition-colors" />
+                <input
                   type="email"
-                  placeholder="you@example.com"
-                  className="pl-10 py-3 rounded-lg border-gray-300 focus:border-pink-500 focus:ring-pink-500"
-                  {...register("email", {
-                    required: "Email is required",
-                    pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
-                  })}
+                  placeholder="name@example.com"
+                  className="w-full pl-12 pr-4 py-3.5 bg-secondary/30 border border-border rounded-xl text-foreground outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  required
                 />
               </div>
-              {errors.email && (
-                <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
-              )}
             </div>
 
-            {/* Password */}
-            <div>
-              <Label htmlFor="password" className="text-gray-700 font-medium">
-                Password
-              </Label>
-              <div className="relative mt-1">
-                <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                <Input
-                  id="password"
+            <div className="space-y-2">
+              <div className="flex justify-between items-center ml-1">
+                <label className="text-sm font-semibold text-foreground">Password</label>
+                <a href="#" className="text-xs font-semibold text-primary hover:underline">Forgot password?</a>
+              </div>
+              <div className="relative group">
+                <Lock className="w-5 h-5 text-muted-foreground absolute left-4 top-3.5 group-focus-within:text-primary transition-colors" />
+                <input
                   type="password"
-                  placeholder="••••••••"
-                  className="pl-10 py-3 rounded-lg border-gray-300 focus:border-pink-500 focus:ring-pink-500"
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: { value: 6, message: "Min 6 characters" },
-                  })}
+                  placeholder="Enter your password"
+                  className="w-full pl-12 pr-4 py-3.5 bg-secondary/30 border border-border rounded-xl text-foreground outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
                 />
               </div>
-              {errors.password && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.password.message}
-                </p>
-              )}
             </div>
 
-            {/* Login Button */}
-            <Button
-              type="submit"
-              className="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 rounded-lg shadow-md transition"
-            >
-              Log In
+            <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 h-12 rounded-xl text-white font-bold text-base shadow-lg shadow-primary/25 transition-all hover:scale-[1.02]">
+              {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-6">
-            <div className="h-px flex-1 bg-gray-200"></div>
-            <span className="text-gray-400 text-sm">OR</span>
-            <div className="h-px flex-1 bg-gray-200"></div>
+          <div className="relative py-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground font-medium">Or continue with</span>
+            </div>
           </div>
 
-          {/* Google Login */}
-          <Button
-            variant="outline"
-            className="w-full flex items-center justify-center gap-3 rounded-lg py-3 border-gray-300 hover:bg-gray-50 transition"
-            onClick={handleGoogleLogin}
-          >
-            <FcGoogle className="text-2xl" />
-            <span className="font-medium text-gray-700">Continue with Google</span>
-          </Button>
+          <div className="grid grid-cols-2 gap-4">
+            <button className="flex items-center justify-center px-4 py-2.5 border border-border rounded-xl hover:bg-secondary/50 transition font-medium text-muted-foreground text-sm gap-2">
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+              Google
+            </button>
+            <button className="flex items-center justify-center px-4 py-2.5 border border-border rounded-xl hover:bg-secondary/50 transition font-medium text-muted-foreground text-sm gap-2">
+              <img src="https://www.svgrepo.com/show/448224/facebook.svg" alt="Facebook" className="w-5 h-5" />
+              Facebook
+            </button>
+          </div>
 
-          {/* Signup link */}
-          <p className="text-center text-sm text-gray-500 mt-6">
-            Don’t have an account?{" "}
-            <a
-              href="/signup"
-              className="text-pink-600 font-semibold hover:underline"
-            >
-              Sign up
-            </a>
-          </p>
-        </CardContent>
-      </Card>
+          <div className="text-center mt-6">
+            <p className="text-muted-foreground text-sm">
+              Don't have an account?{" "}
+              <Link to="/signup" className="text-primary font-bold hover:underline">
+                Create free account
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+
     </div>
-  )
+  );
 }

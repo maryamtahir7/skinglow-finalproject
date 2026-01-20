@@ -8,7 +8,18 @@ import {
   setCartItemQuantity,
 } from "../backend/database";
 import { Button } from "@/components/ui/button";
-import { Trash2, Minus, Plus } from "lucide-react";
+import {
+  Trash2,
+  Minus,
+  Plus,
+  ShieldCheck,
+  Lock,
+  Truck,
+  ArrowRight,
+  ShoppingBag,
+  Sparkles,
+  Leaf
+} from "lucide-react";
 import { useUser } from "../context/UserContext";
 
 export default function CartPage() {
@@ -35,7 +46,7 @@ export default function CartPage() {
           const prods = await getProductsByIds(ids);
           const map = {};
           (prods.documents || []).forEach((p) => {
-            map[String(p.$id)] = p; // ensure key is string
+            map[String(p.$id)] = p;
           });
           setProductsMap(map);
         } else {
@@ -81,101 +92,148 @@ export default function CartPage() {
   };
 
   if (loading) {
-    return <div className="max-w-6xl mx-auto p-6">Loading cart…</div>;
+    return <div className="min-h-screen flex items-center justify-center bg-background text-primary font-bold">Loading Cart...</div>;
   }
 
   if (!items.length) {
     return (
-      <div className="max-w-6xl mx-auto p-6 text-center">
-        <h2 className="text-2xl font-semibold mb-2">Your cart is empty</h2>
-        <Button onClick={() => navigate("/products")} className="mt-2">
-          Shop Products
-        </Button>
+      <div className="min-h-screen bg-background flex items-center justify-center p-6 font-sans">
+        <div className="text-center bg-card p-10 rounded-3xl shadow-lg border border-border max-w-md w-full">
+          <div className="w-20 h-20 bg-secondary/50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <ShoppingBag className="w-10 h-10 text-primary" />
+          </div>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Your Bag is Empty</h2>
+          <p className="text-muted-foreground mb-8">Start your journey to glowing skin today.</p>
+          <Button onClick={() => navigate("/products")} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-12 rounded-xl shadow-lg shadow-primary/20">
+            Start Shopping
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Your Cart</h1>
+    <div className="min-h-screen bg-background py-10 px-6 font-sans text-foreground">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8 flex items-center gap-3">
+          <span className="bg-primary/10 p-2 rounded-xl"><ShoppingBag className="w-6 h-6 text-primary" /></span>
+          Your Cart
+          <span className="text-lg font-normal text-muted-foreground ml-2">({items.length} items)</span>
+        </h1>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-xl shadow p-4 space-y-4">
-          {items.map((it) => {
-            const p = productsMap[String(it.productId)];
-            if (!p) {
-              return (
-                <div key={it.$id} className="text-red-500">
-                  Product not found (ID: {it.productId})
-                </div>
-              );
-            }
-
-            return (
-              <div
-                key={it.$id}
-                className="flex items-center gap-4 py-4 border-b last:border-none"
-              >
-                <img
-                  src={p.imageUrl}
-                  alt={p.name}
-                  className="w-20 h-20 object-contain rounded"
-                />
-                <div className="flex-1">
-                  <div className="font-semibold">{p.name}</div>
-                  <div className="text-sm text-gray-500">{p.category}</div>
-                  <div className="mt-1 font-medium">Rs. {p.price}</div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onQty(it, Number(it.quantity) - 1)}
-                    className="px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 transition"
-                    aria-label="Decrease quantity"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </button>
-                  <span className="px-3">{it.quantity}</span>
-                  <button
-                    onClick={() => onQty(it, Number(it.quantity) + 1)}
-                    className="px-2 py-1 rounded bg-gray-100 hover:bg-gray-200 transition"
-                    aria-label="Increase quantity"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <button
-                  onClick={() => onRemove(it)}
-                  className="ml-4 p-2 rounded bg-red-50 text-red-600 hover:bg-red-100 transition"
-                  title="Remove"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+        <div className="grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-6">
+            {/* Trust Banner */}
+            <div className="bg-secondary/30 border border-primary/10 text-primary px-5 py-4 rounded-2xl flex items-center gap-4 text-sm font-medium">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4" /> 100% Authentic
               </div>
-            );
-          })}
-        </div>
+              <div className="w-px h-4 bg-primary/20"></div>
+              <div className="flex items-center gap-2">
+                <Leaf className="w-4 h-4" /> Cruelty-Free
+              </div>
+            </div>
 
-        <div className="bg-white rounded-xl shadow p-4 h-fit">
-          <div className="flex justify-between mb-3">
-            <span className="text-gray-600">Subtotal</span>
-            <span className="font-semibold">Rs. {subtotal.toFixed(2)}</span>
+            <div className="bg-card rounded-3xl shadow-sm border border-border overflow-hidden">
+              {items.map((it) => {
+                const p = productsMap[String(it.productId)];
+                if (!p) return null;
+
+                return (
+                  <div
+                    key={it.$id}
+                    className="flex flex-col sm:flex-row items-start sm:items-center gap-6 p-6 border-b border-border last:border-none hover:bg-secondary/10 transition-colors"
+                  >
+                    <div className="w-24 h-24 bg-white border border-border rounded-2xl p-2 flex-shrink-0 flex items-center justify-center">
+                      <img
+                        src={p.imageUrl}
+                        alt={p.name}
+                        className="max-w-full max-h-full object-contain"
+                      />
+                    </div>
+
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 className="font-bold text-foreground text-lg mb-1">{p.name}</h3>
+                          <p className="text-sm text-muted-foreground mb-2">{p.category} • In Stock</p>
+                        </div>
+                        <button
+                          onClick={() => onRemove(it)}
+                          className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                          title="Remove"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="font-mono font-medium text-primary text-xl">Rs. {p.price}</div>
+
+                        <div className="flex items-center border border-border rounded-xl bg-background overflow-hidden">
+                          <button
+                            onClick={() => onQty(it, Number(it.quantity) - 1)}
+                            className="px-3 py-1.5 hover:bg-secondary transition text-muted-foreground"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <span className="px-3 font-semibold text-foreground border-x border-border text-sm min-w-[2rem] text-center">{it.quantity}</span>
+                          <button
+                            onClick={() => onQty(it, Number(it.quantity) + 1)}
+                            className="px-3 py-1.5 hover:bg-secondary transition text-muted-foreground"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-          <div className="flex justify-between mb-4">
-            <span className="text-gray-600">Delivery</span>
-            <span className="font-semibold">Free</span>
+
+          {/* Summary Box */}
+          <div className="space-y-6">
+            <div className="bg-card rounded-3xl shadow-sm border border-border p-8 sticky top-6">
+              <h2 className="text-xl font-bold text-foreground mb-6">Order Summary</h2>
+
+              <div className="space-y-4 mb-6">
+                <div className="flex justify-between text-muted-foreground text-sm">
+                  <span>Subtotal</span>
+                  <span className="font-medium text-foreground">Rs. {subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between text-muted-foreground text-sm">
+                  <span>Shipping</span>
+                  <span className="text-primary font-medium flex items-center gap-1">
+                    <Truck className="w-4 h-4" /> Free
+                  </span>
+                </div>
+                <div className="flex justify-between text-muted-foreground text-sm">
+                  <span>Tax (Estimated)</span>
+                  <span className="font-medium text-foreground">Rs. {(subtotal * 0.05).toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className="border-t border-border pt-4 mb-8">
+                <div className="flex justify-between items-center">
+                  <span className="text-lg font-bold text-foreground">Total</span>
+                  <span className="text-2xl font-bold text-primary">Rs. {(subtotal + subtotal * 0.05).toFixed(2)}</span>
+                </div>
+              </div>
+
+              <Button
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-14 rounded-2xl shadow-xl shadow-primary/20 text-lg group transition-all hover:scale-[1.02]"
+                onClick={() => navigate("/checkout")}
+              >
+                Checkout Securely <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+
+              <div className="flex items-center justify-center gap-2 mt-6 text-xs text-muted-foreground opacity-70">
+                <Lock className="w-3 h-3" /> Secure Transaction
+              </div>
+            </div>
           </div>
-          <div className="flex justify-between text-lg font-bold border-t pt-3">
-            <span>Total</span>
-            <span>Rs. {subtotal.toFixed(2)}</span>
-          </div>
-          <Button
-            className="w-full mt-4"
-            onClick={() => navigate("/checkout")}
-          >
-            Proceed to Checkout (COD)
-          </Button>
         </div>
       </div>
     </div>

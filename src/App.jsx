@@ -6,9 +6,11 @@ import SignupForm from "./pages/signup";
 import AddProductForm from "./pages/admin/addproduct";
 import AdminProducts from "./pages/admin/allproducts";
 import AdminPage from "./pages/admin/adminpage";
-import OrdersPage from "./pages/admin/OrdersPage"; 
+import OrdersPage from "./pages/admin/OrdersPage";
 import ReportsPage from "./pages/admin/ReportsPage";
 import StocksPage from "./pages/admin/StocksPage";// ✅ fixed casing
+import AdminLabTests from "./pages/admin/AdminLabTests";
+import AdminPrescriptions from "./pages/admin/AdminPrescriptions";
 import Homepage from "./pages/homepage";
 import ProductsPage from "./pages/products";
 import ProductDetailPage from "./pages/productdetail";
@@ -21,8 +23,17 @@ import AdminRoute from "./components/AdminRoute";
 import PolicyPage from "./pages/privacypolicy";
 import Categories from "./pages/admin/categories";
 import UserOrdersPage from "./pages/UserOrdersPage"; // ✅ user orders page
+import UserProfilePage from "./pages/UserProfilePage";
 import AIChat from "./pages/AIChat";
-import ContactPage from "./pages/Contact"; // ✅ import AI Chat page
+import LabTests from "./pages/LabTests";
+import UploadPrescription from "./pages/UploadPrescription";
+import ContactPage from "./pages/Contact";
+import BlogPage from "./pages/BlogPage";
+
+import AdminReviews from "./pages/admin/reviews";
+import SkinQuiz from "./pages/SkinQuiz";
+import RoutinePage from "./pages/RoutinePage";
+
 
 function App() {
   return (
@@ -43,22 +54,33 @@ function App() {
           <Route path="/privacy-policy" element={<PolicyPage />} />
           <Route path="/contact" element={<ContactPage />} />  {/* Contact page route */}
 
-          {/* User Orders */}
+          {/* User Profile & Orders */}
+          <Route path="/profile" element={<UserProfilePage />} />
           <Route path="/orders" element={<UserOrdersPage />} />
 
           {/* ✅ AI Chat route */}
           <Route path="/ai-chat" element={<AIChat />} />
+          <Route path="/lab-tests" element={<LabTests />} />
+          <Route path="/upload-prescription" element={<UploadPrescription />} />
+          <Route path="/skin-quiz" element={<SkinQuiz />} />
+          <Route path="/routine" element={<RoutinePage />} />
+          <Route path="/blog" element={<BlogPage />} />
         </Route>
+
 
         {/* Admin-only routes */}
         <Route element={<AdminRoute />}>
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/admin/add-product" element={<AddProductForm />} />
-          <Route path="/admin/products" element={<AdminProducts />} />
-          <Route path="/admin/categories" element={<Categories />} />
-          <Route path="/admin/orders" element={<OrdersPage />} />
-          <Route path="/admin/reports" element={<ReportsPage />} />
-          <Route path="/admin/stock" element={<StocksPage />} />
+          <Route path="/admin" element={<AdminPage />}>
+            <Route path="add-product" element={<AddProductForm />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="categories" element={<Categories />} />
+            <Route path="reviews" element={<AdminReviews />} />
+            <Route path="orders" element={<OrdersPage />} />
+            <Route path="lab-tests" element={<AdminLabTests />} />
+            <Route path="prescriptions" element={<AdminPrescriptions />} />
+            <Route path="reports" element={<ReportsPage />} />
+            <Route path="stock" element={<StocksPage />} />
+          </Route>
         </Route>
       </Routes>
     </Router>

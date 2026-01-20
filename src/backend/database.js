@@ -11,11 +11,35 @@ export async function addProduct(product) {
   );
 }
 
-export async function getProducts() {
-  return databases.listDocuments(
+export async function getProductByName(name) {
+  const res = await databases.listDocuments(
     import.meta.env.VITE_APPWRITE_DATABASE_ID,
-    import.meta.env.VITE_APPWRITE_TABLE_ID
+    import.meta.env.VITE_APPWRITE_TABLE_ID,
+    [Query.equal("name", String(name))]
   );
+
+  if (!res.total) return null;
+  return res.documents[0];
+}
+
+export async function getProducts() {
+  // Fetch all products - Appwrite default limit is 25, so we need to fetch all
+  // Using a high limit to get all products at once
+  try {
+    const response = await databases.listDocuments(
+      import.meta.env.VITE_APPWRITE_DATABASE_ID,
+      import.meta.env.VITE_APPWRITE_TABLE_ID,
+      [Query.limit(1000)] // Fetch up to 1000 products
+    );
+    return response;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    // Fallback: try without limit if limit fails
+    return databases.listDocuments(
+      import.meta.env.VITE_APPWRITE_DATABASE_ID,
+      import.meta.env.VITE_APPWRITE_TABLE_ID
+    );
+  }
 }
 
 export async function getProductById(productId) {
@@ -336,5 +360,138 @@ export async function deleteReport(reportId) {
     import.meta.env.VITE_APPWRITE_DATABASE_ID,
     import.meta.env.VITE_APPWRITE_REPORTS_ID,
     String(reportId)
+  );
+}
+
+/* --------------------- LAB TESTS --------------------- */
+export async function addLabBooking(booking) {
+  return databases.createDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_LAB_ID,
+    "unique()",
+    booking
+  );
+}
+
+export async function getLabBookings(userId) {
+  return databases.listDocuments(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_LAB_ID,
+    [Query.equal("userId", String(userId)), Query.orderDesc("$createdAt")]
+  );
+}
+
+export async function getAllLabBookings() {
+  return databases.listDocuments(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_LAB_ID,
+    [Query.orderDesc("$createdAt")]
+  );
+}
+
+/* --------------------- PRESCRIPTIONS --------------------- */
+export async function addPrescription(data) {
+  return databases.createDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_PRESCRIPTION_ID,
+    "unique()",
+    data
+  );
+}
+
+export async function getPrescriptions(userId) {
+  return databases.listDocuments(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_PRESCRIPTION_ID,
+    [Query.equal("userId", String(userId)), Query.orderDesc("$createdAt")]
+  );
+}
+
+export async function getAllPrescriptions() {
+  return databases.listDocuments(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_PRESCRIPTION_ID,
+    [Query.orderDesc("$createdAt")]
+  );
+}
+
+export async function updatePrescription(id, updates) {
+  updates.$updatedAt = new Date().toISOString();
+  return databases.updateDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_PRESCRIPTION_ID,
+    String(id),
+    updates
+  );
+}
+
+export async function deletePrescription(id) {
+  return databases.deleteDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_PRESCRIPTION_ID,
+    String(id)
+  );
+}
+
+export async function updateLabBooking(id, updates) {
+  return databases.updateDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_LAB_ID,
+    String(id),
+    updates
+  );
+}
+
+export async function deleteLabBooking(id) {
+  return databases.deleteDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_LAB_ID,
+    String(id)
+  );
+}
+
+/* --------------------- REVIEWS --------------------- */
+export async function addReview(review) {
+  if (!import.meta.env.VITE_APPWRITE_REVIEWS_ID) {
+    throw new Error("Missing VITE_APPWRITE_REVIEWS_ID in environment variables");
+  }
+  return databases.createDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_REVIEWS_ID,
+    "unique()",
+    review
+  );
+}
+
+export async function getReviews(productId) {
+  return databases.listDocuments(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_REVIEWS_ID,
+    [Query.equal("productId", String(productId)), Query.orderDesc("$createdAt")]
+  );
+}
+
+export async function getAllReviews() {
+  return databases.listDocuments(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_REVIEWS_ID,
+    [Query.orderDesc("$createdAt"), Query.limit(100)]
+  );
+}
+
+export async function updateReview(reviewId, updates) {
+  return databases.updateDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_REVIEWS_ID,
+    String(reviewId),
+    updates
+  );
+}
+
+export async function deleteReview(reviewId) {
+  return databases.deleteDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_REVIEWS_ID,
+    String(reviewId)
   );
 }
