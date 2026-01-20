@@ -12,8 +12,15 @@ export default function AdminRoute({ children }) {
     async function checkUser() {
       const user = await getCurrentUser();
       console.log("Current user:", user);
-      if (user && (user.email === "admin@gmail.com" || user.email === "maryamtahir1262@gmail.com" || user.email === "maryamtahir236@gmail.com")) {
+      // Only allow maryamtahir1262@gmail.com to access admin page
+      if (user && user.email === "maryamtahir1262@gmail.com") {
         setIsAdmin(true);
+      } else {
+        // Log unauthorized access attempt
+        if (user) {
+          console.warn(`Unauthorized admin access attempt by: ${user.email}`);
+        }
+        setIsAdmin(false);
       }
       setLoading(false);
     }

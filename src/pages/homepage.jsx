@@ -2,6 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { getProducts, getCategories } from "../backend/database";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../context/UserContext";
+import { getCurrentUser } from "../backend/auth";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles,
@@ -24,8 +26,24 @@ function Homepage() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { setUser } = useUser();
 
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Check for user after OAuth redirect
+  useEffect(() => {
+    async function checkOAuthUser() {
+      try {
+        const user = await getCurrentUser();
+        if (user) {
+          setUser(user);
+        }
+      } catch (err) {
+        // User not logged in, that's okay
+      }
+    }
+    checkOAuthUser();
+  }, [setUser]);
 
   useEffect(() => {
     async function fetchData() {

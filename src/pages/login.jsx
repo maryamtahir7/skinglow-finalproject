@@ -1,26 +1,41 @@
 // src/pages/login.jsx
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { login } from "../backend/auth";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { login, loginWithGoogle } from "../backend/auth";
 import { useUser } from "../context/UserContext";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Mail, Lock, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { setUser } = useUser();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Check if redirected from signup
+  useEffect(() => {
+    if (location.state?.email) {
+      setFormData(prev => ({ ...prev, email: location.state.email }));
+    }
+    if (location.state?.message) {
+      setSuccess(location.state.message);
+      // Clear state to prevent showing message on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess(""); // Clear success message on submit
 
     try {
-      const session = await login(formData.email, formData.password);
-      setUser(session.user);
+      const user = await login(formData.email, formData.password);
+      setUser(user);
       navigate("/");
     } catch (err) {
       console.error(err);
@@ -87,6 +102,12 @@ export default function LoginForm() {
             <p className="text-muted-foreground mt-2">Please enter your details to sign in.</p>
           </div>
 
+          {success && (
+            <div className="bg-green-50 text-green-600 p-4 rounded-xl text-sm flex items-center gap-2 border border-green-100 animate-in fade-in slide-in-from-top-2">
+              <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> {success}
+            </div>
+          )}
+
           {error && (
             <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm flex items-center gap-2 border border-red-100 animate-in fade-in slide-in-from-top-2">
               <AlertCircle className="w-4 h-4 flex-shrink-0" /> {error}
@@ -103,7 +124,10 @@ export default function LoginForm() {
                   placeholder="name@example.com"
                   className="w-full pl-12 pr-4 py-3.5 bg-secondary/30 border border-border rounded-xl text-foreground outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, email: e.target.value });
+                    setSuccess(""); // Clear success message when typing
+                  }}
                   required
                 />
               </div>
@@ -141,16 +165,22 @@ export default function LoginForm() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center px-4 py-2.5 border border-border rounded-xl hover:bg-secondary/50 transition font-medium text-muted-foreground text-sm gap-2">
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-              Google
-            </button>
-            <button className="flex items-center justify-center px-4 py-2.5 border border-border rounded-xl hover:bg-secondary/50 transition font-medium text-muted-foreground text-sm gap-2">
-              <img src="https://www.svgrepo.com/show/448224/facebook.svg" alt="Facebook" className="w-5 h-5" />
-              Facebook
-            </button>
-          </div>
+          <button
+            onClick={async () => {
+              try {
+                await loginWithGoogle();
+                // After successful OAuth, Appwrite will redirect to successRedirect
+                // The user will be automatically logged in
+              } catch (err) {
+                console.error("Google login error:", err);
+                setError("Failed to sign in with Google. Please try again.");
+              }
+            }}
+            className="w-full flex items-center justify-center px-4 py-2.5 border border-border rounded-xl hover:bg-secondary/50 transition font-medium text-muted-foreground text-sm gap-2"
+          >
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+            Continue with Google
+          </button>
 
           <div className="text-center mt-6">
             <p className="text-muted-foreground text-sm">

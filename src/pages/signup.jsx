@@ -1,7 +1,7 @@
 // src/pages/signup.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signup, login } from "../backend/auth";
+import { signup, loginWithGoogle } from "../backend/auth";
 import { useUser } from "../context/UserContext";
 import { Button } from "@/components/ui/button";
 import { Sparkles, User, Mail, Lock, AlertCircle, ShieldCheck, Truck } from "lucide-react";
@@ -23,19 +23,26 @@ export default function SignupForm() {
     setError("");
 
     try {
-      // 1. Create Account
+      // Create Account (without auto-login)
       await signup(formData.email, formData.password, formData.name);
 
-      // 2. Auto-login
-      const user = await login(formData.email, formData.password);
-      setUser(user);
-      navigate("/");
+      // Show success message and redirect to login
+      // Pass email as state so login page can pre-fill it
+      navigate("/login", { 
+        state: { 
+          email: formData.email,
+          message: "Account created successfully! Please sign in to continue." 
+        } 
+      });
     } catch (err) {
       console.error("Signup Error:", err);
       if (err.code === 409) {
         setError("An account with this email already exists.");
       } else if (err.message?.toLowerCase().includes("rate limit")) {
         setError("Too many attempts. Please wait a moment.");
+      } else if (err.message?.toLowerCase().includes("prohibited") || err.message?.toLowerCase().includes("session")) {
+        // Handle Appwrite's "creation is prohibited when session is active" error
+        setError("Please log out first before creating a new account.");
       } else {
         setError(err.message || "Failed to create account. Please try again.");
       }
@@ -177,16 +184,22 @@ export default function SignupForm() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center px-4 py-2.5 border border-border rounded-xl hover:bg-secondary/50 transition font-medium text-muted-foreground text-sm gap-2">
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
-              Google
-            </button>
-            <button className="flex items-center justify-center px-4 py-2.5 border border-border rounded-xl hover:bg-secondary/50 transition font-medium text-muted-foreground text-sm gap-2">
-              <img src="https://www.svgrepo.com/show/448224/facebook.svg" alt="Facebook" className="w-5 h-5" />
-              Facebook
-            </button>
-          </div>
+          <button
+            onClick={async () => {
+              try {
+                await loginWithGoogle();
+                // After successful OAuth, Appwrite will redirect to successRedirect
+                // The user will be automatically logged in
+              } catch (err) {
+                console.error("Google signup error:", err);
+                setError("Failed to sign up with Google. Please try again.");
+              }
+            }}
+            className="w-full flex items-center justify-center px-4 py-2.5 border border-border rounded-xl hover:bg-secondary/50 transition font-medium text-muted-foreground text-sm gap-2"
+          >
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5" />
+            Continue with Google
+          </button>
 
           <div className="text-center mt-6">
             <p className="text-muted-foreground text-sm">
