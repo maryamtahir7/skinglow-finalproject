@@ -8,9 +8,7 @@ import AdminProducts from "./pages/admin/allproducts";
 import AdminPage from "./pages/admin/adminpage";
 import OrdersPage from "./pages/admin/OrdersPage";
 import ReportsPage from "./pages/admin/ReportsPage";
-import StocksPage from "./pages/admin/StocksPage";// ✅ fixed casing
-import AdminLabTests from "./pages/admin/AdminLabTests";
-import AdminPrescriptions from "./pages/admin/AdminPrescriptions";
+import StocksPage from "./pages/admin/StocksPage";
 import Homepage from "./pages/homepage";
 import ProductsPage from "./pages/products";
 import ProductDetailPage from "./pages/productdetail";
@@ -25,8 +23,6 @@ import Categories from "./pages/admin/categories";
 import UserOrdersPage from "./pages/UserOrdersPage"; // ✅ user orders page
 import UserProfilePage from "./pages/UserProfilePage";
 import AIChat from "./pages/AIChat";
-import LabTests from "./pages/LabTests";
-import UploadPrescription from "./pages/UploadPrescription";
 import ContactPage from "./pages/Contact";
 import BlogPage from "./pages/BlogPage";
 
@@ -60,8 +56,6 @@ function App() {
 
           {/* ✅ AI Chat route */}
           <Route path="/ai-chat" element={<AIChat />} />
-          <Route path="/lab-tests" element={<LabTests />} />
-          <Route path="/upload-prescription" element={<UploadPrescription />} />
           <Route path="/skin-quiz" element={<SkinQuiz />} />
           <Route path="/routine" element={<RoutinePage />} />
           <Route path="/blog" element={<BlogPage />} />
@@ -76,8 +70,6 @@ function App() {
             <Route path="categories" element={<Categories />} />
             <Route path="reviews" element={<AdminReviews />} />
             <Route path="orders" element={<OrdersPage />} />
-            <Route path="lab-tests" element={<AdminLabTests />} />
-            <Route path="prescriptions" element={<AdminPrescriptions />} />
             <Route path="reports" element={<ReportsPage />} />
             <Route path="stock" element={<StocksPage />} />
           </Route>
