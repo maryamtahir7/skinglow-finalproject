@@ -27,6 +27,8 @@ import ContactPage from "./pages/Contact";
 
 import BlogPage from "./pages/BlogPage";
 import ConcernPage from "./pages/ConcernPage"; // New Page
+import TermsPage from "./pages/TermsPage";
+import LicensePage from "./pages/LicensePage";
 
 import AdminReviews from "./pages/admin/reviews";
 import SkinQuiz from "./pages/SkinQuiz";
@@ -50,6 +52,8 @@ function App() {
           <Route path="/signup" element={<SignupForm />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/privacy-policy" element={<PolicyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/license" element={<LicensePage />} />
           <Route path="/contact" element={<ContactPage />} />  {/* Contact page route */}
 
           {/* User Profile & Orders */}

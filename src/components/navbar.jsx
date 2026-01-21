@@ -282,6 +282,10 @@ export default function Navbar() {
               <NavItem key={item} item={item} isMobile={true} />
             ))}
 
+            <div className="px-3 mt-2">
+              <InstallPWAButton className="w-full justify-center bg-slate-50 border-slate-200 text-slate-700 hover:bg-primary hover:text-white" />
+            </div>
+
             <hr className="my-4 border-slate-100" />
 
             {/* Mobile User Actions */}
@@ -342,7 +346,7 @@ export default function Navbar() {
           {/* Mobile Footer */}
           <div className="p-6 bg-slate-50 border-t border-slate-100">
             <p className="text-xs text-slate-400 text-center">
-              SkinGlow &copy; 2024
+              SkinGlow &copy; 2026
             </p>
           </div>
         </div>
