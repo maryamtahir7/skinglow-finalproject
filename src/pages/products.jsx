@@ -24,7 +24,7 @@ function Products() {
   const [searchParams] = useSearchParams();
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get("category") || "all");
   const [selectedConcern, setSelectedConcern] = useState(searchParams.get("concern") || "all");
-  
+
   // Reset to "all" if selected category doesn't exist in products
   useEffect(() => {
     if (selectedCategory !== "all" && products.length > 0) {
@@ -34,29 +34,29 @@ function Products() {
           return cat;
         }).filter(Boolean)
       );
-      
+
       // Also create base forms (remove 's' for plural matching)
       const availableBases = new Set(
         Array.from(availableCategories).map(cat => cat.replace(/s$/, ""))
       );
-      
+
       const selectedCatLower = selectedCategory.toLowerCase().trim();
       const selectedBase = selectedCatLower.replace(/s$/, "");
-      
+
       // Check if category exists (exact or base form)
-      const categoryExists = availableCategories.has(selectedCatLower) || 
-                            availableBases.has(selectedBase) ||
-                            Array.from(availableCategories).some(cat => 
-                              cat.includes(selectedCatLower) || selectedCatLower.includes(cat)
-                            );
-      
+      const categoryExists = availableCategories.has(selectedCatLower) ||
+        availableBases.has(selectedBase) ||
+        Array.from(availableCategories).some(cat =>
+          cat.includes(selectedCatLower) || selectedCatLower.includes(cat)
+        );
+
       if (selectedCatLower && !categoryExists) {
         console.warn(`⚠️ Category "${selectedCategory}" not found in products. Available: ${Array.from(availableCategories).join(", ")}. Resetting to "all".`);
         setSelectedCategory("all");
       }
     }
   }, [products]); // Only depend on products, not selectedCategory to avoid loops
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(searchParams.get("search") || "");
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("name-asc");
@@ -71,7 +71,7 @@ function Products() {
         console.log(`✅ Fetched ${productsList.length} products from database`);
         console.log(`📊 Total products in response: ${prodData.total || productsList.length}`);
         console.log("Sample products:", productsList.slice(0, 3).map(p => ({ name: p.name, category: p.category })));
-        
+
         // Log all unique categories found in products
         const allCategories = [...new Set(productsList.map(p => {
           if (typeof p.category === "string") return p.category;
@@ -86,9 +86,9 @@ function Products() {
           }).length;
           return `${cat}: ${count} products`;
         }));
-        
+
         setProducts(productsList);
-        
+
         const catData = await getCategories();
         const categoriesList = catData.documents || [];
         console.log(`✅ Fetched ${categoriesList.length} categories from database`);
@@ -122,13 +122,13 @@ function Products() {
     if (!products || products.length === 0) {
       return [];
     }
-    
+
     return products.filter((product) => {
       // Skip products without a name (invalid products)
       if (!product || !product.name) {
         return false;
       }
-      
+
       // Handle category matching - check if category exists and matches (case-insensitive)
       // Category might be stored as string or object with name property
       let productCategory = "";
@@ -141,36 +141,36 @@ function Products() {
           productCategory = String(product.category).trim();
         }
       }
-      
+
       const selectedCat = selectedCategory === "all" ? "all" : String(selectedCategory).trim();
-      
+
       // More flexible category matching - handles singular/plural differences
       let matchCategory = selectedCat === "all";
       if (!matchCategory && productCategory) {
         const productCatLower = productCategory.toLowerCase().trim();
         const selectedCatLower = selectedCat.toLowerCase().trim();
-        
+
         // Normalize both to handle common variations
         const normalizeCategory = (cat) => cat.replace(/\s+/g, "").replace(/s$/, "");
         const productNormalized = normalizeCategory(productCatLower);
         const selectedNormalized = normalizeCategory(selectedCatLower);
-        
+
         // Multiple matching strategies:
         // 1. Exact match (case-insensitive)
         // 2. Normalized match (handles plural/singular, spaces)
         // 3. Contains match (handles partial matches)
-        matchCategory = 
-          productCatLower === selectedCatLower || 
+        matchCategory =
+          productCatLower === selectedCatLower ||
           productNormalized === selectedNormalized ||
           productCatLower.includes(selectedCatLower) ||
           selectedCatLower.includes(productCatLower) ||
           productNormalized.includes(selectedNormalized) ||
           selectedNormalized.includes(productNormalized);
       }
-      
+
       // Search filter - show all if search is empty
       const matchSearch = !search || (product.name && product.name.toLowerCase().includes(search.toLowerCase()));
-      
+
       // Basic simulation for concern filtering based on name/description if data missing
       const matchConcern = selectedConcern === "all" ||
         (product.description && product.description.toLowerCase().includes(selectedConcern.toLowerCase())) ||
@@ -179,7 +179,7 @@ function Products() {
       return matchCategory && matchSearch && matchConcern;
     });
   }, [products, selectedCategory, search, selectedConcern]);
-  
+
   // Debug logging for category filtering
   useEffect(() => {
     if (selectedCategory !== "all" && products.length > 0) {
@@ -188,27 +188,27 @@ function Products() {
         const cat = typeof p.category === "string" ? p.category : (p.category?.name || "");
         return cat;
       }).filter(Boolean))];
-      
+
       console.log(`🔍 Filtering for category "${selectedCategory}":`);
       console.log(`   Total products: ${products.length}`);
       console.log(`   All categories in products:`, allProductCategories);
       console.log(`   Filtered products: ${filteredProducts.length}`);
-      
+
       // Show products that should match
       const matchingProducts = products.filter(p => {
         const cat = typeof p.category === "string" ? p.category : (p.category?.name || "");
         const catLower = cat.toLowerCase().trim();
         const selectedLower = selectedCategory.toLowerCase().trim();
-        return catLower === selectedLower || 
-               catLower.replace(/s$/, "") === selectedLower.replace(/s$/, "") ||
-               catLower.includes(selectedLower) ||
-               selectedLower.includes(catLower);
+        return catLower === selectedLower ||
+          catLower.replace(/s$/, "") === selectedLower.replace(/s$/, "") ||
+          catLower.includes(selectedLower) ||
+          selectedLower.includes(catLower);
       });
-      
+
       console.log(`   Products matching "${selectedCategory}":`, matchingProducts.length);
       if (matchingProducts.length > 0) {
-        console.log(`   Sample matching products:`, matchingProducts.slice(0, 3).map(p => ({ 
-          name: p.name, 
+        console.log(`   Sample matching products:`, matchingProducts.slice(0, 3).map(p => ({
+          name: p.name,
           category: p.category,
           categoryType: typeof p.category
         })));
@@ -268,11 +268,10 @@ function Products() {
             <div className="space-y-2">
               <button
                 onClick={() => setSelectedCategory("all")}
-                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center gap-3 ${
-                  selectedCategory === "all"
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center gap-3 ${selectedCategory === "all"
                     ? "bg-primary text-white shadow-md"
                     : "text-muted-foreground hover:bg-secondary"
-                }`}
+                  }`}
               >
                 <div className="w-9 h-9 rounded-full bg-secondary/40 flex items-center justify-center overflow-hidden border border-border/60">
                   <span className="text-[11px] font-bold uppercase tracking-wide">
@@ -288,49 +287,49 @@ function Products() {
                   const pCat = typeof p.category === "string" ? p.category : (p.category?.name || "");
                   const catLower = categoryName.toLowerCase();
                   const pCatLower = pCat.toLowerCase();
-                  return pCatLower === catLower || 
-                         pCatLower.replace(/s$/, "") === catLower.replace(/s$/, "") ||
-                         pCatLower.includes(catLower) ||
-                         catLower.includes(pCatLower);
+                  return pCatLower === catLower ||
+                    pCatLower.replace(/s$/, "") === catLower.replace(/s$/, "") ||
+                    pCatLower.includes(catLower) ||
+                    catLower.includes(pCatLower);
                 }).length;
-                
+
                 return (
-                <button
-                  key={cat.$id || cat}
-                  onClick={() => {
-                    console.log(`📌 Selected category: "${categoryName}"`);
-                    setSelectedCategory(categoryName);
-                  }}
-                  className={`w-full text-left p-2 rounded-xl text-sm font-medium transition-all flex items-center gap-3 ${
-                    selectedCategory === categoryName
-                      ? "bg-primary text-white shadow-md"
-                      : "text-muted-foreground hover:bg-secondary"
-                  }`}
-                >
-                  <div className="w-9 h-9 rounded-full bg-secondary/40 flex items-center justify-center overflow-hidden border border-border/60 flex-shrink-0">
-                    {cat.imageUrl ? (
-                      <img
-                        src={cat.imageUrl}
-                        alt={categoryName}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <span className="text-[11px] font-bold uppercase tracking-wide">
-                        {categoryName?.charAt(0) || "?"}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <span className="truncate block">{categoryName}</span>
-                    {productCount > 0 && (
-                      <span className="text-xs opacity-70">({productCount})</span>
-                    )}
-                  </div>
-                </button>
-              )})}
+                  <button
+                    key={cat.$id || cat}
+                    onClick={() => {
+                      console.log(`📌 Selected category: "${categoryName}"`);
+                      setSelectedCategory(categoryName);
+                    }}
+                    className={`w-full text-left p-2 rounded-xl text-sm font-medium transition-all flex items-center gap-3 ${selectedCategory === categoryName
+                        ? "bg-primary text-white shadow-md"
+                        : "text-muted-foreground hover:bg-secondary"
+                      }`}
+                  >
+                    <div className="w-9 h-9 rounded-full bg-secondary/40 flex items-center justify-center overflow-hidden border border-border/60 flex-shrink-0">
+                      {cat.imageUrl ? (
+                        <img
+                          src={cat.imageUrl}
+                          alt={categoryName}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.target.style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <span className="text-[11px] font-bold uppercase tracking-wide">
+                          {categoryName?.charAt(0) || "?"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <span className="truncate block">{categoryName}</span>
+                      {productCount > 0 && (
+                        <span className="text-xs opacity-70">({productCount})</span>
+                      )}
+                    </div>
+                  </button>
+                )
+              })}
             </div>
           </div>
 
@@ -444,14 +443,44 @@ function Products() {
 
                     {viewMode === 'grid' && (
                       <div className="flex items-center justify-between mt-3">
-                        <span className="font-bold text-lg">Rs. {product.price}</span>
+                        {(() => {
+                          const numericPrice = parseInt(String(product.price || 0).replace(/,/g, ""), 10) || 0;
+                          const cutPrice = numericPrice ? Math.round(numericPrice * 0.9) : 0;
+                          return (
+                            <div className="flex flex-col">
+                              <span className="font-bold text-lg text-primary">
+                                Rs. {numericPrice.toLocaleString()}
+                              </span>
+                              {cutPrice > 0 && (
+                                <span className="text-xs text-muted-foreground line-through">
+                                  Rs. {cutPrice.toLocaleString()}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                   </div>
 
                   {viewMode === 'list' && (
                     <div className="text-right flex-shrink-0">
-                      <div className="font-bold text-xl mb-2">Rs. {product.price}</div>
+                      {(() => {
+                        const numericPrice = parseInt(String(product.price || 0).replace(/,/g, ""), 10) || 0;
+                        const cutPrice = numericPrice ? Math.round(numericPrice * 0.9) : 0;
+                        return (
+                          <div className="flex flex-col items-end mb-2">
+                            <span className="font-bold text-xl text-primary">
+                              Rs. {numericPrice.toLocaleString()}
+                            </span>
+                            {cutPrice > 0 && (
+                              <span className="text-xs text-muted-foreground line-through">
+                                Rs. {cutPrice.toLocaleString()}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })()}
                       <Button onClick={() => handleAddToCart(product)} className="bg-primary hover:bg-primary/90 text-white rounded-lg">
                         Add to Bag
                       </Button>
@@ -467,7 +496,7 @@ function Products() {
               </div>
               <h3 className="text-lg font-bold mb-2">No matches found</h3>
               <p className="text-muted-foreground mb-4">
-                {products.length === 0 
+                {products.length === 0
                   ? `No products found in database.`
                   : `We couldn't find any products matching your filters. Total products: ${products.length}`
                 }

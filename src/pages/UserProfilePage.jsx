@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User as UserIcon, Mail, Phone, Calendar, MapPin } from "lucide-react";
+import { User as UserIcon, Mail, Phone, Calendar, MapPin, Sparkles } from "lucide-react";
 
 export default function UserProfilePage() {
   const navigate = useNavigate();
@@ -105,6 +105,13 @@ export default function UserProfilePage() {
               <CardTitle className="text-base">Quick Links</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
+              <Button
+                variant="default"
+                className="w-full justify-start gap-2 bg-primary text-white hover:bg-primary/90"
+                onClick={() => navigate("/ai-chat")}
+              >
+                <Sparkles className="w-4 h-4" /> AI Skin Expert
+              </Button>
               <Button
                 variant="outline"
                 className="w-full justify-start gap-2"

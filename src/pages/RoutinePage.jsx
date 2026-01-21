@@ -1,79 +1,262 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Sun, Moon, ArrowRight, Sparkles } from "lucide-react";
+import { Sun, Moon, ArrowRight, Sparkles, CheckCircle2, Circle, ShoppingBag, Info, RefreshCw } from "lucide-react";
+import { getProducts, addToCart } from "../backend/database";
+import { useUser } from "../context/UserContext";
 
 function RoutinePage() {
     const navigate = useNavigate();
+    const { user } = useUser();
+
+    // State
+    const [activeRoutine, setActiveRoutine] = useState('AM');
+    const [completedSteps, setCompletedSteps] = useState({});
+    const [products, setProducts] = useState([]);
+    const [recommendations, setRecommendations] = useState({});
+    const [loading, setLoading] = useState(true);
+
+    // Initialize based on time of day
+    useEffect(() => {
+        const hour = new Date().getHours();
+        const initialRoutine = (hour >= 5 && hour < 18) ? 'AM' : 'PM';
+        setActiveRoutine(initialRoutine);
+
+        // Load saved progress
+        const saved = localStorage.getItem('skinglow_routine_progress');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // Reset if it's a new day (simple check)
+            const lastDate = localStorage.getItem('skinglow_routine_date');
+            const today = new Date().toDateString();
+            if (lastDate !== today) {
+                setCompletedSteps({});
+                localStorage.setItem('skinglow_routine_date', today);
+            } else {
+                setCompletedSteps(parsed);
+            }
+        }
+    }, []);
+
+    // Save progress
+    useEffect(() => {
+        localStorage.setItem('skinglow_routine_progress', JSON.stringify(completedSteps));
+    }, [completedSteps]);
+
+    // Fetch products
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const res = await getProducts();
+                if (res.documents) {
+                    setProducts(res.documents);
+                }
+            } catch (error) {
+                console.error("Failed to fetch products for routine suggestions", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        fetchData();
+    }, []);
 
     const stepsAM = [
-        { title: "Cleanser", desc: "Remove overnight impurities.", icon: Sparkles },
-        { title: "Vitamin C", desc: "Brighten and protect.", icon: Sun },
-        { title: "Moisturizer", desc: "Hydrate and prep.", icon: Sparkles },
-        { title: "SPF", desc: "Protect from UV rays.", icon: Sun },
+        { id: 'am_1', title: "Cleanser", desc: "Remove overnight impurities.", type: "Cleanser" },
+        { id: 'am_2', title: "Toner", desc: "Balance pH and prep.", type: "Toner" },
+        { id: 'am_3', title: "Vitamin C", desc: "Brighten and protect.", type: "Serum" },
+        { id: 'am_4', title: "Moisturizer", desc: "Hydrate for the day.", type: "Moisturizer" },
+        { id: 'am_5', title: "SPF", desc: "Protect from UV rays.", type: "Sunscreen" },
     ];
 
     const stepsPM = [
-        { title: "Double Cleanse", desc: "Remove makeup and SPF.", icon: Sparkles },
-        { title: "Treatment", desc: "Retinol or Acids.", icon: Moon },
-        { title: "Moisturizer", desc: "Lock in hydration.", icon: Sparkles },
-        { title: "Oil", desc: "Seal it all in.", icon: Moon },
+        { id: 'pm_1', title: "Double Cleanse", desc: "Remove makeup and SPF.", type: "Cleanser" },
+        { id: 'pm_2', title: "Exfoliate/Treat", desc: "Target specific concerns.", type: "Treatment" },
+        { id: 'pm_3', title: "Serums", desc: "Deep nourishment.", type: "Serum" },
+        { id: 'pm_4', title: "Moisturizer", desc: "Lock in hydration.", type: "Moisturizer" },
+        { id: 'pm_5', title: "Face Oil", desc: "Seal with overnight repair.", type: "Oil" },
     ];
 
+    const currentSteps = activeRoutine === 'AM' ? stepsAM : stepsPM;
+
+    // Calculate progress
+    const amProgress = stepsAM.filter(s => completedSteps[s.id]).length / stepsAM.length * 100;
+    const pmProgress = stepsPM.filter(s => completedSteps[s.id]).length / stepsPM.length * 100;
+
+    const toggleStep = (id) => {
+        setCompletedSteps(prev => ({
+            ...prev,
+            [id]: !prev[id]
+        }));
+    };
+
+    const getRecommendedProduct = (type) => {
+        if (!products.length) return null;
+
+        // Simple matching logic - in a real app this would be smarter
+        // or personalized based on the user's skin quiz results
+        const matches = products.filter(p => {
+            const cat = (typeof p.category === 'string' ? p.category : p.category?.name || "").toLowerCase();
+            const typeLower = type.toLowerCase();
+            return cat.includes(typeLower) ||
+                (typeLower === 'treatment' && (cat.includes('serum') || cat.includes('acid'))) ||
+                (typeLower === 'oil' && cat.includes('oil'));
+        });
+
+        if (!matches.length) return null;
+        // Return random match to vary it up, or first one
+        return matches[0];
+    };
+
+    const handleAddToCart = async (product) => {
+        if (!user) {
+            navigate("/login");
+            return;
+        }
+        try {
+            await addToCart(user.$id, product, 1);
+            alert(`Added ${product.name} to cart`);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
     return (
-        <div className="min-h-screen bg-background font-sans text-foreground">
-            <div className="max-w-4xl mx-auto px-6 py-16">
-                <div className="text-center mb-16 space-y-4">
-                    <h1 className="text-4xl md:text-5xl font-bold">The Art of the Routine</h1>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                        Consistency is key. Discover the perfect AM and PM rituals for your skin type.
-                    </p>
-                    <Button onClick={() => navigate('/skin-quiz')} className="bg-primary text-white rounded-full px-8 py-6 text-lg font-bold shadow-xl hover:scale-105 transition-transform">
-                        Build My Personalized Routine
-                    </Button>
+        <div className="min-h-screen bg-slate-50 font-sans text-slate-800 pb-20">
+            {/* Hero Section */}
+            <div className={`relative overflow-hidden transition-colors duration-700 ${activeRoutine === 'AM' ? 'bg-orange-50/80' : 'bg-slate-900 text-white'}`}>
+                <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
+                    {activeRoutine === 'AM'
+                        ? <Sun className="w-64 h-64 text-orange-400 rotate-12" />
+                        : <Moon className="w-64 h-64 text-indigo-400 -rotate-12" />
+                    }
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-12">
-                    {/* AM Routine */}
-                    <div className="bg-card border border-border rounded-3xl p-8 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10">
-                            <Sun className="w-32 h-32 text-amber-500" />
+                <div className="max-w-4xl mx-auto px-6 py-20 relative z-10 text-center">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sm font-bold mb-6">
+                        <Sparkles className="w-4 h-4" /> Daily Skincare Tracker
+                    </div>
+                    <h1 className="text-4xl md:text-6xl font-bold mb-6 transition-all duration-500">
+                        Good {activeRoutine === 'AM' ? 'Morning' : 'Evening'}, {user ? user.name.split(' ')[0] : 'Beautiful'}
+                    </h1>
+                    <p className={`text-xl max-w-2xl mx-auto mb-10 ${activeRoutine === 'AM' ? 'text-slate-600' : 'text-slate-300'}`}>
+                        {activeRoutine === 'AM'
+                            ? "Ready to protect and brighten your skin for the day ahead?"
+                            : "Time to unwind, repair, and prepare for a restful sleep."}
+                    </p>
+
+                    {/* Toggle Switch */}
+                    <div className="inline-flex bg-white/20 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-lg relative">
+                        <div
+                            className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-white rounded-full shadow-md transition-all duration-300 ease-spring ${activeRoutine === 'PM' ? 'translate-x-full left-1.5' : 'left-1.5'}`}
+                        />
+                        <button
+                            onClick={() => setActiveRoutine('AM')}
+                            className={`relative z-10 px-8 py-3 rounded-full font-bold text-sm flex items-center gap-2 transition-colors ${activeRoutine === 'AM' ? (activeRoutine === 'AM' ? 'text-slate-800' : 'text-slate-900') : 'text-white/70 hover:text-white'}`}
+                        >
+                            <Sun className="w-4 h-4" /> AM Routine
+                        </button>
+                        <button
+                            onClick={() => setActiveRoutine('PM')}
+                            className={`relative z-10 px-8 py-3 rounded-full font-bold text-sm flex items-center gap-2 transition-colors ${activeRoutine === 'PM' ? 'text-slate-900' : (activeRoutine === 'AM' ? 'text-slate-600 hover:text-slate-900' : 'text-white/70')}`}
+                        >
+                            <Moon className="w-4 h-4" /> PM Routine
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Progress Bar Container */}
+            <div className="sticky top-[73px] z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-3 shadow-sm">
+                <div className="max-w-3xl mx-auto flex items-center gap-4">
+                    <div className="flex-1">
+                        <div className="flex justify-between text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">
+                            <span>Todays Progress</span>
+                            <span>{Math.round((amProgress + pmProgress) / 2)}% Completed</span>
                         </div>
-                        <h2 className="text-2xl font-bold mb-8 flex items-center gap-3">
-                            <Sun className="w-6 h-6 text-amber-500" /> Morning Ritual
-                        </h2>
-                        <div className="space-y-6 relative z-10">
-                            {stepsAM.map((step, i) => (
-                                <div key={i} className="flex items-center gap-4 group cursor-pointer hover:bg-secondary/40 p-2 rounded-xl transition-colors">
-                                    <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center font-bold text-primary text-sm">{i + 1}</div>
-                                    <div>
-                                        <h3 className="font-bold">{step.title}</h3>
-                                        <p className="text-sm text-muted-foreground">{step.desc}</p>
-                                    </div>
-                                </div>
-                            ))}
+                        <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="h-full bg-primary transition-all duration-500" style={{ width: `${(amProgress + pmProgress) / 2}%` }} />
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    {/* PM Routine */}
-                    <div className="bg-slate-900 text-white border border-slate-800 rounded-3xl p-8 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10">
-                            <Moon className="w-32 h-32 text-indigo-400" />
-                        </div>
-                        <h2 className="text-2xl font-bold mb-8 flex items-center gap-3 text-white">
-                            <Moon className="w-6 h-6 text-indigo-400" /> Evening Ritual
-                        </h2>
-                        <div className="space-y-6 relative z-10">
-                            {stepsPM.map((step, i) => (
-                                <div key={i} className="flex items-center gap-4 group cursor-pointer hover:bg-white/5 p-2 rounded-xl transition-colors">
-                                    <div className="w-8 h-8 rounded-full bg-indigo-500/20 flex items-center justify-center font-bold text-indigo-300 text-sm">{i + 1}</div>
-                                    <div>
-                                        <h3 className="font-bold">{step.title}</h3>
-                                        <p className="text-sm text-slate-400">{step.desc}</p>
+            <div className="max-w-3xl mx-auto px-6 py-12">
+                <div className="space-y-8">
+                    {currentSteps.map((step, index) => {
+                        const isCompleted = completedSteps[step.id];
+                        const recommendedProduct = getRecommendedProduct(step.type);
+
+                        return (
+                            <div
+                                key={step.id}
+                                className={`group relative bg-white border border-slate-100 rounded-2xl p-6 shadow-sm transition-all duration-300 ${isCompleted ? 'opacity-70 bg-slate-50' : 'hover:shadow-md hover:border-primary/30'}`}
+                            >
+                                {/* Connector Line */}
+                                {index !== currentSteps.length - 1 && (
+                                    <div className="absolute left-9 bottom-0 top-20 w-px bg-slate-100 -z-10 group-hover:bg-primary/10 transition-colors" />
+                                )}
+
+                                <div className="flex gap-6 items-start">
+                                    {/* Checkbox */}
+                                    <button
+                                        onClick={() => toggleStep(step.id)}
+                                        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isCompleted ? 'bg-green-500 text-white scale-110' : 'bg-white border-2 border-slate-200 text-slate-300 hover:border-primary hover:text-primary'}`}
+                                    >
+                                        {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
+                                    </button>
+
+                                    {/* Content */}
+                                    <div className="flex-1">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                                            <h3 className={`text-xl font-bold transition-colors ${isCompleted ? 'text-slate-500 line-through' : 'text-slate-800'}`}>
+                                                {step.title}
+                                            </h3>
+                                            <span className="text-xs font-semibold px-2 py-1 bg-slate-100 text-slate-500 rounded-md w-fit">
+                                                Step {index + 1}
+                                            </span>
+                                        </div>
+                                        <p className="text-slate-500 mb-4">{step.desc}</p>
+
+                                        {/* Product Recommendation Card */}
+                                        {!isCompleted && recommendedProduct && (
+                                            <div className="mt-4 bg-slate-50/80 border border-slate-100 rounded-xl p-3 flex items-center gap-4 animate-in slide-in-from-top-2 fade-in">
+                                                <div className="w-12 h-12 bg-white rounded-lg border border-slate-100 p-1 flex-shrink-0">
+                                                    <img
+                                                        src={recommendedProduct.imageUrl || "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=100"}
+                                                        alt={recommendedProduct.name}
+                                                        className="w-full h-full object-contain"
+                                                    />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="text-[10px] font-bold text-primary uppercase leading-tight">Recommended</div>
+                                                    <div className="font-medium text-sm text-slate-900 truncate">{recommendedProduct.name}</div>
+                                                </div>
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="h-8 text-xs bg-white hover:bg-primary hover:text-white transition-colors"
+                                                    onClick={() => handleAddToCart(recommendedProduct)}
+                                                >
+                                                    <ShoppingBag className="w-3 h-3 mr-1.5" /> Add
+                                                </Button>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                <div className="mt-16 text-center">
+                    <div className="bg-primary/5 border border-primary/10 rounded-2xl p-8 max-w-xl mx-auto">
+                        <h3 className="text-lg font-bold text-slate-900 mb-2">Want a fully personalized plan?</h3>
+                        <p className="text-slate-600 mb-6 text-sm">
+                            Take our 2-minute skin analysis to get a routine catered exactly to your skin type and concerns.
+                        </p>
+                        <Button onClick={() => navigate('/skin-quiz')} className="bg-primary text-white rounded-full px-6">
+                            <RefreshCw className="w-4 h-4 mr-2" /> Take Skin Quiz
+                        </Button>
                     </div>
                 </div>
             </div>

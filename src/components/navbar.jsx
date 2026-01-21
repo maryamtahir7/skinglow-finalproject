@@ -4,6 +4,7 @@ import { Heart, ShoppingCart, User as UserIcon, LogOut, LogIn, UserPlus, Menu, X
 import { useUser } from "../context/UserContext";
 import { logout } from "../backend/auth";
 import { getCart, getWishlist } from "../backend/database";
+import InstallPWAButton from "./InstallPWAButton";
 
 export default function Navbar() {
   const { user, setUser } = useUser();
@@ -13,6 +14,20 @@ export default function Navbar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearch = () => {
+    if (searchTerm.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchTerm.trim())}`);
+      setSearchTerm(""); // Optional: clear after search
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
 
   // Skincare-themed nav items
   const navItems = ["Home", "Shop", "Routine", "Concerns", "Quiz", "Journal"];
@@ -44,16 +59,12 @@ export default function Navbar() {
     }
   };
 
-  const handleAIChat = () => {
-    navigate("/ai-chat");
-  };
-
   const NavItem = ({ item, isMobile = false }) => {
     // Map display names to routes
     let route = `/${item.toLowerCase().replace(" ", "-")}`;
     if (item === "Shop") route = "/products";
     if (item === "Routine") route = "/routine"; // page to be created
-    if (item === "Concerns") route = "/products?filter=concern";
+    if (item === "Concerns") route = "/concerns";
     if (item === "Quiz") route = "/skin-quiz";
     if (item === "Journal") route = "/blog";
     if (item === "Home") route = "/";
@@ -94,8 +105,14 @@ export default function Navbar() {
             type="text"
             placeholder="Search for serums, cleansers..."
             className="w-full pl-4 pr-10 py-2.5 rounded-full bg-slate-50 border border-slate-200 focus:border-primary focus:ring-2 focus:ring-secondary outline-none transition-all text-sm"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
-          <button className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary">
+          <button
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary"
+            onClick={handleSearch}
+          >
             <Search className="w-5 h-5" />
           </button>
         </div>
@@ -135,14 +152,8 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* AI Chat Button */}
-          <button
-            onClick={handleAIChat}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-accent-foreground hover:from-primary/90 hover:to-accent-foreground/90 text-white rounded-full font-medium text-sm shadow-md hover:shadow-lg transition-all"
-            title="Ask AI Dermatologist"
-          >
-            <span>Ask AI</span>
-          </button>
+          {/* Install App Button (PWA) */}
+          <InstallPWAButton />
 
           {/* User Menu */}
           <div className="relative">
@@ -212,6 +223,13 @@ export default function Navbar() {
                     >
                       <ShoppingCart className="w-4 h-4 text-primary" /> Cart
                     </Link>
+                    <Link
+                      to="/ai-chat"
+                      className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition text-sm"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      <Sparkles className="w-4 h-4 text-amber-500" /> Ask AI
+                    </Link>
 
                     <button
                       onClick={handleLogout}
@@ -265,16 +283,6 @@ export default function Navbar() {
             ))}
 
             <hr className="my-4 border-slate-100" />
-
-            <button
-              onClick={() => {
-                handleAIChat();
-                setIsMobileMenuOpen(false);
-              }}
-              className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-secondary to-white text-primary rounded-xl font-medium"
-            >
-              <span>🤖 Ask AI Dermatologist</span>
-            </button>
 
             {/* Mobile User Actions */}
             <div className="mt-4 space-y-2">

@@ -24,7 +24,9 @@ import UserOrdersPage from "./pages/UserOrdersPage"; // ✅ user orders page
 import UserProfilePage from "./pages/UserProfilePage";
 import AIChat from "./pages/AIChat";
 import ContactPage from "./pages/Contact";
+
 import BlogPage from "./pages/BlogPage";
+import ConcernPage from "./pages/ConcernPage"; // New Page
 
 import AdminReviews from "./pages/admin/reviews";
 import SkinQuiz from "./pages/SkinQuiz";
@@ -57,6 +59,7 @@ function App() {
           {/* ✅ AI Chat route */}
           <Route path="/ai-chat" element={<AIChat />} />
           <Route path="/skin-quiz" element={<SkinQuiz />} />
+          <Route path="/concerns" element={<ConcernPage />} /> {/* New Route */}
           <Route path="/routine" element={<RoutinePage />} />
           <Route path="/blog" element={<BlogPage />} />
         </Route>

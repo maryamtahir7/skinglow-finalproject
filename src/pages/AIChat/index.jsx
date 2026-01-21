@@ -1,7 +1,7 @@
 // src/pages/AIChat/index.jsx
 import React, { useState, useRef, useEffect } from 'react';
 import './styles.css';
-import { Bot, User, Send, Sparkles, Star, Heart, Smile, CheckCircle } from 'lucide-react';
+import { User, Send, Sparkles } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
 const AIChat = () => {
@@ -82,59 +82,74 @@ const AIChat = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] bg-background py-6 px-4 font-sans">
-      <div className="w-full max-w-4xl bg-card rounded-3xl shadow-2xl overflow-hidden border border-border flex flex-col h-[700px]">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background py-10 px-4 font-sans">
+      <div className="relative w-full max-w-4xl rounded-3xl shadow-xl border border-border bg-card flex flex-col h-[700px] overflow-hidden">
 
         {/* Header */}
-        <div className="bg-primary/10 p-6 flex items-center justify-between border-b border-primary/10">
+        <div className="relative z-10 bg-primary/5 px-6 py-5 flex items-center justify-between border-b border-primary/10">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-rose-200 to-indigo-200 flex items-center justify-center shadow-inner">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shadow-sm">
                 <Sparkles className="w-6 h-6 text-primary" />
               </div>
-              <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+              <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-card rounded-full"></span>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">SkinGlow AI</h1>
-              <p className="text-muted-foreground text-sm flex items-center gap-1">
-                Virtual Esthetician
+              <h1 className="text-xl font-semibold text-foreground tracking-tight">SkinGlow AI</h1>
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Virtual esthetician for your routine
               </p>
             </div>
           </div>
-          <div className="hidden sm:flex gap-2">
-            <span className="text-xs font-medium px-3 py-1 bg-white/50 rounded-full text-foreground border border-black/5">24/7 Support</span>
+          <div className="hidden sm:flex gap-2 items-center">
+            <span className="text-[10px] font-medium px-3 py-1.5 bg-background rounded-full text-foreground border border-border">
+              24/7 glow guidance
+            </span>
           </div>
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto p-6 bg-secondary/20 flex flex-col gap-6 relative">
-          <div className="absolute inset-0 opacity-5 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+        <div className="relative z-10 flex-1 overflow-y-auto px-4 sm:px-6 py-5 flex flex-col gap-5 bg-background">
 
           {messages.map((msg, idx) => (
-            <div key={idx} className={`flex gap-4 relative z-10 ${msg.sender === 'user' ? 'flex-row-reverse' : ''} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${msg.sender === 'user' ? 'bg-primary text-secondary' : 'bg-white text-primary border border-primary/20'}`}>
-                {msg.sender === 'user' ? <User className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
+            <div
+              key={idx}
+              className={`flex gap-3 sm:gap-4 relative z-10 ${
+                msg.sender === 'user' ? 'flex-row-reverse' : ''
+              } animate-in fade-in slide-in-from-bottom-2 duration-300`}
+            >
+              <div
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${
+                  msg.sender === 'user'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-primary border border-border'
+                }`}
+              >
+                {msg.sender === 'user' ? <User className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
               </div>
 
-              <div className={`max-w-[75%] px-6 py-4 rounded-3xl text-sm leading-relaxed shadow-sm ${msg.sender === 'user'
-                ? 'bg-primary text-primary-foreground rounded-tr-none'
-                : 'bg-white text-foreground border border-border rounded-tl-none'
-                }`}>
+              <div
+                className={`max-w-[78%] sm:max-w-[75%] px-4 sm:px-5 py-3.5 rounded-3xl text-[13px] sm:text-sm leading-relaxed shadow-sm ${
+                  msg.sender === 'user'
+                    ? 'bg-primary text-primary-foreground rounded-tr-sm'
+                    : 'bg-muted text-foreground border border-border rounded-tl-sm'
+                }`}
+              >
                 {msg.text}
               </div>
             </div>
           ))}
 
           {loading && (
-            <div className="flex gap-4 relative z-10">
-              <div className="w-10 h-10 rounded-full bg-white border border-primary/20 flex items-center justify-center flex-shrink-0 shadow-sm">
-                <Sparkles className="w-5 h-5 text-primary" />
+            <div className="flex gap-3 sm:gap-4 relative z-10">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-secondary border border-border flex items-center justify-center flex-shrink-0 shadow-sm">
+                <Sparkles className="w-4 h-4 text-primary" />
               </div>
-              <div className="bg-white border border-border px-6 py-4 rounded-3xl rounded-tl-none text-muted-foreground text-sm flex items-center gap-2 shadow-sm">
-                <div className="flex gap-1">
-                  <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                  <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                  <span className="w-2 h-2 bg-primary/40 rounded-full animate-bounce"></span>
+              <div className="bg-muted border border-border px-4 sm:px-5 py-3.5 rounded-3xl rounded-tl-sm text-muted-foreground text-[13px] sm:text-sm flex items-center gap-2 shadow-sm">
+                <div className="flex gap-1.5">
+                  <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                  <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                  <span className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" />
                 </div>
               </div>
             </div>
@@ -143,24 +158,24 @@ const AIChat = () => {
         </div>
 
         {/* Input Area */}
-        <div className="p-6 bg-card border-t border-border">
+        <div className="relative z-10 px-4 sm:px-6 pb-5 pt-4 bg-card border-t border-border">
           {/* Suggested Prompts */}
-          <div className="flex gap-3 overflow-x-auto pb-4 custom-scrollbar mb-2 no-scrollbar">
+          <div className="flex gap-2.5 overflow-x-auto pb-3 custom-scrollbar mb-1.5 no-scrollbar">
             {suggestedPrompts.map((prompt, i) => (
               <button
                 key={i}
                 onClick={() => handleSend(prompt)}
-                className="whitespace-nowrap px-4 py-2 bg-secondary/50 hover:bg-primary/10 border border-border hover:border-primary/30 text-muted-foreground hover:text-primary text-xs font-semibold rounded-full transition-all flex items-center gap-2"
+                className="whitespace-nowrap px-3.5 py-2 bg-secondary hover:bg-secondary/80 border border-border text-[11px] font-semibold rounded-full transition-all flex items-center gap-2 text-foreground"
               >
                 {prompt}
               </button>
             ))}
           </div>
 
-          <div className="flex gap-3 relative">
+          <div className="flex gap-3 relative mt-1">
             <input
-              className="flex-1 bg-secondary/20 border border-border text-foreground text-sm rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary block w-full p-4 pl-6 outline-none transition-all placeholder:text-muted-foreground"
-              placeholder="Ask for a routine recommendation..."
+              className="flex-1 bg-background border border-border text-foreground text-sm rounded-2xl focus:ring-2 focus:ring-primary/30 focus:border-primary block w-full py-3.5 px-4 sm:px-5 outline-none transition-all placeholder:text-muted-foreground"
+              placeholder="Ask for a glow routine, ingredient advice, or product match..."
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
@@ -168,13 +183,13 @@ const AIChat = () => {
             <Button
               onClick={() => handleSend()}
               disabled={!input.trim()}
-              className="bg-primary hover:bg-primary/90 h-[54px] w-[54px] rounded-2xl shadow-lg shadow-primary/20 p-0 flex items-center justify-center transition-all hover:scale-105 active:scale-95"
+              className="h-[52px] w-[52px] rounded-2xl p-0 flex items-center justify-center transition-all hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Send className="w-5 h-5 text-primary-foreground ml-0.5" />
             </Button>
           </div>
-          <p className="text-center text-[10px] text-muted-foreground mt-4 flex items-center justify-center gap-1">
-            <Sparkles className="w-3 h-3" /> Expert advice powered by SkinGlow Intelligence
+          <p className="text-center text-[10px] text-muted-foreground mt-3 flex items-center justify-center gap-1.5">
+            <Sparkles className="w-3 h-3 text-primary" /> Expert guidance powered by SkinGlow Intelligence
           </p>
         </div>
       </div>

@@ -52,7 +52,7 @@ function Homepage() {
 
         const productsList = prodData.documents || [];
         console.log(`✅ Homepage: Fetched ${productsList.length} products`);
-        
+
         // Filter or just take first few for now
         setProducts(productsList.slice(0, 4));
         setCategories(catData.documents || []);
@@ -68,26 +68,26 @@ function Homepage() {
 
   const heroSlides = [
     {
-      image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=1920&q=80',
-      title: 'Natural & Organic',
+      image: 'https://i.pinimg.com/736x/93/71/8c/93718c4fee2260ae11240d9030afec2c.jpg',
+      title: <>Natural & <span className="font-light italic text-rose-200/90 font-serif">Organic</span></>,
       subtitle: 'Premium Skincare Collection',
       text: 'Transform your skin with nature\'s finest ingredients'
     },
     {
       image: 'https://theindustry.beauty/wp-content/uploads/2023/01/Pacifica.jpg',
-      title: 'Glowing Skin',
+      title: <>Glowing <span className="font-light italic text-rose-200/90 font-serif">Skin</span></>,
       subtitle: 'Your Journey Starts Here',
       text: 'Discover products that make a real difference'
     },
     {
-      image: 'https://www.pacificabeauty.com/cdn/shop/files/FUTUREYOUTHGROUPCLOUDS_FLARE_1800x.jpg?v=1692891857',
-      title: 'Clean Beauty',
+      image: 'https://i.pinimg.com/1200x/83/af/ca/83afcaddd4e79b05cb4348340fead68c.jpg',
+      title: <>Clean <span className="font-light italic text-rose-200/90 font-serif">Beauty</span></>,
       subtitle: 'Ethically Sourced',
       text: 'Pure ingredients for radiant, healthy skin'
     },
     {
       image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=1920&q=80',
-      title: 'Radiant You',
+      title: <>Radiant <span className="font-light italic text-rose-200/90 font-serif">You</span></>,
       subtitle: 'Best Skincare Experience',
       text: 'Experience the luxury of premium organic skincare'
     },
@@ -129,119 +129,112 @@ function Homepage() {
   return (
     <div className="min-h-screen bg-background font-sans text-foreground">
 
-      {/* HERO SLIDESHOW */}
-      <section className="relative h-[85vh] w-full overflow-hidden bg-gradient-to-b from-rose-50 via-background to-background">
+      {/* HERO SLIDESHOW - ULTIMATE PREMIUIM */}
+      <section className="relative h-screen w-full overflow-hidden bg-black font-sans">
         {heroSlides.map((slide, index) => (
           <div
-            key={slide.title}
-            className={`absolute inset-0 transition-opacity duration-700 ease-out transform ${
-              index === currentSlide
-                ? "opacity-100 z-10 scale-100"
-                : "opacity-0 z-0 scale-105"
-            }`}
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-[2000ms] ease-in-out ${index === currentSlide
+              ? "opacity-100 z-10"
+              : "opacity-0 z-0"
+              }`}
           >
+            {/* Ken Burns Effect Image */}
             <img
               src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover opacity-90"
+              alt="Hero"
+              className={`w-full h-full object-cover ${index === currentSlide ? 'animate-ken-burns' : ''}`}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-rose-100/80 via-background/60 to-transparent mix-blend-soft-light" />
-            <div className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 bg-primary/15 rounded-full blur-3xl hero-orb" />
-            <div className="pointer-events-none absolute bottom-[-5rem] left-[-3rem] w-64 h-64 bg-rose-300/25 rounded-full blur-3xl hero-orb hero-orb--reverse" />
+
+            {/* Cinematic Noise Overlay */}
+            <div className="absolute inset-0 z-[1] animate-noise pointer-events-none" />
+
+            {/* Vignette & Gradients */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/60 z-[2]" />
+            <div className="absolute inset-0 bg-black/20 mix-blend-overlay z-[2]" />
           </div>
         ))}
 
         {/* Slide content + controls */}
-        <div className="relative z-20 h-full max-w-7xl mx-auto px-6 flex items-center justify-between">
-          {/* Text card */}
-          <div className="max-w-xl md:max-w-2xl">
-            <div className="rounded-[30px] p-[1.5px] bg-gradient-to-br from-primary/80 via-rose-300/80 to-sky-300/80 shadow-[0_30px_80px_rgba(15,23,42,0.35)] float-soft">
-              <div className="backdrop-blur-2xl bg-background/80 rounded-[28px] px-6 md:px-10 py-8 md:py-11 border border-white/40">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary font-semibold text-xs md:text-sm tracking-wide uppercase border border-primary/20 mb-4">
-                <Sparkles className="w-4 h-4" /> {heroSlides[currentSlide].subtitle}
-              </div>
+        <div className="relative z-20 h-full w-full flex flex-col items-center justify-center text-center px-6 md:px-12 pt-16">
 
-              <h1 className="text-4xl md:text-6xl font-bold leading-tight text-foreground tracking-tight drop-shadow-[0_10px_40px_rgba(15,23,42,0.6)] mb-4">
+          <div className="max-w-6xl mx-auto space-y-10">
+            {/* Subtitle tag */}
+            <div className="overflow-hidden">
+              <div key={`sub-${currentSlide}`} className="animate-fade-up-blur">
+                <span className="inline-block px-6 py-2 border border-white/20 rounded-full bg-white/5 backdrop-blur-md text-white/90 text-[10px] md:text-sm font-bold uppercase tracking-[0.3em] shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                  {heroSlides[currentSlide].subtitle}
+                </span>
+              </div>
+            </div>
+
+            {/* Main Title - Playfair Display - Massive & Elegant w/ Mixed Typography */}
+            <div key={`title-${currentSlide}`} className="overflow-hidden py-4">
+              <h1 className="text-6xl md:text-8xl lg:text-[7.5rem] font-medium text-white leading-[0.95] font-['Playfair_Display'] animate-fade-up-blur delay-200 drop-shadow-2xl tracking-tighter">
                 {heroSlides[currentSlide].title}
               </h1>
+            </div>
 
-              <p className="text-base md:text-lg text-muted-foreground/90 leading-relaxed max-w-xl">
+            {/* Body Text */}
+            <div key={`text-${currentSlide}`} className="overflow-hidden">
+              <p className="text-lg md:text-2xl text-white/70 font-light leading-relaxed max-w-2xl mx-auto animate-fade-up-blur delay-300 font-sans tracking-wide">
                 {heroSlides[currentSlide].text}
               </p>
+            </div>
 
-              <div className="flex flex-wrap gap-4 pt-6">
-                <Button
-                  onClick={() => navigate("/products")}
-                  className="px-9 py-3.5 md:py-4 rounded-full text-sm md:text-base bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_18px_45px_rgba(244,114,182,0.55)] transition-all hover:scale-[1.04]"
-                >
-                  Shop Now
-                </Button>
-                <Button
-                  onClick={() => navigate("/skin-quiz")}
-                  variant="outline"
-                  className="px-9 py-3.5 md:py-4 rounded-full text-sm md:text-base border-2 border-primary/80 text-primary hover:bg-primary/5 font-bold transition-all hover:scale-[1.02] shadow-[0_0_30px_rgba(244,114,182,0.25)]"
-                >
-                  Take Skin Quiz
-                </Button>
-              </div>
+            {/* Buttons - Magnetic Feel */}
+            <div key={`btns-${currentSlide}`} className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8 animate-fade-up-blur delay-500">
+              <Button
+                onClick={() => navigate("/products")}
+                className="relative group overflow-hidden min-w-[200px] h-14 rounded-full bg-white text-black hover:text-white transition-colors duration-500 border border-white"
+              >
+                <span className="relative z-10 text-sm uppercase tracking-[0.2em] font-bold group-hover:tracking-[0.3em] transition-all duration-500">Shop Now</span>
+                <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+              </Button>
 
-              {/* Dots */}
-              <div className="flex items-center gap-2 pt-5">
-                {heroSlides.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentSlide(index)}
-                    className={`h-2 rounded-full transition-all ${
-                      index === currentSlide
-                        ? "w-7 bg-white shadow-md"
-                        : "w-2 bg-white/40 hover:bg-white/80"
-                    }`}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
-                ))}
-              </div>
-              {/* Trust badges */}
-              <div className="mt-6 flex flex-wrap gap-4 text-xs md:text-sm text-muted-foreground/90">
-                <div className="flex items-center gap-2">
-                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  <span>4.9/5 rated by 1k+ glowing customers</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Truck className="w-4 h-4 text-primary" />
-                  <span>Free delivery over Rs. 2,000</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                  <span>Dermatologist-tested formulas</span>
-                </div>
-              </div>
-              </div>
+              <Button
+                onClick={() => navigate("/skin-quiz")}
+                className="relative group overflow-hidden min-w-[200px] h-14 rounded-full bg-transparent text-white border border-white/40 hover:border-white transition-colors duration-500"
+              >
+                <span className="relative z-10 text-sm uppercase tracking-[0.2em] font-bold group-hover:tracking-[0.3em] transition-all duration-500">Discover</span>
+                <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+              </Button>
             </div>
           </div>
 
-          {/* Arrow controls (desktop) */}
-          <div className="hidden md:flex flex-col gap-3 items-center pr-4">
-            <button
-              onClick={() =>
-                setCurrentSlide(
-                  (prev) => (prev - 1 + heroSlides.length) % heroSlides.length
-                )
-              }
-              className="w-10 h-10 rounded-full bg-white/80 hover:bg-white text-foreground shadow-xl flex items-center justify-center border border-white/70 transition"
-              aria-label="Previous slide"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() =>
-                setCurrentSlide((prev) => (prev + 1) % heroSlides.length)
-              }
-              className="w-10 h-10 rounded-full bg-white/80 hover:bg-white text-foreground shadow-xl flex items-center justify-center border border-white/70 transition"
-              aria-label="Next slide"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
+          {/* Bottom Indicators */}
+          <div className="absolute bottom-12 left-0 right-0 flex justify-center gap-4 z-30">
+            {heroSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`h-[2px] transition-all duration-1000 ease-in-out ${index === currentSlide
+                  ? "w-24 bg-rose-200/80 shadow-[0_0_15px_rgba(253,224,71,0.6)]"
+                  : "w-12 bg-white/20 hover:bg-white/50"
+                  }`}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
           </div>
+
+          {/* Navigation Arrows */}
+          <button
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
+            className="absolute left-8 top-1/2 -translate-y-1/2 group hidden md:block p-6 z-30 opacity-60 hover:opacity-100 transition-opacity"
+          >
+            <div className="w-16 h-16 border border-white/10 rounded-full flex items-center justify-center text-white/50 group-hover:border-white/40 group-hover:text-white group-hover:scale-110 transition-all duration-500 backdrop-blur-[2px]">
+              <ChevronLeft className="w-6 h-6" />
+            </div>
+          </button>
+
+          <button
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
+            className="absolute right-8 top-1/2 -translate-y-1/2 group hidden md:block p-6 z-30 opacity-60 hover:opacity-100 transition-opacity"
+          >
+            <div className="w-16 h-16 border border-white/10 rounded-full flex items-center justify-center text-white/50 group-hover:border-white/40 group-hover:text-white group-hover:scale-110 transition-all duration-500 backdrop-blur-[2px]">
+              <ChevronRight className="w-6 h-6" />
+            </div>
+          </button>
         </div>
       </section>
 

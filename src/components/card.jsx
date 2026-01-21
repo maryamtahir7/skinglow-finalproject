@@ -23,7 +23,8 @@ const Card = ({ product }) => {
 
   // Ensure price is numeric
   const numericPrice = parseInt(String(price).replace(/,/g, ""), 10) || 0;
-  const discountedPrice = (numericPrice * 0.8).toLocaleString();
+  // Show original price as main, with a slightly lower "cut" price below
+  const cutPrice = numericPrice ? Math.round(numericPrice * 0.9) : 0;
 
   return (
     <ShadCard
@@ -89,11 +90,13 @@ const Card = ({ product }) => {
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-2xl font-bold text-blue-600">
-              Rs. {discountedPrice}
-            </span>
-            <span className="text-gray-400 text-sm line-through">
               Rs. {numericPrice.toLocaleString()}
             </span>
+            {cutPrice > 0 && (
+              <span className="text-gray-400 text-sm line-through">
+                Rs. {cutPrice.toLocaleString()}
+              </span>
+            )}
           </div>
 
           <button

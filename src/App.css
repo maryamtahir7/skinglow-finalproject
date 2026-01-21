@@ -1,12 +1,16 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 
 @custom-variant dark (&:is(.dark *));
 
 summary::-webkit-details-marker {
   display: none
 }
-html, body, #root {
+
+html,
+body,
+#root {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -20,7 +24,7 @@ html, body, #root {
   bottom: 0;
   left: 0;
   background-image: linear-gradient(#e6e6e690 1px, transparent 1px),
-  linear-gradient(90deg, #e6e6e690 1px, transparent 1px);
+    linear-gradient(90deg, #e6e6e690 1px, transparent 1px);
   background-size: 3.7em 3.7em;
   mask-image: radial-gradient(ellipse at 50% 40%, black 0%, transparent 55%);
   z-index: -1;
@@ -67,28 +71,37 @@ html, body, #root {
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.99 0.01 20); /* Soft cream/white */
-  --foreground: oklch(0.25 0.02 25); /* Soft charcoal/brown */
+  --background: oklch(0.99 0.01 20);
+  /* Soft cream/white */
+  --foreground: oklch(0.25 0.02 25);
+  /* Soft charcoal/brown */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.25 0.02 25);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.25 0.02 25);
-  --primary: oklch(0.7 0.15 20); /* Soft Rose/Terracotta */
+  --primary: oklch(0.7 0.15 20);
+  /* Soft Rose/Terracotta */
   --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.95 0.03 90); /* Sage Green Tint */
+  --secondary: oklch(0.95 0.03 90);
+  /* Sage Green Tint */
   --secondary-foreground: oklch(0.3 0.05 100);
   --muted: oklch(0.96 0.01 20);
   --muted-foreground: oklch(0.55 0.04 25);
-  --accent: oklch(0.92 0.06 20); /* Light Peach Accent */
+  --accent: oklch(0.92 0.06 20);
+  /* Light Peach Accent */
   --accent-foreground: oklch(0.35 0.1 20);
-  --destructive: oklch(0.6 0.2 25); 
+  --destructive: oklch(0.6 0.2 25);
   --border: oklch(0.92 0.02 25);
   --input: oklch(0.92 0.02 25);
   --ring: oklch(0.8 0.1 20);
-  --chart-1: oklch(0.7 0.15 20); /* Rose */
-  --chart-2: oklch(0.75 0.12 100); /* Sage */
-  --chart-3: oklch(0.8 0.1 60); /* Gold/Honey */
-  --chart-4: oklch(0.85 0.08 200); /* Soft Blue */
+  --chart-1: oklch(0.7 0.15 20);
+  /* Rose */
+  --chart-2: oklch(0.75 0.12 100);
+  /* Sage */
+  --chart-3: oklch(0.8 0.1 60);
+  /* Gold/Honey */
+  --chart-4: oklch(0.85 0.08 200);
+  /* Soft Blue */
   --chart-5: oklch(0.6 0.2 25);
   --sidebar: oklch(0.99 0.01 20);
   --sidebar-foreground: oklch(0.25 0.02 25);
@@ -98,19 +111,21 @@ html, body, #root {
   --sidebar-accent-foreground: oklch(0.35 0.1 20);
   --sidebar-border: oklch(0.92 0.02 25);
   --sidebar-ring: oklch(0.8 0.1 20);
-  
+
   /* Custom Font fallback just in case, though usually set in body */
   font-family: 'Inter', system-ui, sans-serif;
 }
 
 .dark {
-  --background: oklch(0.15 0.02 200); /* dark slate */
+  --background: oklch(0.15 0.02 200);
+  /* dark slate */
   --foreground: oklch(0.98 0.01 200);
   --card: oklch(0.2 0.03 200);
   --card-foreground: oklch(0.98 0.01 200);
   --popover: oklch(0.2 0.03 200);
   --popover-foreground: oklch(0.98 0.01 200);
-  --primary: oklch(0.6 0.16 182); /* same teal, pops on dark */
+  --primary: oklch(0.6 0.16 182);
+  /* same teal, pops on dark */
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.25 0.04 200);
   --secondary-foreground: oklch(0.98 0.01 200);
@@ -141,6 +156,7 @@ html, body, #root {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -152,9 +168,11 @@ html, body, #root {
   0% {
     transform: translate3d(0, 0, 0) scale(1);
   }
+
   50% {
     transform: translate3d(-10px, -18px, 0) scale(1.04);
   }
+
   100% {
     transform: translate3d(8px, 10px, 0) scale(1);
   }
@@ -164,9 +182,11 @@ html, body, #root {
   0% {
     transform: translate3d(0, 0, 0) scale(1.02);
   }
+
   50% {
     transform: translate3d(12px, -14px, 0) scale(1.06);
   }
+
   100% {
     transform: translate3d(-6px, 8px, 0) scale(1.02);
   }
@@ -184,9 +204,11 @@ html, body, #root {
   0% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-6px);
   }
+
   100% {
     transform: translateY(0);
   }
@@ -200,6 +222,7 @@ html, body, #root {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -217,6 +240,150 @@ html, body, #root {
   animation: categoryScroll 40s linear infinite;
 }
 
-.category-marquee-track:hover {
-  animation-play-state: paused;
+@keyframes kenBurns {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1.15);
+  }
+}
+
+.animate-ken-burns {
+  animation: kenBurns 20s ease-out infinite alternate;
+}
+
+@keyframes fadeUpBlur {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.animate-fade-up-blur {
+  animation: fadeUpBlur 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-500 {
+  animation-delay: 500ms;
+}
+
+@keyframes noise {
+
+  0%,
+  100% {
+    background-position: 0 0;
+  }
+
+  10% {
+    background-position: -5% -10%;
+  }
+
+  20% {
+    background-position: -15% 5%;
+  }
+
+  30% {
+    background-position: 7% -25%;
+  }
+
+  40% {
+    background-position: 20% 25%;
+  }
+
+  50% {
+    background-position: -25% 10%;
+  }
+
+  60% {
+    background-position: 15% 5%;
+  }
+
+  70% {
+    background-position: 0% 15%;
+  }
+
+  80% {
+    background-position: 25% 35%;
+  }
+
+  90% {
+    background-position: -10% 10%;
+  }
+}
+
+.animate-noise {
+  background: url('https://cdnjs.cloudflare.com/ajax/libs/paper-css/0.3.0/examples/white-paper.png');
+  /* Light textured noise equivalent */
+  opacity: 0.15;
+  animation: noise 8s steps(10) infinite;
+  mix-blend-mode: overlay;
+}
+
+@keyframes pulseSlow {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 3s ease-in-out infinite;
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-slide-up-fade {
+  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes typing {
+
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.animate-typing-dot {
+  animation: typing 1.4s infinite ease-in-out both;
 }
