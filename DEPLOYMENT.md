@@ -127,3 +127,4 @@ After deployment:
 - The `vercel.json` file configures routing and build settings
 - API routes in `api/` folder are automatically deployed as serverless functions
 
+

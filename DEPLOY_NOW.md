@@ -35,3 +35,4 @@ vercel env add VITE_APPWRITE_PROJECT_ID
 
 Or add them via Dashboard: **Settings → Environment Variables**
 
+

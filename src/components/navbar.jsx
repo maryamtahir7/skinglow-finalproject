@@ -371,10 +371,16 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Footer */}
-          <div className="p-6 bg-slate-50 border-t border-slate-100">
+          <div className="p-6 bg-slate-50 border-t border-slate-100 space-y-2">
             <p className="text-xs text-slate-400 text-center">
-              SkinGlow &copy; 2026
+              SkinGlow &copy; {new Date().getFullYear()}
             </p>
+            <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
+              <span className="text-slate-600">Developed by</span>
+              <span className="text-primary font-semibold tracking-wide">Maryam Tahir</span>
+              <span className="text-slate-600">•</span>
+              <span className="text-slate-500">Full Stack Developer</span>
+            </div>
           </div>
         </div>
       </div>

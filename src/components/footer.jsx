@@ -193,44 +193,54 @@ export default function Footer() {
         </motion.div>
 
         {/* Bottom */}
-        <div className="border-t border-slate-800 pt-8 mt-12 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-xs text-slate-500 text-center md:text-left">
-            © {new Date().getFullYear()} SkinGlow. All rights reserved.
-          </p>
+        <div className="border-t border-slate-800 pt-8 mt-12">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="text-center md:text-left space-y-2">
+              <p className="text-xs text-slate-400">
+                © {new Date().getFullYear()} SkinGlow. All rights reserved.
+              </p>
+              <div className="flex items-center gap-2 justify-center md:justify-start text-xs text-slate-500">
+                <span className="text-slate-600">Developed by</span>
+                <span className="text-primary font-semibold tracking-wide">Maryam Tahir</span>
+                <span className="text-slate-600">•</span>
+                <span className="text-slate-500">Full Stack Developer</span>
+              </div>
+            </div>
 
-          <div className="flex gap-6">
-            {legal.map((l, i) => (
+            <div className="flex gap-6">
+              {legal.map((l, i) => (
+                <button
+                  key={i}
+                  onClick={() => navigate(l.path)}
+                  className="text-xs text-slate-500 hover:text-primary transition"
+                >
+                  {l.name}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-3">
+              {socials.map((s, i) => (
+                <a
+                  key={i}
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`p-2 rounded-full bg-slate-800 hover:bg-slate-700 transition ${s.color}`}
+                >
+                  <s.icon className="w-4 h-4" />
+                </a>
+              ))}
               <button
-                key={i}
-                onClick={() => navigate(l.path)}
-                className="text-xs text-slate-500 hover:text-primary transition"
+                onClick={() =>
+                  window.scrollTo({ top: 0, behavior: "smooth" })
+                }
+                className="p-2 rounded-full bg-primary hover:bg-primary/90 text-white transition shadow-lg ml-4"
+                title="Back to Top"
               >
-                {l.name}
+                <ArrowUp className="w-4 h-4" />
               </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-3">
-            {socials.map((s, i) => (
-              <a
-                key={i}
-                href={s.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`p-2 rounded-full bg-slate-800 hover:bg-slate-700 transition ${s.color}`}
-              >
-                <s.icon className="w-4 h-4" />
-              </a>
-            ))}
-            <button
-              onClick={() =>
-                window.scrollTo({ top: 0, behavior: "smooth" })
-              }
-              className="p-2 rounded-full bg-primary hover:bg-primary/90 text-white transition shadow-lg ml-4"
-              title="Back to Top"
-            >
-              <ArrowUp className="w-4 h-4" />
-            </button>
+            </div>
           </div>
         </div>
       </div>

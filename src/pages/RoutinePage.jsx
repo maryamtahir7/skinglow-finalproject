@@ -180,8 +180,8 @@ function RoutinePage() {
                 </div>
             </div>
 
-            <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
-                <div className="space-y-8">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+                <div className="space-y-4 sm:space-y-6">
                     {currentSteps.map((step, index) => {
                         const isCompleted = completedSteps[step.id];
                         const recommendedProduct = getRecommendedProduct(step.type);
@@ -189,38 +189,39 @@ function RoutinePage() {
                         return (
                             <div
                                 key={step.id}
-                                className={`group relative bg-white border border-slate-100 rounded-2xl p-6 shadow-sm transition-all duration-300 ${isCompleted ? 'opacity-70 bg-slate-50' : 'hover:shadow-md hover:border-primary/30'}`}
+                                className={`group relative bg-white border border-slate-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm transition-all duration-300 ${isCompleted ? 'opacity-70 bg-slate-50' : 'hover:shadow-md hover:border-primary/30 active:scale-[0.98]'}`}
                             >
-                                {/* Connector Line */}
+                                {/* Connector Line - Hidden on mobile */}
                                 {index !== currentSteps.length - 1 && (
-                                    <div className="absolute left-9 bottom-0 top-20 w-px bg-slate-100 -z-10 group-hover:bg-primary/10 transition-colors" />
+                                    <div className="hidden sm:block absolute left-8 sm:left-9 bottom-0 top-16 sm:top-20 w-px bg-slate-100 -z-10 group-hover:bg-primary/10 transition-colors" />
                                 )}
 
-                                <div className="flex gap-6 items-start">
+                                <div className="flex gap-3 sm:gap-4 md:gap-6 items-start">
                                     {/* Checkbox */}
                                     <button
                                         onClick={() => toggleStep(step.id)}
-                                        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${isCompleted ? 'bg-green-500 text-white scale-110' : 'bg-white border-2 border-slate-200 text-slate-300 hover:border-primary hover:text-primary'}`}
+                                        className={`flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all duration-300 active:scale-95 ${isCompleted ? 'bg-green-500 text-white scale-110' : 'bg-white border-2 border-slate-200 text-slate-300 hover:border-primary hover:text-primary'}`}
+                                        aria-label={`Mark ${step.title} as ${isCompleted ? 'incomplete' : 'complete'}`}
                                     >
-                                        {isCompleted ? <CheckCircle2 className="w-5 h-5" /> : <Circle className="w-5 h-5" />}
+                                        {isCompleted ? <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5" /> : <Circle className="w-4 h-4 sm:w-5 sm:h-5" />}
                                     </button>
 
                                     {/* Content */}
-                                    <div className="flex-1">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2">
-                                            <h3 className={`text-lg sm:text-xl font-bold transition-colors ${isCompleted ? 'text-slate-500 line-through' : 'text-slate-800'}`}>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-2 mb-2">
+                                            <h3 className={`text-base sm:text-lg md:text-xl font-bold transition-colors ${isCompleted ? 'text-slate-500 line-through' : 'text-slate-800'}`}>
                                                 {step.title}
                                             </h3>
-                                            <span className="text-[10px] sm:text-xs font-semibold px-2 py-1 bg-slate-100 text-slate-500 rounded-md w-fit">
+                                            <span className="text-[10px] sm:text-xs font-semibold px-2 py-0.5 sm:py-1 bg-slate-100 text-slate-500 rounded-md w-fit">
                                                 Step {index + 1}
                                             </span>
                                         </div>
-                                        <p className="text-slate-500 text-sm mb-4">{step.desc}</p>
+                                        <p className="text-slate-500 text-xs sm:text-sm mb-3 sm:mb-4 leading-relaxed">{step.desc}</p>
 
                                         {/* Product Recommendation Card */}
                                         {!isCompleted && recommendedProduct && (
-                                            <div className="mt-4 bg-slate-50/80 border border-slate-100 rounded-xl p-3 flex items-center gap-3 sm:gap-4 animate-in slide-in-from-top-2 fade-in">
-                                                <div className="w-11 h-11 sm:w-12 sm:h-12 bg-white rounded-lg border border-slate-100 p-1 flex-shrink-0">
+                                            <div className="mt-3 sm:mt-4 bg-slate-50/80 border border-slate-100 rounded-lg sm:rounded-xl p-2.5 sm:p-3 flex items-center gap-2.5 sm:gap-3 md:gap-4 animate-in slide-in-from-top-2 fade-in">
+                                                <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white rounded-lg border border-slate-100 p-1 flex-shrink-0">
                                                     <img
                                                         src={recommendedProduct.imageUrl || "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=100"}
                                                         alt={recommendedProduct.name}
@@ -228,16 +229,17 @@ function RoutinePage() {
                                                     />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <div className="text-[10px] font-bold text-primary uppercase leading-tight">Recommended</div>
-                                                    <div className="font-medium text-xs sm:text-sm text-slate-900 truncate">{recommendedProduct.name}</div>
+                                                    <div className="text-[9px] sm:text-[10px] font-bold text-primary uppercase leading-tight mb-0.5">Recommended</div>
+                                                    <div className="font-medium text-xs sm:text-sm text-slate-900 truncate leading-tight">{recommendedProduct.name}</div>
                                                 </div>
                                                 <Button
                                                     size="sm"
                                                     variant="outline"
-                                                    className="h-8 text-xs bg-white hover:bg-primary hover:text-white transition-colors"
+                                                    className="h-7 sm:h-8 text-[10px] sm:text-xs bg-white hover:bg-primary hover:text-white transition-colors active:scale-95 px-2 sm:px-3"
                                                     onClick={() => handleAddToCart(recommendedProduct)}
                                                 >
-                                                    <ShoppingBag className="w-3 h-3 mr-1.5" /> Add
+                                                    <ShoppingBag className="w-3 h-3 sm:mr-1.5" />
+                                                    <span className="hidden sm:inline">Add</span>
                                                 </Button>
                                             </div>
                                         )}
@@ -248,13 +250,16 @@ function RoutinePage() {
                     })}
                 </div>
 
-                <div className="mt-16 text-center">
-                    <div className="bg-primary/5 border border-primary/10 rounded-2xl p-8 max-w-xl mx-auto">
-                        <h3 className="text-lg font-bold text-slate-900 mb-2">Want a fully personalized plan?</h3>
-                        <p className="text-slate-600 mb-6 text-sm">
+                <div className="mt-10 sm:mt-16 text-center">
+                    <div className="bg-primary/5 border border-primary/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 max-w-xl mx-auto">
+                        <h3 className="text-base sm:text-lg font-bold text-slate-900 mb-2">Want a fully personalized plan?</h3>
+                        <p className="text-slate-600 mb-4 sm:mb-6 text-xs sm:text-sm leading-relaxed px-2">
                             Take our 2-minute skin analysis to get a routine catered exactly to your skin type and concerns.
                         </p>
-                        <Button onClick={() => navigate('/skin-quiz')} className="bg-primary text-white rounded-full px-6">
+                        <Button 
+                            onClick={() => navigate('/skin-quiz')} 
+                            className="bg-primary text-white rounded-full px-5 sm:px-6 h-10 sm:h-11 text-sm active:scale-95"
+                        >
                             <RefreshCw className="w-4 h-4 mr-2" /> Take Skin Quiz
                         </Button>
                     </div>

@@ -82,3 +82,4 @@ Share:
 - Screenshot of Google Console redirect URIs
 - Your Appwrite endpoint (from environment variable)
 
+

@@ -633,3 +633,4 @@ console.log(`\n✅ All product names are real brand names (no "SkinGlow" prefix)
 console.log(`✅ Image URLs are from Pexels (reliable and working)`);
 console.log(`✅ Ready to upload to your admin panel!`);
 
+

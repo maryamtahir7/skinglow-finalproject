@@ -94,3 +94,4 @@ https://cloud.appwrite.io/v1/account/sessions/oauth2/callback/google
 - [ ] Client ID and Secret entered in Appwrite Console
 - [ ] Tested the OAuth flow
 
+
