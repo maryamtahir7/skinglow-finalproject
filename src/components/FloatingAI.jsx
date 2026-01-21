@@ -99,7 +99,7 @@ const FloatingAI = () => {
             {/* Chat Interface Popup */}
             {isOpen && (
                 <div
-                    className="fixed bottom-24 right-4 md:right-8 z-[60] w-[90vw] md:w-[400px] h-[600px] max-h-[80vh] bg-white/90 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white/50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-500 origin-bottom-right"
+                    className="fixed bottom-0 right-0 md:bottom-24 md:right-8 z-[60] w-full h-[100dvh] md:w-[400px] md:h-[600px] md:max-h-[80vh] bg-white/95 md:bg-white/90 backdrop-blur-xl md:rounded-[2rem] rounded-none shadow-2xl border border-white/50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300 origin-bottom-right"
                 >
                     {/* Header */}
                     <div className="bg-gradient-to-r from-primary/10 to-pink-500/10 px-6 py-5 flex items-center justify-between border-b border-primary/5">

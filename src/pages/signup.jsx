@@ -22,17 +22,38 @@ export default function SignupForm() {
     setLoading(true);
     setError("");
 
+    // Custom Email Validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+
+    // Block common disposable email domains
+    // This is a basic list; for production consider a comprehensive library or API
+    const disposableDomains = [
+      "tempmail.com", "throwawaymail.com", "mailinator.com", "yopmail.com",
+      "guerrillamail.com", "10minutemail.com", "sharklasers.com"
+    ];
+    const domain = formData.email.split('@')[1].toLowerCase();
+    if (disposableDomains.includes(domain)) {
+      setError("Security: Temporary/Disposable email addresses are not allowed. Please use a valid personal email.");
+      setLoading(false);
+      return;
+    }
+
     try {
       // Create Account (without auto-login)
       await signup(formData.email, formData.password, formData.name);
 
       // Show success message and redirect to login
       // Pass email as state so login page can pre-fill it
-      navigate("/login", { 
-        state: { 
+      navigate("/login", {
+        state: {
           email: formData.email,
-          message: "Account created successfully! Please sign in to continue." 
-        } 
+          message: "Account created successfully! Please sign in to continue."
+        }
       });
     } catch (err) {
       console.error("Signup Error:", err);

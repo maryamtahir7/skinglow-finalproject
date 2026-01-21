@@ -276,7 +276,7 @@ function ProductDetail() {
             <div className="mb-2 text-primary font-bold uppercase tracking-widest text-xs">
               {product.category || "Skincare"}
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">{product.name}</h1>
+            <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">{product.name}</h1>
 
             <div className="flex items-center gap-4 text-sm mb-6">
               <div className="flex text-primary">
@@ -286,8 +286,27 @@ function ProductDetail() {
               <span className="text-muted-foreground">{reviews.length} Reviews</span>
             </div>
 
-            <div className="text-3xl font-bold mb-8 flex items-baseline gap-3">
-              Rs. {productPrice}
+            {/* Price Display with Discount Logic */}
+            <div className="mb-8 flex items-end gap-3">
+              {(() => {
+                const numericPrice = parseInt(String(product.price || 0).replace(/,/g, ""), 10) || 0;
+                const originalPrice = numericPrice ? Math.round(numericPrice * 1.25) : 0;
+                return (
+                  <>
+                    <div className="text-3xl md:text-4xl font-bold text-primary">
+                      Rs. {numericPrice.toLocaleString()}
+                    </div>
+                    {originalPrice > 0 && (
+                      <div className="text-lg text-muted-foreground line-through decoration-red-500/50 mb-1">
+                        Rs. {originalPrice.toLocaleString()}
+                      </div>
+                    )}
+                    <div className="mb-2 px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">
+                      -20%
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
             <p className="text-muted-foreground leading-relaxed mb-8 max-w-lg">
@@ -295,39 +314,51 @@ function ProductDetail() {
             </p>
 
             {/* Quantity & Actions */}
-            <div className="flex items-center gap-6 mb-8">
-              <div className="flex items-center border border-border rounded-full h-12 px-2 bg-card">
-                <button onClick={() => handleQuantityChange(-1)} className="p-2 hover:text-primary transition"><Minus className="w-4 h-4" /></button>
-                <span className="w-8 text-center font-bold">{quantity}</span>
-                <button onClick={() => handleQuantityChange(1)} className="p-2 hover:text-primary transition"><Plus className="w-4 h-4" /></button>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-8">
+              <div className="flex items-center justify-center border border-border rounded-full h-12 px-2 bg-card w-full sm:w-auto">
+                <button onClick={() => handleQuantityChange(-1)} className="p-3 hover:text-primary transition"><Minus className="w-4 h-4" /></button>
+                <span className="w-12 text-center font-bold">{quantity}</span>
+                <button onClick={() => handleQuantityChange(1)} className="p-3 hover:text-primary transition"><Plus className="w-4 h-4" /></button>
               </div>
-              <Button onClick={handleAddToCart} className="flex-1 h-12 rounded-full text-base font-bold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25">
-                Add to Bag
-              </Button>
-              <Button onClick={handleBuyNow} className="flex-1 h-12 rounded-full text-base font-bold bg-secondary hover:bg-secondary/90 text-primary border border-primary/20 shadow-lg shadow-secondary/25">
-                Buy Now
-              </Button>
+
+              <div className="flex gap-3 flex-1">
+                <Button onClick={handleAddToCart} className="flex-1 h-12 rounded-full text-base font-bold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25">
+                  Add to Bag
+                </Button>
+                <Button onClick={handleBuyNow} className="flex-1 h-12 rounded-full text-base font-bold bg-secondary hover:bg-secondary/90 text-primary border border-primary/20 shadow-lg shadow-secondary/25">
+                  Buy Now
+                </Button>
+              </div>
+
               <button
                 onClick={handleAddToWishlist}
-                className={`p-3 rounded-full border border-border transition-colors ${isLiked ? 'bg-red-50 text-red-500 border-red-200' : 'hover:border-primary hover:text-primary'}`}
+                className={`hidden sm:flex p-3 rounded-full border border-border transition-colors ${isLiked ? 'bg-red-50 text-red-500 border-red-200' : 'hover:border-primary hover:text-primary'}`}
               >
                 <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
               </button>
+              {/* Mobile Wishlist Button (Full Width) */}
+              <Button
+                onClick={handleAddToWishlist}
+                variant="outline"
+                className={`sm:hidden h-12 rounded-full border-border ${isLiked ? 'bg-red-50 text-red-500 border-red-200' : ''}`}
+              >
+                <Heart className={`w-5 h-5 mr-2 ${isLiked ? 'fill-current' : ''}`} /> {isLiked ? 'Saved' : 'Save to Wishlist'}
+              </Button>
             </div>
 
             {/* Quick Benefits */}
             <div className="grid grid-cols-2 gap-4 text-sm text-foreground/80 mb-8">
               <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-primary" /> Vegan & Cruelty Free
+                <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /> Vegan & Cruelty Free
               </div>
               <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-primary" /> Dermatologist Tested
+                <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /> Dermatologist Tested
               </div>
               <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-primary" /> Recyclable Packaging
+                <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /> Recyclable Packaging
               </div>
               <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-primary" /> Free Shipping
+                <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /> Free Shipping
               </div>
             </div>
           </div>
