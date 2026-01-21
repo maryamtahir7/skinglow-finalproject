@@ -269,8 +269,8 @@ function Products() {
               <button
                 onClick={() => setSelectedCategory("all")}
                 className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center gap-3 ${selectedCategory === "all"
-                    ? "bg-primary text-white shadow-md"
-                    : "text-muted-foreground hover:bg-secondary"
+                  ? "bg-primary text-white shadow-md"
+                  : "text-muted-foreground hover:bg-secondary"
                   }`}
               >
                 <div className="w-9 h-9 rounded-full bg-secondary/40 flex items-center justify-center overflow-hidden border border-border/60">
@@ -301,8 +301,8 @@ function Products() {
                       setSelectedCategory(categoryName);
                     }}
                     className={`w-full text-left p-2 rounded-xl text-sm font-medium transition-all flex items-center gap-3 ${selectedCategory === categoryName
-                        ? "bg-primary text-white shadow-md"
-                        : "text-muted-foreground hover:bg-secondary"
+                      ? "bg-primary text-white shadow-md"
+                      : "text-muted-foreground hover:bg-secondary"
                       }`}
                   >
                     <div className="w-9 h-9 rounded-full bg-secondary/40 flex items-center justify-center overflow-hidden border border-border/60 flex-shrink-0">
@@ -445,17 +445,18 @@ function Products() {
                       <div className="flex items-center justify-between mt-3">
                         {(() => {
                           const numericPrice = parseInt(String(product.price || 0).replace(/,/g, ""), 10) || 0;
-                          const cutPrice = numericPrice ? Math.round(numericPrice * 0.9) : 0;
+                          // Simulate an original price that is higher (e.g., 20% markup) to show a discount
+                          const originalPrice = numericPrice ? Math.round(numericPrice * 1.25) : 0;
                           return (
                             <div className="flex flex-col">
+                              {originalPrice > 0 && (
+                                <span className="text-xs text-muted-foreground line-through decoration-red-500/50">
+                                  Rs. {originalPrice.toLocaleString()}
+                                </span>
+                              )}
                               <span className="font-bold text-lg text-primary">
                                 Rs. {numericPrice.toLocaleString()}
                               </span>
-                              {cutPrice > 0 && (
-                                <span className="text-xs text-muted-foreground line-through">
-                                  Rs. {cutPrice.toLocaleString()}
-                                </span>
-                              )}
                             </div>
                           );
                         })()}
@@ -467,17 +468,17 @@ function Products() {
                     <div className="text-right flex-shrink-0">
                       {(() => {
                         const numericPrice = parseInt(String(product.price || 0).replace(/,/g, ""), 10) || 0;
-                        const cutPrice = numericPrice ? Math.round(numericPrice * 0.9) : 0;
+                        const originalPrice = numericPrice ? Math.round(numericPrice * 1.25) : 0;
                         return (
                           <div className="flex flex-col items-end mb-2">
+                            {originalPrice > 0 && (
+                              <span className="text-xs text-muted-foreground line-through decoration-red-500/50">
+                                Rs. {originalPrice.toLocaleString()}
+                              </span>
+                            )}
                             <span className="font-bold text-xl text-primary">
                               Rs. {numericPrice.toLocaleString()}
                             </span>
-                            {cutPrice > 0 && (
-                              <span className="text-xs text-muted-foreground line-through">
-                                Rs. {cutPrice.toLocaleString()}
-                              </span>
-                            )}
                           </div>
                         );
                       })()}
