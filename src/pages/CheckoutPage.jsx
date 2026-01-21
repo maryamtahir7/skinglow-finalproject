@@ -120,12 +120,28 @@ export default function CheckoutPage() {
       return;
     }
 
+    // Ensure we only use the authenticated user's email from their account
+    if (!user || !user.email) {
+      alert("User email not found. Please log in again.");
+      return;
+    }
+
     try {
+      // Fetch fresh user data from Appwrite to ensure we have the latest email
+      const { getCurrentUser } = await import("../backend/auth");
+      const currentUser = await getCurrentUser();
+      
+      if (!currentUser || !currentUser.email) {
+        alert("Unable to verify user email. Please log in again.");
+        return;
+      }
+
       await createOrder({
         userId: user.$id,
+        email: currentUser.email, // Only use authenticated user's email from Appwrite
         items: summaryItems,
         total: Math.round(finalTotal),
-        ...form,
+        ...form, // name, phone, address, city, postalCode, notes, paymentMethod (NO email)
         status: "pending",
       });
 

@@ -240,6 +240,7 @@ export async function createOrder({
   notes = "",
   paymentMethod = "COD",
   status = "pending",
+  email, // optional but helpful for admin view
 }) {
   if (!userId || !items || !total || !name || !phone || !address || !city || !postalCode) {
     throw new Error("Missing required order fields");
@@ -247,6 +248,7 @@ export async function createOrder({
 
   const payload = {
     userId: String(userId),
+    ...(email ? { email: String(email) } : {}),
     items: JSON.stringify(items),
     total: Number(total),
     name: String(name),
@@ -275,6 +277,14 @@ export async function getOrders() {
   );
 }
 
+export async function getOrdersByUser(userId) {
+  return databases.listDocuments(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    import.meta.env.VITE_APPWRITE_ORDERS_ID,
+    [Query.equal("userId", String(userId)), Query.orderDesc("$createdAt")]
+  );
+}
+
 export async function updateOrder(orderId, updates) {
   updates.$updatedAt = new Date().toISOString();
   return databases.updateDocument(
@@ -295,35 +305,58 @@ export async function deleteOrder(orderId) {
 
 /* --------------------- STOCK --------------------- */
 export async function addStock(stock) {
+  const stockId = import.meta.env.VITE_APPWRITE_STOCK_ID;
+  if (!stockId) {
+    throw new Error("VITE_APPWRITE_STOCK_ID is not configured. Please set it in your environment variables.");
+  }
   return databases.createDocument(
     import.meta.env.VITE_APPWRITE_DATABASE_ID,
-    import.meta.env.VITE_APPWRITE_STOCK_ID,
+    stockId,
     "unique()",
     stock
   );
 }
 
 export async function getStocks() {
-  return databases.listDocuments(
-    import.meta.env.VITE_APPWRITE_DATABASE_ID,
-    import.meta.env.VITE_APPWRITE_STOCK_ID,
-    [Query.orderDesc("$createdAt")]
-  );
+  const stockId = import.meta.env.VITE_APPWRITE_STOCK_ID;
+  if (!stockId) {
+    console.warn("VITE_APPWRITE_STOCK_ID is not configured. Returning empty stocks list.");
+    return { documents: [], total: 0 };
+  }
+  try {
+    return await databases.listDocuments(
+      import.meta.env.VITE_APPWRITE_DATABASE_ID,
+      stockId,
+      [Query.orderDesc("$createdAt")]
+    );
+  } catch (error) {
+    // If collection doesn't exist or other error, return empty list instead of crashing
+    console.error("Error fetching stocks:", error);
+    return { documents: [], total: 0 };
+  }
 }
 
 export async function updateStock(stockId, updates) {
+  const stockCollectionId = import.meta.env.VITE_APPWRITE_STOCK_ID;
+  if (!stockCollectionId) {
+    throw new Error("VITE_APPWRITE_STOCK_ID is not configured.");
+  }
   return databases.updateDocument(
     import.meta.env.VITE_APPWRITE_DATABASE_ID,
-    import.meta.env.VITE_APPWRITE_STOCK_ID,
+    stockCollectionId,
     String(stockId),
     updates
   );
 }
 
 export async function deleteStock(stockId) {
+  const stockCollectionId = import.meta.env.VITE_APPWRITE_STOCK_ID;
+  if (!stockCollectionId) {
+    throw new Error("VITE_APPWRITE_STOCK_ID is not configured.");
+  }
   return databases.deleteDocument(
     import.meta.env.VITE_APPWRITE_DATABASE_ID,
-    import.meta.env.VITE_APPWRITE_STOCK_ID,
+    stockCollectionId,
     String(stockId)
   );
 }
@@ -493,5 +526,39 @@ export async function deleteReview(reviewId) {
     import.meta.env.VITE_APPWRITE_DATABASE_ID,
     import.meta.env.VITE_APPWRITE_REVIEWS_ID,
     String(reviewId)
+  );
+}
+/* --------------------- NOTIFICATIONS --------------------- */
+export async function addNotification(notification) {
+  // notification = { userId, message, type, link, read: false }
+  const notifId = import.meta.env.VITE_APPWRITE_NOTIFICATIONS_ID || "notifications";
+  return databases.createDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    notifId,
+    "unique()",
+    notification
+  );
+}
+
+export async function getNotifications(userId) {
+  const notifId = import.meta.env.VITE_APPWRITE_NOTIFICATIONS_ID || "notifications";
+  return databases.listDocuments(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    notifId,
+    [
+      Query.equal("userId", String(userId)),
+      Query.orderDesc("$createdAt"),
+      Query.limit(20)
+    ]
+  );
+}
+
+export async function markNotificationRead(notificationId) {
+  const notifId = import.meta.env.VITE_APPWRITE_NOTIFICATIONS_ID || "notifications";
+  return databases.updateDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    notifId,
+    String(notificationId),
+    { read: true }
   );
 }

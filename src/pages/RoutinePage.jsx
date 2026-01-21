@@ -121,7 +121,7 @@ function RoutinePage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 font-sans text-slate-800 pb-20">
+        <div className="min-h-screen bg-slate-50 font-sans text-slate-800 pb-16">
             {/* Hero Section */}
             <div className={`relative overflow-hidden transition-colors duration-700 ${activeRoutine === 'AM' ? 'bg-orange-50/80' : 'bg-slate-900 text-white'}`}>
                 <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
@@ -131,33 +131,33 @@ function RoutinePage() {
                     }
                 </div>
 
-                <div className="max-w-4xl mx-auto px-6 py-20 relative z-10 text-center">
+                <div className="max-w-4xl mx-auto px-4 sm:px-6 py-14 sm:py-20 relative z-10 text-center">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-sm font-bold mb-6">
                         <Sparkles className="w-4 h-4" /> Daily Skincare Tracker
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-bold mb-6 transition-all duration-500">
+                    <h1 className="text-3xl md:text-6xl font-bold mb-4 sm:mb-6 leading-tight transition-all duration-500">
                         Good {activeRoutine === 'AM' ? 'Morning' : 'Evening'}, {user ? user.name.split(' ')[0] : 'Beautiful'}
                     </h1>
-                    <p className={`text-xl max-w-2xl mx-auto mb-10 ${activeRoutine === 'AM' ? 'text-slate-600' : 'text-slate-300'}`}>
+                    <p className={`text-base sm:text-xl max-w-2xl mx-auto mb-8 sm:mb-10 ${activeRoutine === 'AM' ? 'text-slate-600' : 'text-slate-300'}`}>
                         {activeRoutine === 'AM'
                             ? "Ready to protect and brighten your skin for the day ahead?"
                             : "Time to unwind, repair, and prepare for a restful sleep."}
                     </p>
 
                     {/* Toggle Switch */}
-                    <div className="inline-flex bg-white/20 backdrop-blur-md p-1.5 rounded-full border border-white/20 shadow-lg relative">
+                    <div className="inline-flex bg-white/20 backdrop-blur-md p-1 rounded-full border border-white/20 shadow-lg relative text-xs sm:text-sm">
                         <div
-                            className={`absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-white rounded-full shadow-md transition-all duration-300 ease-spring ${activeRoutine === 'PM' ? 'translate-x-full left-1.5' : 'left-1.5'}`}
+                            className={`absolute top-1 bottom-1 w-[calc(50%-6px)] bg-white rounded-full shadow-md transition-all duration-300 ease-spring ${activeRoutine === 'PM' ? 'translate-x-full left-1.5' : 'left-1.5'}`}
                         />
                         <button
                             onClick={() => setActiveRoutine('AM')}
-                            className={`relative z-10 px-8 py-3 rounded-full font-bold text-sm flex items-center gap-2 transition-colors ${activeRoutine === 'AM' ? (activeRoutine === 'AM' ? 'text-slate-800' : 'text-slate-900') : 'text-white/70 hover:text-white'}`}
+                            className={`relative z-10 px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-colors ${activeRoutine === 'AM' ? (activeRoutine === 'AM' ? 'text-slate-800' : 'text-slate-900') : 'text-white/70 hover:text-white'}`}
                         >
                             <Sun className="w-4 h-4" /> AM Routine
                         </button>
                         <button
                             onClick={() => setActiveRoutine('PM')}
-                            className={`relative z-10 px-8 py-3 rounded-full font-bold text-sm flex items-center gap-2 transition-colors ${activeRoutine === 'PM' ? 'text-slate-900' : (activeRoutine === 'AM' ? 'text-slate-600 hover:text-slate-900' : 'text-white/70')}`}
+                            className={`relative z-10 px-4 sm:px-6 py-2 sm:py-3 rounded-full font-bold text-xs sm:text-sm flex items-center gap-1.5 transition-colors ${activeRoutine === 'PM' ? 'text-slate-900' : (activeRoutine === 'AM' ? 'text-slate-600 hover:text-slate-900' : 'text-white/70')}`}
                         >
                             <Moon className="w-4 h-4" /> PM Routine
                         </button>
@@ -166,10 +166,10 @@ function RoutinePage() {
             </div>
 
             {/* Progress Bar Container */}
-            <div className="sticky top-[73px] z-40 bg-white/80 backdrop-blur-md border-b border-slate-200 px-6 py-3 shadow-sm">
-                <div className="max-w-3xl mx-auto flex items-center gap-4">
+            <div className="sticky top-[64px] z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 py-2.5 shadow-sm">
+                <div className="max-w-3xl mx-auto flex items-center gap-3">
                     <div className="flex-1">
-                        <div className="flex justify-between text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">
+                        <div className="flex justify-between text-[10px] sm:text-xs font-bold text-slate-500 mb-1 uppercase tracking-wider">
                             <span>Todays Progress</span>
                             <span>{Math.round((amProgress + pmProgress) / 2)}% Completed</span>
                         </div>
@@ -180,7 +180,7 @@ function RoutinePage() {
                 </div>
             </div>
 
-            <div className="max-w-3xl mx-auto px-6 py-12">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
                 <div className="space-y-8">
                     {currentSteps.map((step, index) => {
                         const isCompleted = completedSteps[step.id];
@@ -207,20 +207,20 @@ function RoutinePage() {
 
                                     {/* Content */}
                                     <div className="flex-1">
-                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                                            <h3 className={`text-xl font-bold transition-colors ${isCompleted ? 'text-slate-500 line-through' : 'text-slate-800'}`}>
+                                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2">
+                                            <h3 className={`text-lg sm:text-xl font-bold transition-colors ${isCompleted ? 'text-slate-500 line-through' : 'text-slate-800'}`}>
                                                 {step.title}
                                             </h3>
-                                            <span className="text-xs font-semibold px-2 py-1 bg-slate-100 text-slate-500 rounded-md w-fit">
+                                            <span className="text-[10px] sm:text-xs font-semibold px-2 py-1 bg-slate-100 text-slate-500 rounded-md w-fit">
                                                 Step {index + 1}
                                             </span>
                                         </div>
-                                        <p className="text-slate-500 mb-4">{step.desc}</p>
+                                        <p className="text-slate-500 text-sm mb-4">{step.desc}</p>
 
                                         {/* Product Recommendation Card */}
                                         {!isCompleted && recommendedProduct && (
-                                            <div className="mt-4 bg-slate-50/80 border border-slate-100 rounded-xl p-3 flex items-center gap-4 animate-in slide-in-from-top-2 fade-in">
-                                                <div className="w-12 h-12 bg-white rounded-lg border border-slate-100 p-1 flex-shrink-0">
+                                            <div className="mt-4 bg-slate-50/80 border border-slate-100 rounded-xl p-3 flex items-center gap-3 sm:gap-4 animate-in slide-in-from-top-2 fade-in">
+                                                <div className="w-11 h-11 sm:w-12 sm:h-12 bg-white rounded-lg border border-slate-100 p-1 flex-shrink-0">
                                                     <img
                                                         src={recommendedProduct.imageUrl || "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=100"}
                                                         alt={recommendedProduct.name}
@@ -229,7 +229,7 @@ function RoutinePage() {
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="text-[10px] font-bold text-primary uppercase leading-tight">Recommended</div>
-                                                    <div className="font-medium text-sm text-slate-900 truncate">{recommendedProduct.name}</div>
+                                                    <div className="font-medium text-xs sm:text-sm text-slate-900 truncate">{recommendedProduct.name}</div>
                                                 </div>
                                                 <Button
                                                     size="sm"

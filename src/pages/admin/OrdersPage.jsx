@@ -1,6 +1,6 @@
 // src/pages/admin/OrdersPage.jsx
 import React, { useEffect, useState } from "react";
-import { getOrders, updateOrder, deleteOrder } from "../../backend/database";
+import { getOrders, updateOrder, deleteOrder, addNotification } from "../../backend/database";
 import { useUser } from "../../context/UserContext";
 import {
   ClipboardList,
@@ -56,6 +56,21 @@ export default function OrdersPage() {
       setOrders((prev) =>
         prev.map((o) => (o.$id === orderId ? { ...o, status } : o))
       );
+
+      // Send Notification on Delivery
+      if (status === "delivered") {
+        const order = orders.find(o => o.$id === orderId);
+        if (order) {
+          await addNotification({
+            userId: order.userId,
+            message: `Your order #${order.$id.substring(0, 5)} has been delivered! You can now review your products.`,
+            type: "order_update",
+            read: false,
+            link: `/orders` // or deep link to product if single item, but orders page is safer
+          });
+        }
+      }
+
     } catch (e) {
       console.error("Failed to update status:", e);
       alert("Could not update order status.");
@@ -227,9 +242,32 @@ export default function OrdersPage() {
                       <User className="w-4 h-4 text-primary" /> Customer Details
                     </h4>
                     <div className="bg-secondary/10 p-4 rounded-lg border border-border text-sm space-y-2">
-                      <p><span className="text-muted-foreground">Name:</span> <span className="font-medium text-foreground">{order.name}</span></p>
-                      <p><span className="text-muted-foreground">Phone:</span> <span className="font-medium text-foreground">{order.phone}</span></p>
-                      <p><span className="text-muted-foreground">Address:</span> <span className="font-medium text-foreground">{order.address}, {order.city}</span></p>
+                      <p>
+                        <span className="text-muted-foreground">Name:</span>{" "}
+                        <span className="font-medium text-foreground">{order.name}</span>
+                      </p>
+                      <p>
+                        <span className="text-muted-foreground">Email:</span>{" "}
+                        <span className="font-medium text-foreground">
+                          {order.email || order.userEmail || "Not provided"}
+                        </span>
+                      </p>
+                      <p>
+                        <span className="text-muted-foreground">Phone:</span>{" "}
+                        <span className="font-medium text-foreground">{order.phone}</span>
+                      </p>
+                      <p>
+                        <span className="text-muted-foreground">City:</span>{" "}
+                        <span className="font-medium text-foreground">{order.city || "—"}</span>
+                      </p>
+                      <p>
+                        <span className="text-muted-foreground">Postal Code:</span>{" "}
+                        <span className="font-medium text-foreground">{order.postalCode || "—"}</span>
+                      </p>
+                      <p>
+                        <span className="text-muted-foreground">Address:</span>{" "}
+                        <span className="font-medium text-foreground">{order.address}</span>
+                      </p>
                       {order.notes && (
                         <div className="mt-2 pt-2 border-t border-border text-amber-600 bg-amber-50 p-2 rounded">
                           <span className="font-bold text-xs uppercase">Note:</span> {order.notes}

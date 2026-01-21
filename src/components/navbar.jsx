@@ -5,6 +5,7 @@ import { useUser } from "../context/UserContext";
 import { logout } from "../backend/auth";
 import { getCart, getWishlist } from "../backend/database";
 import InstallPWAButton from "./InstallPWAButton";
+import NotificationsDropdown from "./NotificationsDropdown";
 
 export default function Navbar() {
   const { user, setUser } = useUser();
@@ -128,6 +129,9 @@ export default function Navbar() {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-5">
+          {/* Notifications */}
+          <NotificationsDropdown />
+
           {/* Wishlist */}
           <Link to="/wishlist" className="relative group">
             <div className="p-2 rounded-full hover:bg-slate-50 transition-colors">
@@ -245,11 +249,17 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Actions */}
-        <div className="flex md:hidden items-center gap-3">
-          {/* Mobile User Toggle */}
+        <div className="flex md:hidden items-center gap-2">
+          {/* Mobile Notifications (only when logged in) */}
+          <div className="flex items-center">
+            <NotificationsDropdown />
+          </div>
+
+          {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition"
+            aria-label="Open navigation menu"
           >
             {isMobileMenuOpen ? (
               <X className="h-6 w-6" />

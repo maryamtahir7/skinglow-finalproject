@@ -16,7 +16,8 @@ import {
   ShoppingBag,
   Star,
   TrendingUp,
-  AlertCircle
+  AlertCircle,
+  BarChart3
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ export default function AdminPage() {
     { icon: Star, label: "Reviews", path: "/admin/reviews" },
     { icon: Layers, label: "Categories", path: "/admin/categories" },
     { icon: Boxes, label: "Inventory", path: "/admin/stock" },
+    { icon: BarChart3, label: "Reports", path: "/admin/reports" },
   ];
 
   const isActive = (path) => {

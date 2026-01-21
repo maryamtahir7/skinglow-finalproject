@@ -1,6 +1,6 @@
 // src/pages/ProductDetail.jsx
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -10,9 +10,9 @@ import {
   addToWishlist,
   getWishlist,
   addReview,
-  getReviews,
   updateReview,
   deleteReview,
+  getReviews,
 } from "../backend/database";
 import {
   ArrowLeft,
@@ -35,13 +35,14 @@ import {
   MessageSquare,
   Edit2,
   Trash2,
-  X
+  X,
 } from "lucide-react";
 import { useUser } from "../context/UserContext";
 
 function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useUser();
 
   const [product, setProduct] = useState(null);
@@ -59,16 +60,119 @@ function ProductDetail() {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [editingReviewId, setEditingReviewId] = useState(null);
 
+  // --- VERIFIED REVIEW CHECK ---
+  const [canReview, setCanReview] = useState(false);
+  const [verificationLoading, setVerificationLoading] = useState(false);
+
+  // When user comes from "Write Review" button, jump directly to reviews tab
+  useEffect(() => {
+    if (location.state?.openReviews) {
+      setActiveTab("reviews");
+    }
+  }, [location.state]);
+  useEffect(() => {
+    async function checkEligibility() {
+      if (!user) return;
+      setVerificationLoading(true);
+      try {
+        const { getOrdersByUser } = await import("../backend/database");
+        const ordersRes = await getOrdersByUser(user.$id);
+        const deliveredOrders = ordersRes.documents.filter(o => o.status === "delivered");
+
+        let found = false;
+        for (const order of deliveredOrders) {
+          try {
+            const items = JSON.parse(order.items);
+            if (items.some(item => item.productId === id)) {
+              found = true;
+              break;
+            }
+          } catch (e) { console.error("Error parsing order items", e); }
+        }
+        setCanReview(found);
+      } catch (e) {
+        console.error("Verification check failed", e);
+      } finally {
+        setVerificationLoading(false);
+      }
+    }
+    checkEligibility();
+  }, [user, id]);
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!canReview) {
+      alert("You must have purchased and received this product to leave a review.");
+      return;
+    }
+    if (rating === 0) {
+      alert("Please select a rating");
+      return;
+    }
+
+    setIsSubmittingReview(true);
+    try {
+      // Shape the payload to match the Appwrite "reviews" collection
+      const reviewData = {
+        productId: id,
+        userid: user.$id,          // used for ownership checks
+        username: user.name || "", // display name
+        rating: Number(rating),
+        review: newReview,         // text content field in collection
+      };
+
+      if (editingReviewId) {
+        await updateReview(editingReviewId, reviewData);
+      } else {
+        await addReview(reviewData);
+      }
+
+      setNewReview("");
+      setRating(0);
+      setEditingReviewId(null);
+      await loadReviews();
+      // Note: loadReviews needs to be available or defined. 
+      // It seems it wasn't hoisted or defined within scope in previous snippets, 
+      // I might need to make sure 'loadReviews' exists or is called correctly.
+      // Checking context: loadReviews is likely defined in the component but not shown in snippet.
+      // Wait, in the original code, 'fetchData' loads reviews. I should probably refactor 'fetchData' or just reload window/fetch data.
+      // But let's assume 'loadReviews' was part of the original code I replaced? 
+      // Actually, looking at line 60-95, reviews are loaded in useEffect.
+      // I should update the state directly or refetch. 
+      // To be safe, I will just call semantic reload logic or triggers.
+      // For now, I'll assume loadReviews() existed or I need to add it.
+      // Actually, I can just re-trigger the useEffect or fetch manually.
+      // Let's replace loadReviews() with a manual fetch or ignore if not critical for syntax fix.
+      // Or better, let's define `loadReviews` too if needed.
+    } catch (error) {
+      console.error(error);
+      alert("Failed to submit review");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const loadReviews = async () => {
+    try {
+      const fetchedReviews = await getReviews(id);
+      setReviews(fetchedReviews.documents || []);
+    } catch (e) {
+      console.error("Error loading reviews:", e);
+      setReviews([]);
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [p, all, fetchedReviews] = await Promise.all([
+        const [p, all] = await Promise.all([
           getProductById(id),
           getProducts(),
-          getReviews(id).catch(() => ({ documents: [] })) // Fail gracefully
         ]);
         setProduct(p);
-        setReviews(fetchedReviews.documents || []);
+
+        // Load reviews separately
+        await loadReviews();
 
         // Related products logic
         const relatedProducts = (all.documents || [])
@@ -135,38 +239,7 @@ function ProductDetail() {
   };
 
   // Review handlers (omitted detailed implementation changes for brevity, logic remains same)
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
-    if (!ensureAuth()) return;
-    if (!newReview.trim()) return;
 
-    setIsSubmittingReview(true);
-    try {
-      // ... (Exact same logic as before but assumes DB structure is compatible)
-      if (editingReviewId) {
-        await updateReview(editingReviewId, { review: newReview, rating: parseInt(rating) });
-        setReviews(reviews.map(r => r.$id === editingReviewId ? { ...r, review: newReview, rating: parseInt(rating) } : r));
-        setEditingReviewId(null);
-      } else {
-        const reviewData = {
-          userid: user.$id,
-          productId: product.$id,
-          review: newReview,
-          rating: parseInt(rating),
-          username: user.name || "SkinGlow Member"
-        };
-        const res = await addReview(reviewData);
-        setReviews([res, ...reviews]);
-      }
-      setNewReview("");
-      setRating(5);
-    } catch (error) {
-      console.error("Review failed:", error);
-      alert("Review submission failed");
-    } finally {
-      setIsSubmittingReview(false);
-    }
-  };
 
   const handleEditReview = (review) => {
     setNewReview(review.review);
@@ -419,19 +492,31 @@ function ProductDetail() {
               <div className="max-w-2xl mx-auto">
                 {/* Review Form Logic Wrapper */}
                 {user ? (
-                  <form onSubmit={handleReviewSubmit} className="bg-card p-6 rounded-2xl border border-border mb-8 shadow-sm">
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="font-bold text-foreground">Write a Review</span>
-                      {editingReviewId && <button type="button" onClick={handleCancelEdit} className="text-xs text-red-500">Cancel</button>}
+                  verificationLoading ? (
+                    <div className="text-center p-6 text-muted-foreground text-sm">Checking eligibility...</div>
+                  ) : canReview ? (
+                    <form onSubmit={handleReviewSubmit} className="bg-card p-6 rounded-2xl border border-border mb-8 shadow-sm">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="font-bold text-foreground">Write a Review</span>
+                        {editingReviewId && <button type="button" onClick={handleCancelEdit} className="text-xs text-red-500">Cancel</button>}
+                      </div>
+                      <div className="flex gap-1 mb-4">
+                        {[1, 2, 3, 4, 5].map(s => (
+                          <Star key={s} onClick={() => setRating(s)} className={`cursor-pointer w-6 h-6 ${s <= rating ? 'fill-primary text-primary' : 'text-muted-foreground/30'}`} />
+                        ))}
+                      </div>
+                      <Textarea value={newReview} onChange={e => setNewReview(e.target.value)} placeholder="Tell us what you think..." className="mb-4 bg-background" />
+                      <Button disabled={isSubmittingReview} className="w-full bg-primary text-white">{isSubmittingReview ? "Submitting..." : "Post Review"}</Button>
+                    </form>
+                  ) : (
+                    <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center mb-8">
+                      <div className="flex justify-center mb-2">
+                        <ShieldCheck className="w-8 h-8 text-amber-500" />
+                      </div>
+                      <h4 className="font-bold text-amber-800 mb-1">Verified Buyers Only</h4>
+                      <p className="text-amber-700 text-sm">You can only write a review after you have purchased and received this product.</p>
                     </div>
-                    <div className="flex gap-1 mb-4">
-                      {[1, 2, 3, 4, 5].map(s => (
-                        <Star key={s} onClick={() => setRating(s)} className={`cursor-pointer w-6 h-6 ${s <= rating ? 'fill-primary text-primary' : 'text-muted-foreground/30'}`} />
-                      ))}
-                    </div>
-                    <Textarea value={newReview} onChange={e => setNewReview(e.target.value)} placeholder="Tell us what you think..." className="mb-4 bg-background" />
-                    <Button disabled={isSubmittingReview} className="w-full bg-primary text-white">{isSubmittingReview ? "Submitting..." : "Post Review"}</Button>
-                  </form>
+                  )
                 ) : (
                   <div className="text-center p-8 bg-secondary/20 rounded-2xl mb-8">
                     <p className="mb-2">Log in to leave a review</p>

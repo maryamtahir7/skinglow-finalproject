@@ -231,24 +231,50 @@ export default function UserOrdersPage() {
                       <Package className="w-4 h-4 text-primary" /> Items Ordered
                     </h3>
                     <div className="space-y-3">
-                      {items.map((i, idx) => (
-                        <div key={idx} className="flex items-center gap-4 bg-background p-3 rounded-2xl border border-secondary hover:border-border transition-colors">
-                          {(i.imageUrl || productImages[i.productId]) ? (
-                            <img src={i.imageUrl || productImages[i.productId]} alt={i.name} className="w-14 h-14 object-cover rounded-xl bg-secondary" />
-                          ) : (
-                            <div className="w-14 h-14 bg-secondary rounded-xl flex items-center justify-center border border-border">
-                              <Package className="w-7 h-7 text-muted-foreground/50" />
+                      {items.map((i, idx) => {
+                        const lineTotal = ((Number(i.price) || 0) * (Number(i.qty || i.quantity) || 1)).toFixed(2);
+                        const canWriteReview = order.status.toLowerCase() === "delivered";
+
+                        return (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-4 bg-background p-3 rounded-2xl border border-secondary hover:border-border transition-colors"
+                          >
+                            {(i.imageUrl || productImages[i.productId]) ? (
+                              <img
+                                src={i.imageUrl || productImages[i.productId]}
+                                alt={i.name}
+                                className="w-14 h-14 object-cover rounded-xl bg-secondary"
+                              />
+                            ) : (
+                              <div className="w-14 h-14 bg-secondary rounded-xl flex items-center justify-center border border-border">
+                                <Package className="w-7 h-7 text-muted-foreground/50" />
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <h4 className="font-bold text-foreground text-sm line-clamp-1">{i.name || i.productId}</h4>
+                              <p className="text-xs text-muted-foreground">Qty: {i.qty || i.quantity}</p>
+
+                              {canWriteReview && i.productId && (
+                                <div className="mt-1">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-7 px-3 text-[11px] rounded-full border-primary/40 text-primary hover:bg-primary/5"
+                                    onClick={() => navigate(`/products/${i.productId}`, { state: { openReviews: true } })}
+                                  >
+                                    Write Review
+                                  </Button>
+                                </div>
+                              )}
                             </div>
-                          )}
-                          <div className="flex-1">
-                            <h4 className="font-bold text-foreground text-sm line-clamp-1">{i.name || i.productId}</h4>
-                            <p className="text-xs text-muted-foreground">Qty: {i.qty || i.quantity}</p>
+                            <div className="font-bold text-foreground text-sm">
+                              Rs. {lineTotal}
+                            </div>
                           </div>
-                          <div className="font-bold text-foreground text-sm">
-                            Rs. {((Number(i.price) || 0) * (Number(i.qty || i.quantity) || 1)).toFixed(2)}
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 

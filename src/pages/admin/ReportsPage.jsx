@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart3, PlusCircle, TrendingUp, TrendingDown, RefreshCcw, Loader2, FilePlus, Pencil, Trash2 } from "lucide-react";
+import { BarChart3, TrendingUp, TrendingDown, RefreshCcw, Loader2, FilePlus, Pencil, Trash2 } from "lucide-react";
 import { getReports, addReport, getOrders, updateReport, deleteReport } from "../../backend/database";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+const MONTHS = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
 
 export default function ReportsPage() {
   const [reports, setReports] = useState([]);
@@ -93,7 +98,22 @@ export default function ReportsPage() {
 
     } catch (error) {
       console.error("Report generation failed:", error);
-      alert("Failed to generate report: " + error.message);
+
+      // Permission Error Handling
+      if (error.message && error.message.includes('Missing "create" permission')) {
+        // Try to get current user ID to helper user
+        let userId = "unknown";
+        try {
+          const { account } = await import("../../backend/appwrite");
+          const user = await account.get();
+          userId = user.$id;
+        } catch (uErr) { console.error(uErr); }
+
+        alert(`PERMISSION DENIED: You do not have 'create' permissions for Reports.\n\nPlease go to Appwrite Console > Database > Reports > Settings > Permissions.\n\nAdd this User ID to 'Create':\n${userId}\n\nTechnical Details:\n${error.message}`);
+        console.log("Your User ID is:", userId);
+      } else {
+        alert("Failed to generate report: " + error.message);
+      }
     } finally {
       setGenerating(false);
     }
@@ -157,35 +177,91 @@ export default function ReportsPage() {
 
     } catch (error) {
       console.error("Failed to save manual report:", error);
-      alert("Error: " + error.message);
+
+      // Permission Error Handling
+      if (error.message && error.message.includes('Missing "create" permission')) {
+        let userId = "unknown";
+        try {
+          const { account } = await import("../../backend/appwrite");
+          const user = await account.get();
+          userId = user.$id;
+        } catch (uErr) { console.error(uErr); }
+
+        alert(`PERMISSION DENIED: You cannot create/update reports.\n\nPlease update Appwrite Permissions for User ID:\n${userId}\n\nTechnical Details:\n${error.message}`);
+      } else {
+        alert("Error: " + error.message);
+      }
     } finally {
       setSavingManual(false);
     }
   };
 
-  const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
+  const summary = useMemo(() => {
+    if (!reports.length) {
+      return {
+        totalRevenue: 0,
+        totalProfit: 0,
+        monthsTracked: 0,
+        trendLabel: "No data yet",
+        trendValue: 0,
+      };
+    }
+
+    const totalRevenue = reports.reduce((sum, r) => sum + (r.totalSales || 0), 0);
+    const totalProfit = reports.reduce((sum, r) => sum + (r.profit || 0), 0);
+
+    // Sort reports by year + month index to find latest vs previous
+    const sorted = [...reports].sort((a, b) => {
+      const ai = (a.year || 0) * 12 + (MONTHS.indexOf(a.month) || 0);
+      const bi = (b.year || 0) * 12 + (MONTHS.indexOf(b.month) || 0);
+      return ai - bi;
+    });
+
+    const latest = sorted[sorted.length - 1];
+    const prev = sorted.length > 1 ? sorted[sorted.length - 2] : null;
+
+    let trendLabel = "Stable";
+    let trendValue = 0;
+
+    if (prev && latest?.totalSales && prev.totalSales) {
+      const diff = latest.totalSales - prev.totalSales;
+      trendValue = Math.round((diff / prev.totalSales) * 100);
+      if (trendValue > 0) trendLabel = "Up from last month";
+      else if (trendValue < 0) trendLabel = "Down from last month";
+      else trendLabel = "Same as last month";
+    } else {
+      trendLabel = "First month of data";
+    }
+
+    return {
+      totalRevenue,
+      totalProfit,
+      monthsTracked: reports.length,
+      trendLabel,
+      trendValue,
+    };
+  }, [reports]);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Health & Sales Reports</h1>
-          <p className="text-slate-500 text-sm">Analyze pharmacy performance and sales trends.</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">Health & Sales Reports</h1>
+          <p className="text-muted-foreground text-sm md:text-[13px]">
+            Monitor monthly performance, revenue, and profit in one clean view.
+          </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             onClick={generateReport}
             disabled={generating || loading}
-            className="bg-teal-600 hover:bg-teal-700 text-white"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm"
           >
             {generating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCcw className="h-4 w-4 mr-2" />}
             {generating ? "Generating..." : "Auto-Generate Current Month"}
           </Button>
 
-          <Button variant="outline" className="border-slate-200" onClick={handleOpenManual}>
+          <Button variant="outline" className="border-border hover:bg-secondary" onClick={handleOpenManual}>
             <FilePlus className="h-4 w-4 mr-2" /> Manual Entry
           </Button>
 
@@ -203,7 +279,7 @@ export default function ReportsPage() {
                         <SelectValue placeholder="Select Month" />
                       </SelectTrigger>
                       <SelectContent>
-                        {months.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                        {MONTHS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
                       </SelectContent>
                     </Select>
                   </div>
@@ -237,7 +313,7 @@ export default function ReportsPage() {
               </div>
               <DialogFooter>
                 <Button variant="outline" onClick={() => setIsManualOpen(false)}>Cancel</Button>
-                <Button onClick={handleManualSubmit} disabled={savingManual} className="bg-teal-600 text-white">
+                <Button onClick={handleManualSubmit} disabled={savingManual} className="bg-primary text-white">
                   {savingManual ? "Saving..." : (editingId ? "Update Report" : "Save Report")}
                 </Button>
               </DialogFooter>
@@ -246,9 +322,73 @@ export default function ReportsPage() {
         </div>
       </div>
 
+      {/* Summary cards */}
+      {!loading && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden">
+            <CardContent className="p-5 flex flex-col gap-2">
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Total Revenue
+              </span>
+              <div className="text-2xl font-bold text-foreground">
+                Rs. {summary.totalRevenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Across all recorded months.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-primary/5 border border-primary/10 shadow-sm rounded-2xl overflow-hidden">
+            <CardContent className="p-5 flex flex-col gap-2">
+              <span className="text-xs font-semibold uppercase tracking-widest text-primary">
+                Total Net Profit (Est.)
+              </span>
+              <div className="text-2xl font-bold text-primary">
+                Rs. {summary.totalProfit.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+              </div>
+              <p className="text-xs text-primary/80">
+                Based on your saved monthly reports.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden">
+            <CardContent className="p-5 flex flex-col gap-2">
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Performance Trend
+              </span>
+              <div className="flex items-center gap-2">
+                {summary.trendValue >= 0 ? (
+                  <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-emerald-50 text-emerald-600">
+                    <TrendingUp className="w-4 h-4" />
+                  </div>
+                ) : (
+                  <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-rose-50 text-rose-600">
+                    <TrendingDown className="w-4 h-4" />
+                  </div>
+                )}
+                <div>
+                  <div className="text-sm font-semibold text-foreground">
+                    {summary.trendValue > 0 && <>+{summary.trendValue}% vs. last month</>}
+                    {summary.trendValue < 0 && <>{summary.trendValue}% vs. last month</>}
+                    {summary.trendValue === 0 && "No change vs. last month"}
+                  </div>
+                  <p className="text-xs text-muted-foreground">{summary.trendLabel}</p>
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Tracking <span className="font-semibold">{summary.monthsTracked}</span> month
+                {summary.monthsTracked === 1 ? "" : "s"} of data.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex items-center justify-center h-40">
-          <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
+          <Loader2 className="w-8 h-8 text-primary animate-spin" />
         </div>
       ) : reports.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-xl border border-slate-200">
@@ -259,33 +399,61 @@ export default function ReportsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {reports.map((report) => (
-            <Card key={report.$id} className="relative border border-slate-200 shadow-sm hover:shadow-md transition bg-white overflow-hidden group">
-              <CardHeader className="bg-slate-50 border-b border-slate-100 py-3 flex flex-row items-center justify-between">
-                <CardTitle className="text-sm font-bold text-slate-700 uppercase tracking-wide flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-teal-600" /> {report.type}
+            <Card
+              key={report.$id}
+              className="relative border border-border shadow-sm hover:shadow-md transition bg-card overflow-hidden group rounded-2xl"
+            >
+              <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/0 border-b border-border/60 py-3 flex flex-row items-center justify-between">
+                <CardTitle className="text-xs font-bold text-muted-foreground uppercase tracking-[0.18em] flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-primary" /> {report.type}
                 </CardTitle>
                 <div className="flex gap-1 opacity-100 transition-opacity">
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-blue-600 hover:bg-blue-50" onClick={() => handleEditClick(report)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-blue-600 hover:bg-blue-50"
+                    onClick={() => handleEditClick(report)}
+                  >
                     <Pencil className="h-3.5 w-3.5" />
                   </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-red-600 hover:bg-red-50" onClick={() => handleDeleteReport(report.$id)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-red-600 hover:bg-red-50"
+                    onClick={() => handleDeleteReport(report.$id)}
+                  >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </CardHeader>
               <CardContent className="p-6">
-                <div className="text-xs font-semibold text-slate-400 mb-4">{report.month} {report.year}</div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-xs font-semibold text-muted-foreground">
+                    {report.month} {report.year}
+                  </div>
+                  <span className="inline-flex items-center rounded-full bg-secondary/60 px-3 py-1 text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">
+                    Monthly Summary
+                  </span>
+                </div>
 
                 <div className="space-y-4">
                   <div>
-                    <div className="text-sm text-slate-500 mb-1">Total Revenue</div>
-                    <div className="text-2xl font-bold text-slate-900">Rs. {report.totalSales?.toLocaleString()}</div>
+                    <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+                      Total Revenue
+                    </div>
+                    <div className="text-2xl font-bold text-foreground">
+                      Rs. {report.totalSales?.toLocaleString()}
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="text-xs text-slate-500 mb-1">Net Profit (Est.)</div>
-                      <div className="text-lg font-semibold text-teal-600">Rs. {report.profit?.toLocaleString()}</div>
+                      <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+                        Net Profit (Est.)
+                      </div>
+                      <div className="text-lg font-semibold text-primary">
+                        Rs. {report.profit?.toLocaleString()}
+                      </div>
                     </div>
                   </div>
                 </div>
