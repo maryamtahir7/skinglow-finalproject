@@ -124,7 +124,7 @@ export default function CheckoutPage() {
       await createOrder({
         userId: user.$id,
         items: summaryItems,
-        total: finalTotal,
+        total: Math.round(finalTotal),
         ...form,
         status: "pending",
       });
