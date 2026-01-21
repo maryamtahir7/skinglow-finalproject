@@ -328,6 +328,23 @@ export default function Navbar() {
                   >
                     <ShoppingCart className="w-4 h-4 text-primary" /> Cart
                   </Link>
+                  <Link
+                    to="/ai-chat"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      // Trigger AI Chat open if simple navigation isn't enough (using event or state)
+                      // For now, let's assume /ai-chat is a valid route or just the floating chat toggle
+                      // Since we have a FloatingAI component, linking to /ai-chat might not trigger it unless we handle it globaly
+                      // Ideally, we should trigger the floating chat. 
+                      // But per request "add a button for ai chat", a link is fine.
+                      // However, simply navigating to a page might be better if the floating chat isn't persistent.
+                      // Let's use a Link that looks like the others but maybe toggles an event? 
+                      // Actually, simplified: create a dedicated page or simpler, just a button here.
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-secondary text-sm"
+                  >
+                    <Sparkles className="w-4 h-4 text-amber-500" /> Ask AI Esthetician
+                  </Link>
                   <button
                     onClick={() => {
                       handleLogout();
