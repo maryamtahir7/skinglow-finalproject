@@ -2,9 +2,16 @@
 import { Client, Account, Databases, Storage } from "appwrite";
 
 // ✅ Initialize Appwrite client
-const client = new Client()
-  .setEndpoint(import.meta.env.VITE_APPWRITE_ENDPOINT) // e.g. "http://localhost/v1"
-  .setProject(import.meta.env.VITE_APPWRITE_PROJECT_ID); // your project ID
+const endpoint = import.meta.env.VITE_APPWRITE_ENDPOINT || "https://cloud.appwrite.io/v1";
+const projectId = import.meta.env.VITE_APPWRITE_PROJECT_ID;
+
+const client = new Client();
+
+if (endpoint && projectId) {
+  client.setEndpoint(endpoint).setProject(projectId);
+} else {
+  console.error("⚠️ Appwrite Environment Variables missing! Check your Vercel settings.");
+}
 
 // ✅ Services
 const account = new Account(client);
