@@ -40,35 +40,48 @@ export default function FloatingAI() {
 
         // --- CORE WEBSITE INFO ---
         if (text.includes('track') || text.includes('order') || text.includes('shipping'))
-            return '🚚 **Shipping & Tracking:**\nWe offer free express shipping on all orders over Rs. 2000! You can track your order in the "My Orders" section of your profile. Shipping usually takes 2-4 business days.';
+            return '🚚 **Shipping & Tracking:**\nWe offer **Free Express Shipping** on all orders over Rs. 2000! \n\n• **Standard:** 3-5 Business Days\n• **Express:** 1-2 Business Days\n\nYou can track your order in the "My Orders" section of your profile.';
 
         if (text.includes('return') || text.includes('refund') || text.includes('exchange'))
-            return '🔄 **Returns made easy:**\nWe accept returns within 30 days of purchase if the product is unused. Just email support@skinglow.com with your order ID to start a return.';
+            return '🔄 **Hassle-Free Returns:**\nWe want you to love your skin! We accept returns within **30 days** of purchase if the product is unused. \n\n📧 Email support@skinglow.com with your order ID to start.';
 
         if (text.includes('contact') || text.includes('support') || text.includes('help'))
-            return '📞 **We are here for you:**\nYou can reach our support team at support@skinglow.com or call us at +91-800-GLOW-NOW (Mon-Fri, 9am-6pm).';
+            return '📞 **We are here for you:**\nOur skincare experts are available Mon-Fri, 9am-6pm.\n\n• **Email:** support@skinglow.com\n• **Phone:** +91-800-GLOW-NOW';
 
-        // --- SKINCARE KNOWLEDGE ---
+        // --- ADVANCED SKINCARE KNOWLEDGE ---
+
+        // ACNE & BLEMISHES
         if (text.includes('acne') || text.includes('pimple') || text.includes('breakout'))
-            return '✨ **For Acne:**\nLook for **Salicylic Acid** (BHA) to unclog pores and **Niacinamide** to reduce inflammation. \n\n👉 I recommend our **Clarifying Serum** and **Oil-Free Moisturizer**. Avoid heavy oils!';
+            return '✨ **Managing Acne:**\nBreakouts happen! The key is gentle exfoliation and calming ingredients.\n\n**Recommended Ingredients:**\n• **Salicylic Acid (BHA):** Unclogs pores.\n• **Niacinamide:** Reduces redness & oil.\n• **Tea Tree Oil:** Antibacterial.\n\n👉 **Try:** *Clarifying Serum* & *Oil-Free Moisturizer*.';
 
+        // DRY & DEHYDRATED
         if (text.includes('dry') || text.includes('flakey') || text.includes('tight'))
-            return '💧 **For Dry Skin:**\nHydration is key! You need **Hyaluronic Acid** to draw water in and **Ceramides** to lock it in. \n\n👉 Try our **Deep Hydration Cream** and **Gentle Milk Cleanser**.';
+            return '💧 **Dry vs. Dehydrated:**\nDry skin lacks oil, while dehydrated skin lacks water. You likely need both hydration and moisture lock!\n\n**Power Duos:**\n• **Hyaluronic Acid:** Draws water in.\n• **Ceramides:** Builds skin barrier.\n• **Squalane:** Mimics natural oils.\n\n👉 **Try:** *Deep Hydration Cream*.';
 
+        // ANTI-AGING
+        if (text.includes('age') || text.includes('wrinkle') || text.includes('line') || text.includes('aging'))
+            return '⏳ **Ageless Beauty:**\nIt\'s never too early for prevention! Retinoids and SPF are the gold standards.\n\n**Gold Standards:**\n• **Retinol:** Stimulates collagen.\n• **Peptides:** Firms skin structure.\n• **Vitamin C:** Brightens & protects.\n\n👉 **Try:** *Ageless Night Cream* & *Peptide Serum*.';
+
+        // SENSITIVE
+        if (text.includes('sensitive') || text.includes('red') || text.includes('irritat'))
+            return '🌸 **Sensitive Skin Care:**\nLess is more! Avoid fragrance and harsh scrubs. Focus on repairing your barrier.\n\n**Soothing Heroes:**\n• **Centella Asiatica (Cica):** Calms redness.\n• **Oat Extract:** Soothes itchiness.\n• **Aloe Vera:** Hydrates gently.\n\n👉 **Try:** *Calming Gel Cleanser*.';
+
+        // GLOW & DULLNESS
         if (text.includes('dull') || text.includes('bright') || text.includes('glow'))
-            return '🌟 **Get that Glow:**\n**Vitamin C** is your best friend for brightness! Use it in the morning. Exfoliating 1-2 times a week with **AHA/BHA** also reveals fresh skin. \n\n👉 Check out our **Vitamin C Glow Serum**.';
+            return '🌟 **Unlock Your Glow:**\nDullness is often due to dead skin buildup. Exfoliation + Brightening is the fix!\n\n**Glow Getters:**\n• **Vitamin C:** Fades dark spots.\n• **Glycolic Acid (AHA):** Resurfaces texture.\n\n👉 **Try:** *Vitamin C Glow Serum* (AM) & *Glow Tonic* (PM).';
 
-        if (text.includes('routine') || text.includes('steps'))
-            return '🧴 **Basic Routine Guide:**\n\n☀️ **AM:** Cleanser ➔ Vitamin C ➔ Moisturizer ➔ Sunscreen (SPF 50)\n🌙 **PM:** Cleanser ➔ Treatment (Retinol/Acne) ➔ Moisturizer\n\nConsistency is the secret to glowing skin!';
+        // ROUTINE BUILDING
+        if (text.includes('routine') || text.includes('steps') || text.includes('order'))
+            return '🧴 **The Perfect Routine Order:**\n\n☀️ **Morning (Protect):**\n1. Cleanser\n2. Vitamin C / Antioxidant\n3. Moisturizer\n4. **Sunscreen (SPF 50)** – *Vital!*\n\n🌙 **Evening (Repair):**\n1. Oil Cleanser (if wearing makeup)\n2. Water Cleanser\n3. Treatment (Retinol/Acne)\n4. Moisturizer';
 
         if (text.includes('sunscreen') || text.includes('spf'))
-            return '☀️ **Sunscreen is Non-Negotiable!**\nUV rays cause 90% of premature aging. Use at least SPF 30 every single day, inside or outside. Reapply every 2 hours if outdoors.';
+            return '☀️ **Sunscreen is Non-Negotiable!**\nUV rays cause 90% of premature aging. \n\n• **Rule:** SPF 30+ every single day.\n• **Amount:** 2 finger lengths for face & neck.\n• **Reapply:** Every 2 hours outdoors.';
 
         // --- FALLBACK ---
         const fallbackResponses = [
-            '🤔 That’s a great question! I recommend checking our "Shop by Concern" filters to find exactly what you need.',
-            '✨ Skincare is personal! Could you tell me a bit more about your skin type (Oily, Dry, Combination)?',
-            '💖 I\'m your virtual esthetician! Ask me about specific ingredients like Retinol, Vitamin C, or Hyaluronic Acid.'
+            '🤔 **Good Question!**\nI recommend browsing our **"Shop by Concern"** section to filter products exactly for your needs.',
+            '✨ **Skincare is Personal!**\nCould you tell me your skin type? (e.g., *Oily, Dry, Combination, Sensitive*)',
+            '💖 **I\'m here to help!**\nAsk me about specific ingredients like *Retinol*, *Vitamin C*, or *Hyaluronic Acid*.'
         ];
         return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
     };
@@ -95,11 +108,11 @@ export default function FloatingAI() {
 
     return (
         <>
-            {/* Floating Toggle Button - Optimized for Mobile */}
+            {/* Floating Toggle Button - Optimized */}
             <button
                 type="button"
                 onClick={toggleChat}
-                className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[60] flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 group
+                className={`fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[60] flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 group
                 ${isOpen
                         ? 'w-12 h-12 bg-white/80 backdrop-blur-md border border-slate-200 text-slate-600 rotate-90'
                         : 'w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-primary to-pink-600 text-white animate-bounce-slow shadow-primary/40'
@@ -119,29 +132,31 @@ export default function FloatingAI() {
                 )}
             </button>
 
-            {/* Chat Interface Popup - Full Screen on Mobile */}
+            {/* Chat Interface Popup - Premium Desktop Size */}
             {isOpen && (
                 <div
-                    className="fixed bottom-0 right-0 md:bottom-28 md:right-8 z-[60] w-full h-[100dvh] md:w-[400px] md:h-[600px] md:max-h-[80vh] bg-white/95 md:bg-white/90 backdrop-blur-2xl md:backdrop-blur-xl md:rounded-[2.5rem] shadow-2xl border border-white/50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300 origin-bottom-right"
+                    className="fixed bottom-0 right-0 md:bottom-28 md:right-10 z-[60] w-full h-[100dvh] md:w-[450px] md:h-[700px] md:max-h-[85vh] bg-white/95 md:bg-white/90 backdrop-blur-2xl md:backdrop-blur-3xl md:rounded-[2.5rem] shadow-2xl border border-white/50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300 origin-bottom-right ring-1 ring-black/5"
                     style={{
-                        // Prevents iOS keyboard messing up layout
                         paddingBottom: 'safe-area-inset-bottom'
                     }}
                 >
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-primary/10 via-pink-500/5 to-purple-500/10 px-6 py-4 md:py-5 flex items-center justify-between border-b border-primary/5 shrink-0">
+                    <div className="bg-gradient-to-r from-primary/10 via-pink-500/5 to-purple-500/10 px-6 py-4 md:py-6 flex items-center justify-between border-b border-primary/5 shrink-0">
                         <div className="flex items-center gap-4">
                             <div className="relative">
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-primary to-pink-500 p-[2px] shadow-sm">
+                                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-tr from-primary to-pink-500 p-[2px] shadow-sm">
                                     <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
-                                        <Sparkles className="w-6 h-6 text-primary fill-primary/20" />
+                                        <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-primary fill-primary/20" />
                                     </div>
                                 </div>
                                 <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full"></span>
                             </div>
                             <div>
-                                <h3 className="font-bold text-slate-800 text-lg leading-tight">SkinGlow AI</h3>
-                                <p className="text-slate-500 text-xs font-semibold tracking-wide uppercase">Esthetician</p>
+                                <h3 className="font-bold text-slate-800 text-lg md:text-xl leading-tight">SkinGlow AI</h3>
+                                <div className="flex items-center gap-1.5 opacity-80">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-primary/60"></span>
+                                    <p className="text-slate-500 text-xs font-semibold tracking-wide uppercase">Esthetician</p>
+                                </div>
                             </div>
                         </div>
                         <div className="flex items-center gap-1 md:hidden">
@@ -191,7 +206,7 @@ export default function FloatingAI() {
                     </div>
 
                     {/* Input Area */}
-                    <div className="p-4 bg-white/90 backdrop-blur-xl border-t border-slate-100 shrink-0 mb-safe">
+                    <div className="p-4 md:p-5 bg-white/90 backdrop-blur-xl border-t border-slate-100 shrink-0 mb-safe">
                         {/* Suggested Prompts Carousel */}
                         <div className="flex gap-2 overflow-x-auto pb-4 pt-1 no-scrollbar mask-gradient-right">
                             {suggestedPrompts.map((prompt, i) => (
