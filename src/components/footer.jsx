@@ -247,3 +247,4 @@ export default function Footer() {
     </footer>
   );
 }
+// Footer component updated
