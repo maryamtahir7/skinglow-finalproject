@@ -9,18 +9,16 @@ import {
   createOrder,
 } from "../backend/database";
 import {
-  CreditCard,
   Banknote,
-  Truck,
   ShieldCheck,
   Lock,
   MapPin,
-  User,
   CheckCircle,
   ShoppingBag
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+// --- MAIN PAGE ---
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,11 +41,16 @@ export default function CheckoutPage() {
 
   // Load cart or buyNow
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
-      return;
+    if (!user) { navigate("/login"); return; }
+    if (user.prefs) {
+      setForm(prev => ({
+        ...prev,
+        phone: user.prefs.phone ? String(user.prefs.phone).replace(/[^0-9]/g, '') : prev.phone,
+        address: user.prefs.address || prev.address,
+        city: user.prefs.city || prev.city,
+        postalCode: user.prefs.postalCode || prev.postalCode
+      }));
     }
-
     (async () => {
       try {
         if (buyNow) {
@@ -56,106 +59,89 @@ export default function CheckoutPage() {
         } else {
           const cart = await getCart(user.$id);
           setCartDocs(cart.documents || []);
-
           const ids = (cart.documents || []).map((c) => c.productId);
           if (ids.length > 0) {
             const products = await getProductsByIds(ids);
             const map = {};
-            (products.documents || []).forEach((p) => {
-              map[p.$id] = p;
-            });
+            (products.documents || []).forEach((p) => { map[p.$id] = p; });
             setProductsMap(map);
           }
         }
-      } catch (err) {
-        console.error("Checkout load error:", err);
-      } finally {
-        setLoading(false);
-      }
+      } catch (err) { console.error("Checkout load error:", err); }
+      finally { setLoading(false); }
     })();
   }, [user, buyNow, navigate]);
 
-  // Summary logic
   const summaryItems = useMemo(() => {
     if (buyNow) {
       const p = buyNow.product;
-      return [
-        {
-          productId: p.$id,
-          name: p.name,
-          price: Number(p.price),
-          qty: Number(buyNow.quantity),
-          imageUrl: p.imageUrl,
-        },
-      ];
+      return [{ productId: p.$id, name: p.name, price: Number(p.price), qty: Number(buyNow.quantity), imageUrl: p.imageUrl }];
     }
-
-    return (cartDocs || [])
-      .map((c) => {
-        const p = productsMap[c.productId];
-        if (!p) return null;
-        return {
-          productId: p.$id,
-          name: p.name,
-          price: Number(p.price),
-          qty: Number(c.quantity),
-          imageUrl: p.imageUrl,
-        };
-      })
-      .filter(Boolean);
+    return (cartDocs || []).map((c) => {
+      const p = productsMap[c.productId];
+      if (!p) return null;
+      return { productId: p.$id, name: p.name, price: Number(p.price), qty: Number(c.quantity), imageUrl: p.imageUrl };
+    }).filter(Boolean);
   }, [buyNow, cartDocs, productsMap]);
 
-  const total = useMemo(
-    () => summaryItems.reduce((sum, it) => sum + it.price * it.qty, 0),
-    [summaryItems]
-  );
-
+  const total = useMemo(() => summaryItems.reduce((sum, it) => sum + it.price * it.qty, 0), [summaryItems]);
   const tax = total * 0.05;
   const finalTotal = total + tax;
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const handleOrderPlacement = async (transactionId = null) => {
     if (!summaryItems.length || !form.name || !form.phone || !form.address) {
       alert("Please fill all fields.");
       return;
     }
 
-    // Ensure we only use the authenticated user's email from their account
-    if (!user || !user.email) {
-      alert("User email not found. Please log in again.");
+    // Auth Check
+    const { getCurrentUser } = await import("../backend/auth");
+    const currentUser = await getCurrentUser();
+    if (!currentUser || !currentUser.email) {
+      alert("Unable to verify user email.");
+      return;
+    }
+
+    // Validate integers
+    const cleanPhone = String(form.phone).replace(/[^0-9]/g, '');
+    const phoneInt = parseInt(cleanPhone, 10);
+    const cleanPostal = String(form.postalCode).replace(/[^0-9]/g, '');
+    const postalInt = parseInt(cleanPostal, 10);
+
+    if (isNaN(phoneInt)) {
+      alert("Please enter a valid numeric phone number.");
+      return;
+    }
+    if (isNaN(postalInt)) {
+      alert("Please enter a valid numeric postal code.");
       return;
     }
 
     try {
-      // Fetch fresh user data from Appwrite to ensure we have the latest email
-      const { getCurrentUser } = await import("../backend/auth");
-      const currentUser = await getCurrentUser();
-      
-      if (!currentUser || !currentUser.email) {
-        alert("Unable to verify user email. Please log in again.");
-        return;
-      }
-
       await createOrder({
         userId: user.$id,
-        email: currentUser.email, // Only use authenticated user's email from Appwrite
+        email: currentUser.email,
         items: summaryItems,
         total: Math.round(finalTotal),
-        ...form, // name, phone, address, city, postalCode, notes, paymentMethod (NO email)
-        status: "pending",
+        ...form,
+        phone: phoneInt,
+        postalCode: postalInt,
+        status: transactionId ? "paid" : "pending",
+        transactionId: transactionId || ""
       });
 
-      if (!buyNow) {
-        await clearCart(user.$id);
-      }
-
+      if (!buyNow) await clearCart(user.$id);
       alert("Order placed successfully!");
       navigate("/");
     } catch (err) {
       console.error("Order failed:", err);
-      // alert("Failed. Try again.");
       alert(`Failed: ${err.message}`);
     }
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    handleOrderPlacement();
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center font-bold text-primary">Loading Secure Checkout...</div>;
@@ -169,118 +155,82 @@ export default function CheckoutPage() {
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Form Section */}
-          <form onSubmit={onSubmit} className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6">
 
-            {/* Shipping Info Card */}
+            {/* 1. SHIPPING FORM */}
             <div className="bg-card rounded-3xl shadow-sm border border-border p-8">
               <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-primary" /> Shipping Details
               </h2>
-
               <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-muted-foreground">Full Name</label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 w-5 h-5 text-muted-foreground/50" />
-                    <input
-                      required
-                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
-                      placeholder="Jane Doe"
-                      value={form.name}
-                      onChange={e => setForm({ ...form, name: e.target.value })}
-                    />
-                  </div>
+                  <input required className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary outline-none" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Jane Doe" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-muted-foreground">Phone Number</label>
+                  <label className="text-sm font-semibold text-muted-foreground">Phone</label>
                   <input
                     required
-                    type="tel"
-                    className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
-                    placeholder="+92 300 1234567"
+                    className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary outline-none"
                     value={form.phone}
-                    onChange={e => setForm({ ...form, phone: e.target.value })}
+                    onChange={e => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      setForm({ ...form, phone: val });
+                    }}
+                    placeholder="03001234567"
                   />
                 </div>
                 <div className="sm:col-span-2 space-y-2">
                   <label className="text-sm font-semibold text-muted-foreground">Address</label>
-                  <input
-                    required
-                    className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
-                    placeholder="123 Glow Avenue, Suite 101"
-                    value={form.address}
-                    onChange={e => setForm({ ...form, address: e.target.value })}
-                  />
+                  <input required className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary outline-none" value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} placeholder="123 Glow Avenue" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-muted-foreground">City</label>
-                  <input
-                    required
-                    className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
-                    placeholder="Lahore"
-                    value={form.city}
-                    onChange={e => setForm({ ...form, city: e.target.value })}
-                  />
+                  <input required className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary outline-none" value={form.city} onChange={e => setForm({ ...form, city: e.target.value })} placeholder="Lahore" />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-muted-foreground">Postal Code</label>
                   <input
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
-                    placeholder="54000"
+                    className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary outline-none"
                     value={form.postalCode}
-                    onChange={e => setForm({ ...form, postalCode: e.target.value })}
+                    onChange={e => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      setForm({ ...form, postalCode: val });
+                    }}
+                    placeholder="54000"
                   />
                 </div>
                 <div className="sm:col-span-2 space-y-2">
-                  <label className="text-sm font-semibold text-muted-foreground">Delivery Notes (Optional)</label>
-                  <input
-                    className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all outline-none"
-                    placeholder="Leave at front desk..."
-                    value={form.notes}
-                    onChange={e => setForm({ ...form, notes: e.target.value })}
-                  />
+                  <label className="text-sm font-semibold text-muted-foreground">Notes</label>
+                  <input className="w-full px-4 py-3 rounded-xl border border-border bg-background focus:border-primary outline-none" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} placeholder="Optional delivery instructions" />
                 </div>
               </div>
             </div>
 
-            {/* Payment Method */}
+            {/* 2. PAYMENT METHOD SELECTION */}
             <div className="bg-card rounded-3xl shadow-sm border border-border p-8">
               <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-primary" /> Payment
+                <Banknote className="w-5 h-5 text-primary" /> Payment
               </h2>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div
-                  onClick={() => setForm({ ...form, paymentMethod: "COD" })}
-                  className={`border rounded-xl p-4 cursor-pointer transition-all flex items-center gap-4 ${form.paymentMethod === "COD" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border hover:border-primary/50"}`}
-                >
-                  <div className="bg-background p-2 rounded-lg border border-border"><Banknote className="w-6 h-6 text-primary" /></div>
-                  <div>
-                    <div className="font-bold text-foreground">Cash on Delivery</div>
-                    <div className="text-xs text-muted-foreground">Pay when you receive</div>
-                  </div>
-                  {form.paymentMethod === "COD" && <CheckCircle className="w-5 h-5 text-primary ml-auto" />}
+              <div className="border rounded-2xl p-5 bg-primary/5 border-primary/20 flex items-center gap-4">
+                <div className="bg-background p-2.5 rounded-xl border border-border">
+                  <Banknote className="w-6 h-6 text-primary" />
                 </div>
+                <div className="flex-1">
+                  <div className="font-bold text-foreground">Cash on Delivery</div>
+                  <div className="text-xs text-muted-foreground">Online payment will be added in a future update.</div>
+                </div>
+                <CheckCircle className="w-5 h-5 text-primary" />
+              </div>
 
-                <div
-                  onClick={() => setForm({ ...form, paymentMethod: "Online" })}
-                  className={`border rounded-xl p-4 cursor-pointer transition-all flex items-center gap-4 ${form.paymentMethod === "Online" ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-border hover:border-primary/50"}`}
-                >
-                  <div className="bg-background p-2 rounded-lg border border-border"><CreditCard className="w-6 h-6 text-foreground" /></div>
-                  <div>
-                    <div className="font-bold text-foreground">Online Payment</div>
-                    <div className="text-xs text-muted-foreground">Credit/Debit Card</div>
-                  </div>
-                  {form.paymentMethod === "Online" && <CheckCircle className="w-5 h-5 text-primary ml-auto" />}
-                </div>
+              <div className="mt-8 pt-8 border-t border-border">
+                <Button onClick={onSubmit} className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-2xl text-lg shadow-xl shadow-primary/20">
+                  <CheckCircle className="w-5 h-5 mr-2" /> Place Order (COD)
+                </Button>
               </div>
             </div>
-
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white font-bold h-14 rounded-2xl text-lg shadow-xl shadow-primary/20 transition-transform hover:scale-[1.01]">
-              <Lock className="w-5 h-5 mr-2" /> Pay and Place Order
-            </Button>
-          </form>
+          </div>
 
           {/* Order Summary */}
           <div className="h-fit space-y-6">
