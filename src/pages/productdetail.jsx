@@ -1,558 +1,367 @@
-// src/pages/ProductDetail.jsx
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
-  getProductById,
-  getProducts,
-  addToCart,
-  addToWishlist,
-  getWishlist,
-  addReview,
-  updateReview,
-  deleteReview,
-  getReviews,
+  getProductById, getProducts, addToCart, addToWishlist, getWishlist,
+  addReview, updateReview, deleteReview, getReviews, canUserReviewProduct
 } from "../backend/database";
-import {
-  ArrowLeft,
-  Heart,
-  Truck,
-  ShieldCheck,
-  ShoppingBag,
-  Zap,
-  Package,
-  Sparkles,
-  Plus,
-  Minus,
-  AlertCircle,
-  FileText,
-  Info,
-  Droplets,
-  Sun,
-  CheckCircle,
-  Star,
-  MessageSquare,
-  Edit2,
-  Trash2,
-  X,
-} from "lucide-react";
 import { useUser } from "../context/UserContext";
+import { useToast } from "../context/ToastContext";
+import {
+  Minus, Plus, Heart, Star, ChevronDown, Check,
+  ShieldCheck, ArrowLeft, Share2, Sparkles, AlertCircle
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 
-function ProductDetail() {
+export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useUser();
+  const { showToast } = useToast();
 
+  // Data State
   const [product, setProduct] = useState(null);
-  const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isLiked, setIsLiked] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [activeTab, setActiveTab] = useState("details");
+  const [activeAccordion, setActiveAccordion] = useState(null);
   const [selectedImage, setSelectedImage] = useState(0);
 
-  // Review State
+  // Reviews State
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState("");
   const [rating, setRating] = useState(5);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
-  const [editingReviewId, setEditingReviewId] = useState(null);
-
-  // --- VERIFIED REVIEW CHECK ---
   const [canReview, setCanReview] = useState(false);
-  const [verificationLoading, setVerificationLoading] = useState(false);
 
-  // When user comes from "Write Review" button, jump directly to reviews tab
+  // Sticky Bar Logic
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const mainButtonRef = useRef(null);
+
   useEffect(() => {
-    if (location.state?.openReviews) {
-      setActiveTab("reviews");
-    }
-  }, [location.state]);
-  useEffect(() => {
-    async function checkEligibility() {
-      if (!user) return;
-      setVerificationLoading(true);
+    async function load() {
       try {
-        const { getOrdersByUser } = await import("../backend/database");
-        const ordersRes = await getOrdersByUser(user.$id);
-        const deliveredOrders = ordersRes.documents.filter(o => o.status === "delivered");
-
-        let found = false;
-        for (const order of deliveredOrders) {
-          try {
-            const items = JSON.parse(order.items);
-            if (items.some(item => item.productId === id)) {
-              found = true;
-              break;
-            }
-          } catch (e) { console.error("Error parsing order items", e); }
-        }
-        setCanReview(found);
-      } catch (e) {
-        console.error("Verification check failed", e);
-      } finally {
-        setVerificationLoading(false);
-      }
-    }
-    checkEligibility();
-  }, [user, id]);
-
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
-    if (!canReview) {
-      alert("You must have purchased and received this product to leave a review.");
-      return;
-    }
-    if (rating === 0) {
-      alert("Please select a rating");
-      return;
-    }
-
-    setIsSubmittingReview(true);
-    try {
-      // Shape the payload to match the Appwrite "reviews" collection
-      const reviewData = {
-        productId: id,
-        userid: user.$id,          // used for ownership checks
-        username: user.name || "", // display name
-        rating: Number(rating),
-        review: newReview,         // text content field in collection
-      };
-
-      if (editingReviewId) {
-        await updateReview(editingReviewId, reviewData);
-      } else {
-        await addReview(reviewData);
-      }
-
-      setNewReview("");
-      setRating(0);
-      setEditingReviewId(null);
-      await loadReviews();
-      // Note: loadReviews needs to be available or defined. 
-      // It seems it wasn't hoisted or defined within scope in previous snippets, 
-      // I might need to make sure 'loadReviews' exists or is called correctly.
-      // Checking context: loadReviews is likely defined in the component but not shown in snippet.
-      // Wait, in the original code, 'fetchData' loads reviews. I should probably refactor 'fetchData' or just reload window/fetch data.
-      // But let's assume 'loadReviews' was part of the original code I replaced? 
-      // Actually, looking at line 60-95, reviews are loaded in useEffect.
-      // I should update the state directly or refetch. 
-      // To be safe, I will just call semantic reload logic or triggers.
-      // For now, I'll assume loadReviews() existed or I need to add it.
-      // Actually, I can just re-trigger the useEffect or fetch manually.
-      // Let's replace loadReviews() with a manual fetch or ignore if not critical for syntax fix.
-      // Or better, let's define `loadReviews` too if needed.
-    } catch (error) {
-      console.error(error);
-      alert("Failed to submit review");
-    } finally {
-      setIsSubmittingReview(false);
-    }
-  };
-
-  const loadReviews = async () => {
-    try {
-      const fetchedReviews = await getReviews(id);
-      setReviews(fetchedReviews.documents || []);
-    } catch (e) {
-      console.error("Error loading reviews:", e);
-      setReviews([]);
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [p, all] = await Promise.all([
+        const [p, rev] = await Promise.all([
           getProductById(id),
-          getProducts(),
+          getReviews(id)
         ]);
         setProduct(p);
-
-        // Load reviews separately
-        await loadReviews();
-
-        // Related products logic
-        const relatedProducts = (all.documents || [])
-          .filter((d) => d.$id !== id && d.category === p.category)
-          .slice(0, 4);
-        setRelated(relatedProducts);
+        setReviews(rev.documents || []);
 
         if (user) {
-          const wishlist = await getWishlist(user.$id);
-          const alreadyLiked = wishlist.documents.some((w) => w.productId === id);
-          setIsLiked(alreadyLiked);
+          canUserReviewProduct(user.$id, id).then(setCanReview);
         }
       } catch (e) {
-        console.error("Error loading product detail:", e);
+        console.error(e);
+        showToast("Product not found", "error");
       } finally {
         setLoading(false);
       }
-    };
-    fetchData();
+    }
+    load();
   }, [id, user]);
 
-  const ensureAuth = () => {
-    if (!user) {
-      navigate("/login");
-      return false;
-    }
-    return true;
-  };
+  // Scroll observer for sticky bar
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setShowStickyBar(!entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+    if (mainButtonRef.current) observer.observe(mainButtonRef.current);
+    return () => observer.disconnect();
+  }, [loading]);
 
   const handleAddToCart = async () => {
-    if (!ensureAuth()) return;
+    if (!user) { navigate("/login"); return; }
     try {
-      await addToCart({
-        userId: user.$id,
-        productId: product.$id, // Assuming DB aligns
-        quantity,
-      });
-      alert(`Added to your routine`);
-    } catch (e) {
-      console.error(e);
-      alert("Failed to add to cart");
-    }
-  };
-
-  const handleAddToWishlist = async () => {
-    if (!ensureAuth()) return;
-    try {
-      await addToWishlist({ userId: user.$id, productId: product.$id });
-      setIsLiked(true);
-      alert("Saved to wishlist");
-    } catch (e) {
-      console.error(e);
-      alert("Failed to save");
-    }
+      await addToCart({ userId: user.$id, productId: product.$id, quantity });
+      showToast(`Added ${quantity}x ${product.name} to bag`, "cart");
+      window.dispatchEvent(new Event('cart-updated'));
+    } catch { showToast("Failed to add", "error"); }
   };
 
   const handleBuyNow = () => {
-    if (!ensureAuth()) return;
-    navigate("/checkout", { state: { buyNow: { product, quantity } } });
+    if (!user) { navigate("/login"); return; }
+    navigate("/checkout", {
+      state: {
+        buyNow: {
+          product: product,
+          quantity: quantity
+        }
+      }
+    });
   };
 
-  const handleQuantityChange = (delta) => {
-    setQuantity((prev) => Math.max(1, prev + delta));
-  };
-
-  // Review handlers (omitted detailed implementation changes for brevity, logic remains same)
-
-
-  const handleEditReview = (review) => {
-    setNewReview(review.review);
-    setRating(review.rating);
-    setEditingReviewId(review.$id);
-  };
-  const handleDeleteReview = async (id) => {
-    if (!window.confirm("Delete this review?")) return;
+  const handleWishlist = async () => {
+    if (!user) { navigate("/login"); return; }
     try {
-      await deleteReview(id);
-      setReviews(reviews.filter(r => r.$id !== id));
-    } catch (e) { console.error(e); }
-  };
-  const handleCancelEdit = () => {
-    setNewReview("");
-    setRating(5);
-    setEditingReviewId(null);
+      await addToWishlist({ userId: user.$id, productId: product.$id });
+      showToast("Saved to wishlist", "success");
+    } catch { showToast("Failed to save", "error"); }
   };
 
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) return;
+    setIsSubmittingReview(true);
+    try {
+      await addReview({
+        productId: id,
+        userid: user.$id,
+        username: user.name,
+        rating,
+        review: newReview,
+      });
+      const updated = await getReviews(id);
+      setReviews(updated.documents || []);
+      setNewReview("");
+    } catch { showToast("Review failed", "error"); }
+    finally { setIsSubmittingReview(false); }
+  };
 
-  const averageRating = reviews.length
-    ? (reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / reviews.length).toFixed(1)
-    : 0;
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="w-12 h-12 border-4 border-stone-200 border-t-stone-800 rounded-full animate-spin" /></div>;
+  if (!product) return null;
 
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <Sparkles className="animate-pulse w-10 h-10 text-primary" />
-      </div>
-    );
-  }
-
-  if (!product) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="text-center">
-          <AlertCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Product Not Found</h2>
-          <Button onClick={() => navigate("/products")} className="bg-primary hover:bg-primary/90">
-            Back to Shop
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  const productPrice = Number(product.price || 0).toFixed(2);
-
-  // Support multiple images per product: imageUrl, imageUrl2, imageUrl3 or an array field imageGallery
-  const productImagesRaw = [
-    product.imageUrl,
-    product.imageUrl2,
-    product.imageUrl3,
-    ...(Array.isArray(product.imageGallery) ? product.imageGallery : []),
-  ].filter(Boolean);
-
-  const productImages = productImagesRaw.length
-    ? productImagesRaw
-    : [product.imageUrl].filter(Boolean);
+  // Images Logic
+  const images = [product.imageUrl, product.imageUrl2, product.imageUrl3].filter(Boolean);
+  const displayPrice = parseInt(product.price).toLocaleString();
 
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground">
+    <div className="min-h-screen bg-[#FDFBF7] text-stone-900 font-sans selection:bg-rose-100 pb-32">
 
-      {/* Breadcrumb */}
-      <div className="border-b border-border py-4 px-6 sticky top-0 bg-background/80 backdrop-blur z-10">
-        <div className="max-w-7xl mx-auto flex items-center gap-2 text-sm text-muted-foreground">
-          <button onClick={() => navigate("/products")} className="hover:text-primary flex items-center gap-1 transition-colors">
-            Skincare
-          </button>
-          <span className="text-border">/</span>
-          <span className="text-foreground font-medium truncate">{product.name}</span>
+      {/* 1. STICKY HEADER (Mobile/Desktop) */}
+      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-stone-100 px-6 py-4 flex items-center justify-between">
+        <button onClick={() => navigate('/products')} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-stone-900 transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Shop
+        </button>
+        <div className="hidden md:block font-serif italic text-lg opacity-0 lg:opacity-100 transition-opacity">
+          {product.name}
         </div>
+        <button className="text-stone-400 hover:text-stone-900 transition-colors">
+          <Share2 className="w-5 h-5" />
+        </button>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid lg:grid-cols-2 gap-16 mb-20">
+      <div className="max-w-[1600px] mx-auto">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-24">
 
-          {/* Left: Images */}
-          <div className="space-y-6">
-            <div className="bg-card border border-border rounded-3xl overflow-hidden aspect-square relative group">
-              <img
-                src={productImages[selectedImage] || "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=800"}
-                alt={product.name}
-                onError={(e) => e.target.src = "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?auto=format&fit=crop&w=800"}
-                className="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-700"
-              />
-              <div className="absolute top-4 left-4 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                Best Seller
-              </div>
-            </div>
-            {/* Thumbs */}
-            <div className="flex gap-4 justify-center">
-              {productImages.map((img, i) => (
-                <div
-                  key={i}
-                  className={`w-20 h-20 rounded-xl cursor-pointer bg-card border-2 transition-all ${selectedImage === i ? 'border-primary ring-2 ring-primary/20' : 'border-transparent opacity-70 hover:opacity-100'}`}
-                  onClick={() => setSelectedImage(i)}
-                >
-                  <img src={img} alt="" className="w-full h-full object-cover rounded-lg" />
+          {/* 2. LEFT: STICKY GALLERY */}
+          <div className="relative">
+            {/* Desktop: Vertical Sticky Stack */}
+            <div className="hidden lg:block sticky top-24 space-y-4 pl-6 xl:pl-20">
+              {images.map((img, i) => (
+                <div key={i} className="bg-stone-50 w-full aspect-[4/5] rounded-[2px] overflow-hidden group cursor-zoom-in">
+                  <img src={img} alt="" className="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:scale-105 transition-transform duration-700" />
                 </div>
               ))}
             </div>
+
+            {/* Mobile: Horizontal Carousel */}
+            <div className="lg:hidden w-full aspect-square bg-stone-50 overflow-hidden relative snap-x snap-mandatory flex overflow-x-auto scrollbar-hide">
+              {images.map((img, i) => (
+                <img key={i} src={img} alt="" className="w-full h-full object-cover mix-blend-multiply shrink-0 snap-center" />
+              ))}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                {images.map((_, i) => (
+                  <div key={i} className="w-2 h-2 rounded-full bg-stone-800/20" />
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Right: Details */}
-          <div className="flex flex-col justify-center">
-            <div className="mb-2 text-primary font-bold uppercase tracking-widest text-xs">
-              {product.category || "Skincare"}
-            </div>
-            <h1 className="text-3xl md:text-5xl font-bold mb-4 leading-tight">{product.name}</h1>
 
-            <div className="flex items-center gap-4 text-sm mb-6">
-              <div className="flex text-primary">
-                <Star className="w-4 h-4 fill-current" />
-                <span className="ml-1 font-bold">{averageRating}</span>
-              </div>
-              <span className="text-muted-foreground">{reviews.length} Reviews</span>
-            </div>
+          {/* 3. RIGHT: CONTENT & STORY */}
+          <div className="px-6 lg:pr-24 pt-8 lg:pt-0">
+            <div className="lg:sticky lg:top-24 lg:max-h-screen lg:overflow-y-auto scrollbar-hide pb-32">
 
-            {/* Price Display with Discount Logic */}
-            <div className="mb-8 flex items-end gap-3">
-              {(() => {
-                const numericPrice = parseInt(String(product.price || 0).replace(/,/g, ""), 10) || 0;
-                const originalPrice = numericPrice ? Math.round(numericPrice * 1.25) : 0;
-                return (
-                  <>
-                    <div className="text-3xl md:text-4xl font-bold text-primary">
-                      Rs. {numericPrice.toLocaleString()}
+              {/* Header */}
+              <div className="mb-8">
+                <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-rose-800 mb-4">
+                  <span>{typeof product.category === 'string' ? product.category : product.category?.name}</span>
+                  <span className="w-1 h-1 bg-rose-300 rounded-full" />
+                  <div className="flex items-center gap-1">
+                    <Star className="w-3 h-3 fill-rose-800" /> 4.9 (128)
+                  </div>
+                </div>
+
+                <h1 className="text-4xl md:text-6xl font-serif text-stone-900 leading-[1.1] mb-6">
+                  {product.name}
+                </h1>
+
+                <p className="text-xl text-stone-600 font-light leading-relaxed mb-8">
+                  {product.description}
+                </p>
+
+                <div className="text-3xl font-medium text-stone-900 mb-8">
+                  Rs. {displayPrice}
+                </div>
+
+                {/* ACTIONS */}
+                <div className="space-y-6 border-b border-stone-200 pb-12 mb-12">
+                  <div className="flex items-center gap-6">
+                    <div className="flex items-center border border-stone-200 rounded-full h-14 px-4 bg-white">
+                      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-2 hover:text-rose-600 transition"><Minus className="w-4 h-4" /></button>
+                      <span className="w-12 text-center font-bold text-lg">{quantity}</span>
+                      <button onClick={() => setQuantity(quantity + 1)} className="p-2 hover:text-rose-600 transition"><Plus className="w-4 h-4" /></button>
                     </div>
-                    {originalPrice > 0 && (
-                      <div className="text-lg text-muted-foreground line-through decoration-red-500/50 mb-1">
-                        Rs. {originalPrice.toLocaleString()}
+
+                    <Button
+                      ref={mainButtonRef}
+                      onClick={handleAddToCart}
+                      className="flex-1 h-14 rounded-full bg-stone-900 text-white font-bold uppercase tracking-widest hover:bg-stone-800 transition-all shadow-xl hover:shadow-2xl"
+                    >
+                      Add to Ritual
+                    </Button>
+
+                    <Button
+                      onClick={handleBuyNow}
+                      variant="outline"
+                      className="flex-1 h-14 rounded-full border-2 border-stone-900 text-stone-900 font-bold uppercase tracking-widest hover:bg-stone-900 hover:text-white transition-all"
+                    >
+                      Buy Now
+                    </Button>
+
+                    <button onClick={handleWishlist} className="w-14 h-14 border border-stone-200 rounded-full flex items-center justify-center hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 transition-all">
+                      <Heart className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-center gap-6 text-xs font-bold uppercase tracking-wider text-stone-500">
+                    <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-rose-400" /> Free Shipping</span>
+                    <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-rose-400" /> Authentic</span>
+                  </div>
+                </div>
+
+                {/* STORY SECTIONS */}
+                <div className="space-y-12">
+                  <div>
+                    <h3 className="font-serif italic text-2xl mb-4 text-stone-800">The Story</h3>
+                    <p className="text-stone-600 leading-relaxed font-light">
+                      Inspired by ancient beauty rituals, this formula combines modern science with potent botanicals.
+                      Designed to restore balance and luminosity to tired, stressed skin.
+                    </p>
+                  </div>
+
+                  {/* ACCORDIONS */}
+                  <div className="border-t border-stone-200">
+                    {[
+                      { id: 'ingredients', title: "Key Ingredients", content: "Hyaluronic Acid, Vitamin C, Niacinamide, Rosehip Oil." },
+                      { id: 'usage', title: "How to Use", content: "Apply 2-3 drops to clean skin morning and night. Massage gently in upward strokes." },
+                      { id: 'shipping', title: "Shipping & Returns", content: "Free shipping on orders over Rs. 5000. Returns accepted within 30 days." }
+                    ].map((item) => (
+                      <div key={item.id} className="border-b border-stone-200">
+                        <button
+                          onClick={() => setActiveAccordion(activeAccordion === item.id ? null : item.id)}
+                          className="w-full py-6 flex items-center justify-between font-bold text-sm uppercase tracking-widest hover:text-rose-800 transition-colors"
+                        >
+                          {item.title}
+                          <ChevronDown className={`w-4 h-4 transition-transform ${activeAccordion === item.id ? 'rotate-180' : ''}`} />
+                        </button>
+                        <AnimatePresence>
+                          {activeAccordion === item.id && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <p className="pb-6 text-stone-600 font-light leading-relaxed">{item.content}</p>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
-                    )}
-                    <div className="mb-2 px-2 py-0.5 bg-red-100 text-red-600 text-xs font-bold rounded-full">
-                      -20%
+                    ))}
+                  </div>
+                </div>
+
+                {/* REVIEWS PREVIEW */}
+                <div className="mt-16 bg-[#F4F1EE] p-8 rounded-2xl text-center">
+                  <div className="flex justify-center mb-4 text-rose-500">
+                    {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-5 h-5 fill-current" />)}
+                  </div>
+                  <h3 className="font-serif text-2xl mb-2">"Absolute Magic in a Bottle"</h3>
+                  <p className="text-stone-500 italic mb-6">- Sarah J., Verified Buyer</p>
+
+                  {!user ? (
+                    <div className="text-xs text-stone-400">Login to write a review</div>
+                  ) : !canReview ? (
+                    <div className="text-sm text-stone-500 bg-stone-100 p-4 rounded-lg">
+                      <p className="font-bold flex items-center justify-center gap-2">
+                        <AlertCircle className="w-4 h-4" /> Verification Required
+                      </p>
+                      <p className="mt-1">
+                        Only verified buyers who have received this product can write a review.
+                      </p>
                     </div>
-                  </>
-                );
-              })()}
+                  ) : (
+                    <form onSubmit={handleReviewSubmit} className="space-y-4">
+                      <textarea
+                        value={newReview}
+                        onChange={e => setNewReview(e.target.value)}
+                        placeholder="Share your experience..."
+                        className="w-full bg-white p-4 rounded-xl text-sm outline-none focus:ring-1 focus:ring-stone-300"
+                      />
+                      <Button disabled={isSubmittingReview} className="w-full bg-stone-900 text-white">
+                        {isSubmittingReview ? "Posting..." : "Write a Review"}
+                      </Button>
+                    </form>
+                  )}
+
+                  <div className="mt-8 space-y-6 text-left">
+                    {reviews.slice(0, 3).map(r => (
+                      <div key={r.$id} className="border-b border-stone-200/50 pb-4">
+                        <div className="flex justify-between text-xs font-bold text-stone-900 mb-1">
+                          <span>{r.username}</span>
+                          <span>{new Date(r.$createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <p className="text-sm text-stone-600">{r.review}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                </div>
+
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <p className="text-muted-foreground leading-relaxed mb-8 max-w-lg">
-              {product.description || "Formulated with premium ingredients to nourish and rejuvenate your skin. Suitable for all skin types."}
-            </p>
-
-            {/* Quantity & Actions */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-8">
-              <div className="flex items-center justify-center border border-border rounded-full h-12 px-2 bg-card w-full sm:w-auto">
-                <button onClick={() => handleQuantityChange(-1)} className="p-3 hover:text-primary transition"><Minus className="w-4 h-4" /></button>
-                <span className="w-12 text-center font-bold">{quantity}</span>
-                <button onClick={() => handleQuantityChange(1)} className="p-3 hover:text-primary transition"><Plus className="w-4 h-4" /></button>
+      {/* 4. STICKY BOTTOM BAR (Appears on Scroll) */}
+      <AnimatePresence>
+        {showStickyBar && (
+          <motion.div
+            initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }}
+            className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-stone-200 p-4 z-50 shadow-2xl"
+          >
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
+              <div className="hidden md:flex items-center gap-4">
+                <img src={images[0]} alt="" className="w-12 h-12 object-cover rounded-md bg-stone-100" />
+                <div>
+                  <div className="font-bold text-stone-900">{product.name}</div>
+                  <div className="text-xs text-stone-500">Rs. {displayPrice}</div>
+                </div>
               </div>
 
-              <div className="flex gap-3 flex-1">
-                <Button onClick={handleAddToCart} className="flex-1 h-12 rounded-full text-base font-bold bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/25">
+              <div className="flex items-center gap-4 flex-1 md:flex-none justify-end">
+                <div className="hidden sm:flex items-center border border-stone-200 rounded-full h-10 px-3 bg-white">
+                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-1 hover:text-rose-600"><Minus className="w-3 h-3" /></button>
+                  <span className="w-8 text-center font-bold text-sm">{quantity}</span>
+                  <button onClick={() => setQuantity(quantity + 1)} className="p-1 hover:text-rose-600"><Plus className="w-3 h-3" /></button>
+                </div>
+                <Button onClick={handleAddToCart} className="flex-1 md:w-48 h-12 rounded-full bg-stone-900 text-white font-bold uppercase tracking-widest hover:bg-stone-800">
                   Add to Bag
                 </Button>
-                <Button onClick={handleBuyNow} className="flex-1 h-12 rounded-full text-base font-bold bg-secondary hover:bg-secondary/90 text-primary border border-primary/20 shadow-lg shadow-secondary/25">
+                <Button onClick={handleBuyNow} className="hidden md:flex flex-1 md:w-48 h-12 rounded-full border-2 border-stone-900 text-stone-900 bg-transparent font-bold uppercase tracking-widest hover:bg-stone-900 hover:text-white">
                   Buy Now
                 </Button>
               </div>
-
-              <button
-                onClick={handleAddToWishlist}
-                className={`hidden sm:flex p-3 rounded-full border border-border transition-colors ${isLiked ? 'bg-red-50 text-red-500 border-red-200' : 'hover:border-primary hover:text-primary'}`}
-              >
-                <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-              </button>
-              {/* Mobile Wishlist Button (Full Width) */}
-              <Button
-                onClick={handleAddToWishlist}
-                variant="outline"
-                className={`sm:hidden h-12 rounded-full border-border ${isLiked ? 'bg-red-50 text-red-500 border-red-200' : ''}`}
-              >
-                <Heart className={`w-5 h-5 mr-2 ${isLiked ? 'fill-current' : ''}`} /> {isLiked ? 'Saved' : 'Save to Wishlist'}
-              </Button>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            {/* Quick Benefits */}
-            <div className="grid grid-cols-2 gap-4 text-sm text-foreground/80 mb-8">
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /> Vegan & Cruelty Free
-              </div>
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /> Dermatologist Tested
-              </div>
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /> Recyclable Packaging
-              </div>
-              <div className="flex items-center gap-3">
-                <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /> Free Shipping
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Detailed Info Tabs */}
-        <div className="max-w-4xl mx-auto mb-20">
-          <div className="flex justify-center gap-8 border-b border-border mb-10 overflow-x-auto">
-            {['details', 'ingredients', 'usage', 'reviews'].map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`uppercase text-xs font-bold tracking-widest pb-4 border-b-2 transition-all px-4 ${activeTab === tab ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-              >
-                {tab === 'details' && "About The Product"}
-                {tab === 'ingredients' && "Ingredients"}
-                {tab === 'usage' && "How To Use"}
-                {tab === 'reviews' && `Reviews (${reviews.length})`}
-              </button>
-            ))}
-          </div>
-
-          <div className="prose prose-slate max-w-none text-muted-foreground leading-relaxed">
-            {activeTab === 'details' && (
-              <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 text-center max-w-2xl mx-auto space-y-6">
-                <p>{product.description}</p>
-                <p>Experience the ultimate hydration and restoration with our carefully crafted formula.</p>
-              </div>
-            )}
-            {activeTab === 'ingredients' && (
-              <div className="mx-auto max-w-2xl">
-                <h3 className="font-bold text-foreground mb-4 text-center">Key Active Ingredients</h3>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <Sparkles className="w-4 h-4 text-primary mt-1" />
-                    <span><strong>Hyaluronic Acid:</strong> Deeply hydrates and plumps the skin.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Sun className="w-4 h-4 text-primary mt-1" />
-                    <span><strong>Vitamin C:</strong> Brightens complexion and evens skin tone.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Droplets className="w-4 h-4 text-primary mt-1" />
-                    <span><strong>Niacinamide:</strong> Reduces pore appearance and strengthens barrier.</span>
-                  </li>
-                </ul>
-              </div>
-            )}
-            {activeTab === 'usage' && (
-              <div className="text-center max-w-2xl mx-auto">
-                <p className="mb-4">Apply a small amount to clean, dry skin morning and night. Gently massage in upward circular motions until fully absorbed.</p>
-                <div className="bg-secondary/30 p-4 rounded-xl inline-block text-xs font-bold text-primary">
-                  Pro Tip: Layer under your favorite moisturizer for extra hydration.
-                </div>
-              </div>
-            )}
-            {activeTab === 'reviews' && (
-              <div className="max-w-2xl mx-auto">
-                {/* Review Form Logic Wrapper */}
-                {user ? (
-                  verificationLoading ? (
-                    <div className="text-center p-6 text-muted-foreground text-sm">Checking eligibility...</div>
-                  ) : canReview ? (
-                    <form onSubmit={handleReviewSubmit} className="bg-card p-6 rounded-2xl border border-border mb-8 shadow-sm">
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="font-bold text-foreground">Write a Review</span>
-                        {editingReviewId && <button type="button" onClick={handleCancelEdit} className="text-xs text-red-500">Cancel</button>}
-                      </div>
-                      <div className="flex gap-1 mb-4">
-                        {[1, 2, 3, 4, 5].map(s => (
-                          <Star key={s} onClick={() => setRating(s)} className={`cursor-pointer w-6 h-6 ${s <= rating ? 'fill-primary text-primary' : 'text-muted-foreground/30'}`} />
-                        ))}
-                      </div>
-                      <Textarea value={newReview} onChange={e => setNewReview(e.target.value)} placeholder="Tell us what you think..." className="mb-4 bg-background" />
-                      <Button disabled={isSubmittingReview} className="w-full bg-primary text-white">{isSubmittingReview ? "Submitting..." : "Post Review"}</Button>
-                    </form>
-                  ) : (
-                    <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center mb-8">
-                      <div className="flex justify-center mb-2">
-                        <ShieldCheck className="w-8 h-8 text-amber-500" />
-                      </div>
-                      <h4 className="font-bold text-amber-800 mb-1">Verified Buyers Only</h4>
-                      <p className="text-amber-700 text-sm">You can only write a review after you have purchased and received this product.</p>
-                    </div>
-                  )
-                ) : (
-                  <div className="text-center p-8 bg-secondary/20 rounded-2xl mb-8">
-                    <p className="mb-2">Log in to leave a review</p>
-                    <Button variant="outline" onClick={() => navigate('/login')}>Login</Button>
-                  </div>
-                )}
-
-                <div className="space-y-8">
-                  {reviews.length === 0 && <p className="text-center italic">No reviews yet.</p>}
-                  {reviews.map(rev => (
-                    <div key={rev.$id} className="border-b border-border pb-8 last:border-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="font-bold text-foreground">{rev.username || "Verified Buyer"}</div>
-                        <span className="text-xs">{new Date(rev.$createdAt).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex text-primary text-xs mb-3">
-                        {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < rev.rating ? 'fill-current' : 'text-muted-foreground/20'}`} />)}
-                      </div>
-                      <p>{rev.review}</p>
-                      {user && user.$id === rev.userid && (
-                        <div className="mt-2 flex gap-2">
-                          <button onClick={() => handleEditReview(rev)} className="text-xs text-muted-foreground hover:text-primary">Edit</button>
-                          <button onClick={() => handleDeleteReview(rev.$id)} className="text-xs text-muted-foreground hover:text-red-500">Delete</button>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-      </div>
     </div>
   );
 }
-
-export default ProductDetail;

@@ -66,7 +66,7 @@ export default function OrdersPage() {
             message: `Your order #${order.$id.substring(0, 5)} has been delivered! You can now review your products.`,
             type: "order_update",
             read: false,
-            link: `/orders` // or deep link to product if single item, but orders page is safer
+            link: `/orders?highlight=${order.$id}`
           });
         }
       }

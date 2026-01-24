@@ -618,3 +618,4 @@ console.log(`\n⚠️  Note: Google Images URLs are search links.`);
 console.log(`   For production, replace with direct image URLs from product websites.`);
 
 
+

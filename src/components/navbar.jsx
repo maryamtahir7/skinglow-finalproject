@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, ShoppingCart, User as UserIcon, LogOut, LogIn, UserPlus, Menu, X, Sparkles, Search, Package, IdCard } from "lucide-react";
+import { Heart, ShoppingCart, User as UserIcon, LogOut, LogIn, UserPlus, Menu, X, Sparkles, Search, Package, IdCard, ShoppingBag } from "lucide-react";
 import { useUser } from "../context/UserContext";
 import { logout } from "../backend/auth";
 import { getCart, getWishlist } from "../backend/database";
@@ -48,6 +48,15 @@ export default function Navbar() {
 
   useEffect(() => {
     fetchCounts();
+
+    const handleUpdates = () => fetchCounts();
+    window.addEventListener('cart-updated', handleUpdates);
+    window.addEventListener('wishlist-updated', handleUpdates);
+
+    return () => {
+      window.removeEventListener('cart-updated', handleUpdates);
+      window.removeEventListener('wishlist-updated', handleUpdates);
+    };
   }, [user]);
 
   const handleLogout = async () => {
@@ -144,6 +153,8 @@ export default function Navbar() {
             )}
           </Link>
 
+
+
           {/* Cart */}
           <Link to="/cart" className="relative group">
             <div className="p-2 rounded-full hover:bg-secondary transition-colors">
@@ -160,7 +171,7 @@ export default function Navbar() {
           <InstallPWAButton />
 
           {/* User Menu */}
-          <div className="relative">
+          <div className="relative z-50">
             <button
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
               className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-primary font-bold hover:bg-secondary transition"
@@ -170,80 +181,113 @@ export default function Navbar() {
 
             {/* Dropdown Menu */}
             {isUserMenuOpen && (
-              <div className="absolute right-0 mt-3 w-56 bg-white text-slate-800 rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
-                {!user ? (
-                  <>
-                    <Link
-                      to="/login"
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      <LogIn className="w-4 h-4 text-primary" /> Login
-                    </Link>
-                    <Link
-                      to="/signup"
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      <UserPlus className="w-4 h-4 text-primary" /> Sign Up
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    <div className="px-5 py-4 text-sm bg-slate-50 border-b border-slate-100">
-                      <p className="text-slate-500 text-xs uppercase font-bold tracking-wider mb-1">
-                        Signed in as
-                      </p>
-                      <p className="font-semibold text-slate-900 truncate">
-                        {user.name || user.email}
-                      </p>
-                    </div>
+              <>
+                {/* Backdrop for mobile */}
+                <div
+                  className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
+                  onClick={() => setIsUserMenuOpen(false)}
+                />
+                <div className="absolute right-0 mt-3 w-56 bg-white text-slate-800 rounded-xl shadow-xl border border-slate-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+                  {!user ? (
+                    <>
+                      {/* Header for non-logged-in users */}
+                      <div className="px-5 py-3 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                        <span className="text-xs text-slate-400 uppercase font-bold tracking-wider">Menu</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="p-1 rounded-full hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition-colors"
+                          aria-label="Close menu"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <Link
+                        to="/login"
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <LogIn className="w-4 h-4 text-primary" /> Login
+                      </Link>
+                      <Link
+                        to="/signup"
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <UserPlus className="w-4 h-4 text-primary" /> Sign Up
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      <div className="px-5 py-3 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                        <div>
+                          <p className="text-slate-500 text-xs uppercase font-bold tracking-wider mb-1">
+                            Signed in as
+                          </p>
+                          <p className="font-semibold text-slate-900 truncate text-sm">
+                            {user.name || user.email}
+                          </p>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="p-1 rounded-full hover:bg-slate-200 text-slate-500 hover:text-slate-700 transition-colors ml-2"
+                          aria-label="Close menu"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
 
-                    <Link
-                      to="/profile"
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition text-sm"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      <IdCard className="w-4 h-4 text-primary" /> My Profile
-                    </Link>
-                    <Link
-                      to="/orders"
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition text-sm"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      <Package className="w-4 h-4 text-primary" /> My Orders
-                    </Link>
-                    <Link
-                      to="/wishlist"
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition text-sm"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      <Heart className="w-4 h-4 text-pink-500" /> Wishlist
-                    </Link>
-                    <Link
-                      to="/cart"
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition text-sm"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      <ShoppingCart className="w-4 h-4 text-primary" /> Cart
-                    </Link>
-                    <Link
-                      to="/ai-chat"
-                      className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition text-sm"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      <Sparkles className="w-4 h-4 text-amber-500" /> Ask AI
-                    </Link>
+                      <Link
+                        to="/profile"
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition text-sm"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <IdCard className="w-4 h-4 text-primary" /> My Profile
+                      </Link>
+                      <Link
+                        to="/orders"
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition text-sm"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <Package className="w-4 h-4 text-primary" /> My Orders
+                      </Link>
+                      <Link
+                        to="/wishlist"
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition text-sm"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <Heart className="w-4 h-4 text-pink-500" /> Wishlist
+                      </Link>
+                      <Link
+                        to="/cart"
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition text-sm"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <ShoppingCart className="w-4 h-4 text-primary" /> Cart
+                      </Link>
+                      <Link
+                        to="/ai-chat"
+                        className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition text-sm"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <Sparkles className="w-4 h-4 text-amber-500" /> Ask AI
+                      </Link>
 
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-3 w-full px-5 py-3 text-left hover:bg-red-50 text-red-600 transition border-t border-slate-100 mt-1"
-                    >
-                      <LogOut className="w-4 h-4" /> Logout
-                    </button>
-                  </>
-                )}
-              </div>
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-3 w-full px-5 py-3 text-left hover:bg-red-50 text-red-600 transition border-t border-slate-100 mt-1"
+                      >
+                        <LogOut className="w-4 h-4" /> Logout
+                      </button>
+                    </>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </div>

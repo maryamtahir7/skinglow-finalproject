@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, User, Send, Sparkles, X, MessageCircle, ChevronDown, Minimize2, Check } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { getProducts } from "../backend/database";
+import { useNavigate } from 'react-router-dom';
 
 export default function FloatingAI() {
     const [isOpen, setIsOpen] = useState(false);
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
+    const navigate = useNavigate();
 
     const [messages, setMessages] = useState([
         {
@@ -16,6 +19,20 @@ export default function FloatingAI() {
     ]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
+    const [products, setProducts] = useState([]);
+
+    // Fetch products for smart recommendations
+    useEffect(() => {
+        async function loadProducts() {
+            try {
+                const res = await getProducts();
+                if (res.documents) setProducts(res.documents);
+            } catch (err) {
+                console.error("AI failed to load products", err);
+            }
+        }
+        loadProducts();
+    }, []);
 
     useEffect(() => {
         if (isOpen) {
@@ -35,6 +52,13 @@ export default function FloatingAI() {
         "☀️ Sunscreen Guide"
     ];
 
+    const findProducts = (keyword) => {
+        return products.filter(p => {
+            const searchStr = `${p.name} ${p.description} ${typeof p.category === 'string' ? p.category : p.category?.name}`.toLowerCase();
+            return searchStr.includes(keyword.toLowerCase());
+        }).slice(0, 2); // Top 2
+    };
+
     const getAIResponse = async (message) => {
         const text = message.toLowerCase();
 
@@ -48,34 +72,70 @@ export default function FloatingAI() {
         if (text.includes('contact') || text.includes('support') || text.includes('help'))
             return '📞 **We are here for you:**\nOur skincare experts are available Mon-Fri, 9am-6pm.\n\n• **Email:** support@skinglow.com\n• **Phone:** +91-800-GLOW-NOW';
 
-        // --- ADVANCED SKINCARE KNOWLEDGE ---
+        // --- DYNAMIC PRODUCT RECOMMENDATIONS ---
 
-        // ACNE & BLEMISHES
-        if (text.includes('acne') || text.includes('pimple') || text.includes('breakout'))
-            return '✨ **Managing Acne:**\nBreakouts happen! The key is gentle exfoliation and calming ingredients.\n\n**Recommended Ingredients:**\n• **Salicylic Acid (BHA):** Unclogs pores.\n• **Niacinamide:** Reduces redness & oil.\n• **Tea Tree Oil:** Antibacterial.\n\n👉 **Try:** *Clarifying Serum* & *Oil-Free Moisturizer*.';
+        // ACNE
+        if (text.includes('acne') || text.includes('pimple') || text.includes('breakout')) {
+            const matches = findProducts('acne');
+            let recommendationText = "";
+            if (matches.length > 0) {
+                recommendationText = `\n\n👉 **I recommend trying:** ${matches.map(p => `*${p.name}*`).join(" and ")}.`;
+            }
+            return `✨ **Managing Acne:**\nBreakouts happen! The key is gentle exfoliation and calming ingredients like Salicylic Acid and Niacinamide.${recommendationText}`;
+        }
 
-        // DRY & DEHYDRATED
-        if (text.includes('dry') || text.includes('flakey') || text.includes('tight'))
-            return '💧 **Dry vs. Dehydrated:**\nDry skin lacks oil, while dehydrated skin lacks water. You likely need both hydration and moisture lock!\n\n**Power Duos:**\n• **Hyaluronic Acid:** Draws water in.\n• **Ceramides:** Builds skin barrier.\n• **Squalane:** Mimics natural oils.\n\n👉 **Try:** *Deep Hydration Cream*.';
+        // DRY
+        if (text.includes('dry') || text.includes('flakey') || text.includes('tight')) {
+            const matches = findProducts('dry') || findProducts('hydrat') || findProducts('moistur');
+            let recommendationText = "";
+            if (matches.length > 0) {
+                recommendationText = `\n\n👉 **Top Picks for Hydration:** ${matches.map(p => `*${p.name}*`).join(" and ")}.`;
+            }
+            return `💧 **Dry Skin Fix:**\nYou likely need both hydration (water) and moisture (oil). Look for Hyaluronic Acid and Ceramides.${recommendationText}`;
+        }
 
         // ANTI-AGING
-        if (text.includes('age') || text.includes('wrinkle') || text.includes('line') || text.includes('aging'))
-            return '⏳ **Ageless Beauty:**\nIt\'s never too early for prevention! Retinoids and SPF are the gold standards.\n\n**Gold Standards:**\n• **Retinol:** Stimulates collagen.\n• **Peptides:** Firms skin structure.\n• **Vitamin C:** Brightens & protects.\n\n👉 **Try:** *Ageless Night Cream* & *Peptide Serum*.';
+        if (text.includes('age') || text.includes('wrinkle') || text.includes('line') || text.includes('aging')) {
+            const matches = findProducts('aging') || findProducts('retinol') || findProducts('serum');
+            let recommendationText = "";
+            if (matches.length > 0) {
+                recommendationText = `\n\n👉 **Anti-Aging Heroes:** ${matches.map(p => `*${p.name}*`).join(" and ")}.`;
+            }
+            return `⏳ **Ageless Beauty:**\nRetinoids and SPF are the gold standards for preventing fine lines and boosting collagen.${recommendationText}`;
+        }
 
         // SENSITIVE
-        if (text.includes('sensitive') || text.includes('red') || text.includes('irritat'))
-            return '🌸 **Sensitive Skin Care:**\nLess is more! Avoid fragrance and harsh scrubs. Focus on repairing your barrier.\n\n**Soothing Heroes:**\n• **Centella Asiatica (Cica):** Calms redness.\n• **Oat Extract:** Soothes itchiness.\n• **Aloe Vera:** Hydrates gently.\n\n👉 **Try:** *Calming Gel Cleanser*.';
+        if (text.includes('sensitive') || text.includes('red') || text.includes('irritat')) {
+            const matches = findProducts('sensitive') || findProducts('calm') || findProducts('sooth');
+            let recommendationText = "";
+            if (matches.length > 0) {
+                recommendationText = `\n\n👉 **Gentle Choices:** ${matches.map(p => `*${p.name}*`).join(" and ")}.`;
+            }
+            return `🌸 **Sensitive Skin Care:**\nLess is more! Focus on repairing your barrier with Centella Asiatica and avoiding harsh scrubs.${recommendationText}`;
+        }
 
-        // GLOW & DULLNESS
-        if (text.includes('dull') || text.includes('bright') || text.includes('glow'))
-            return '🌟 **Unlock Your Glow:**\nDullness is often due to dead skin buildup. Exfoliation + Brightening is the fix!\n\n**Glow Getters:**\n• **Vitamin C:** Fades dark spots.\n• **Glycolic Acid (AHA):** Resurfaces texture.\n\n👉 **Try:** *Vitamin C Glow Serum* (AM) & *Glow Tonic* (PM).';
+        // DULLNESS
+        if (text.includes('dull') || text.includes('bright') || text.includes('glow')) {
+            const matches = findProducts('bright') || findProducts('vitamin c') || findProducts('glow');
+            let recommendationText = "";
+            if (matches.length > 0) {
+                recommendationText = `\n\n👉 **For that Glow:** ${matches.map(p => `*${p.name}*`).join(" and ")}.`;
+            }
+            return `🌟 **Unlock Your Glow:**\nExfoliation + Brightening is the fix! Vitamin C and AHAs are your best friends here.${recommendationText}`;
+        }
 
         // ROUTINE BUILDING
         if (text.includes('routine') || text.includes('steps') || text.includes('order'))
             return '🧴 **The Perfect Routine Order:**\n\n☀️ **Morning (Protect):**\n1. Cleanser\n2. Vitamin C / Antioxidant\n3. Moisturizer\n4. **Sunscreen (SPF 50)** – *Vital!*\n\n🌙 **Evening (Repair):**\n1. Oil Cleanser (if wearing makeup)\n2. Water Cleanser\n3. Treatment (Retinol/Acne)\n4. Moisturizer';
 
-        if (text.includes('sunscreen') || text.includes('spf'))
-            return '☀️ **Sunscreen is Non-Negotiable!**\nUV rays cause 90% of premature aging. \n\n• **Rule:** SPF 30+ every single day.\n• **Amount:** 2 finger lengths for face & neck.\n• **Reapply:** Every 2 hours outdoors.';
+        if (text.includes('sunscreen') || text.includes('spf')) {
+            const matches = findProducts('spf') || findProducts('sun');
+            let recommendationText = "";
+            if (matches.length > 0) {
+                recommendationText = `\n\n👉 **Our Best SPF:** ${matches.map(p => `*${p.name}*`).join(" and ")}.`;
+            }
+            return `☀️ **Sunscreen is Non-Negotiable!**\nUV rays cause 90% of premature aging. Apply SPF 30+ every single day.${recommendationText}`;
+        }
 
         // --- FALLBACK ---
         const fallbackResponses = [
@@ -112,7 +172,7 @@ export default function FloatingAI() {
             <button
                 type="button"
                 onClick={toggleChat}
-                className={`fixed bottom-6 right-6 md:bottom-10 md:right-10 z-[60] flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 group
+                className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 group
                 ${isOpen
                         ? 'w-12 h-12 bg-white/80 backdrop-blur-md border border-slate-200 text-slate-600 rotate-90'
                         : 'w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-primary to-pink-600 text-white animate-bounce-slow shadow-primary/40'
@@ -135,7 +195,7 @@ export default function FloatingAI() {
             {/* Chat Interface Popup - Premium Desktop Size */}
             {isOpen && (
                 <div
-                    className="fixed bottom-0 right-0 md:bottom-28 md:right-10 z-[60] w-full h-[100dvh] md:w-[450px] md:h-[700px] md:max-h-[85vh] bg-white/95 md:bg-white/90 backdrop-blur-2xl md:backdrop-blur-3xl md:rounded-[2.5rem] shadow-2xl border border-white/50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300 origin-bottom-right ring-1 ring-black/5"
+                    className="fixed bottom-0 right-0 md:bottom-24 md:right-8 z-50 w-full h-[100dvh] md:w-[450px] md:h-[650px] md:max-h-[80vh] bg-white/95 md:bg-white/90 backdrop-blur-2xl md:backdrop-blur-3xl md:rounded-[2.5rem] shadow-2xl border border-white/50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300 origin-bottom-right ring-1 ring-black/5"
                     style={{
                         paddingBottom: 'safe-area-inset-bottom'
                     }}

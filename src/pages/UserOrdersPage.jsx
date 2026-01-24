@@ -1,6 +1,6 @@
 // src/pages/UserOrdersPage.jsx
 import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getOrders, updateOrder, getProducts } from "../backend/database";
 import { Button } from "@/components/ui/button";
 import { useUser } from "../context/UserContext";
@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 
 export default function UserOrdersPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useUser();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,6 +60,21 @@ export default function UserOrdersPage() {
     }
     loadData();
   }, [user, navigate, loadData]);
+
+  // Handle Highlighting specific order
+  useEffect(() => {
+    const highlightId = searchParams.get("highlight");
+    if (highlightId && !loading && orders.length > 0) {
+      const element = document.getElementById(highlightId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth", block: "center" });
+        element.classList.add("ring-2", "ring-primary", "ring-offset-4");
+        setTimeout(() => {
+          element.classList.remove("ring-2", "ring-primary", "ring-offset-4");
+        }, 3000);
+      }
+    }
+  }, [loading, orders, searchParams]);
 
   // Cancel order logic - Strict: Only Pending
   const canCancel = (order) => {
@@ -200,6 +216,7 @@ export default function UserOrdersPage() {
             return (
               <div
                 key={order.$id}
+                id={order.$id}
                 className="bg-card rounded-3xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow duration-300"
               >
                 {/* Header */}

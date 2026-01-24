@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Sun, Moon, ArrowRight, Sparkles, CheckCircle2, Circle, ShoppingBag, Info, RefreshCw } from "lucide-react";
+import { Sun, Moon, ArrowRight, Sparkles, CheckCircle2, Circle, ShoppingBag, Info, RefreshCw, Trash2 } from "lucide-react";
 import { getProducts, addToCart } from "../backend/database";
 import { useUser } from "../context/UserContext";
 
@@ -26,7 +26,6 @@ function RoutinePage() {
         const saved = localStorage.getItem('skinglow_routine_progress');
         if (saved) {
             const parsed = JSON.parse(saved);
-            // Reset if it's a new day (simple check)
             const lastDate = localStorage.getItem('skinglow_routine_date');
             const today = new Date().toDateString();
             if (lastDate !== today) {
@@ -43,7 +42,7 @@ function RoutinePage() {
         localStorage.setItem('skinglow_routine_progress', JSON.stringify(completedSteps));
     }, [completedSteps]);
 
-    // Fetch products
+    // Fetch products and generate recommendations
     useEffect(() => {
         async function fetchData() {
             try {
@@ -52,13 +51,33 @@ function RoutinePage() {
                     setProducts(res.documents);
                 }
             } catch (error) {
-                console.error("Failed to fetch products for routine suggestions", error);
+                console.error("Failed to fetch products for routine", error);
             } finally {
                 setLoading(false);
             }
         }
         fetchData();
     }, []);
+
+    // Generate initial recommendations when products load or routine changes
+    useEffect(() => {
+        if (products.length > 0) {
+            const newRecs = {};
+            const steps = activeRoutine === 'AM' ? stepsAM : stepsPM;
+
+            steps.forEach(step => {
+                // Only generate if not already there to preserve swaps
+                if (!recommendations[step.id]) {
+                    const match = findProductForType(step.type, products);
+                    if (match) newRecs[step.id] = match;
+                }
+            });
+
+            if (Object.keys(newRecs).length > 0) {
+                setRecommendations(prev => ({ ...prev, ...newRecs }));
+            }
+        }
+    }, [products, activeRoutine]);
 
     const stepsAM = [
         { id: 'am_1', title: "Cleanser", desc: "Remove overnight impurities.", type: "Cleanser" },
@@ -89,23 +108,39 @@ function RoutinePage() {
         }));
     };
 
-    const getRecommendedProduct = (type) => {
-        if (!products.length) return null;
+    const findProductForType = (type, allProducts, excludeId = null) => {
+        const matches = allProducts.filter(p => {
+            if (excludeId && p.$id === excludeId) return false;
 
-        // Simple matching logic - in a real app this would be smarter
-        // or personalized based on the user's skin quiz results
-        const matches = products.filter(p => {
             const cat = (typeof p.category === 'string' ? p.category : p.category?.name || "").toLowerCase();
             const typeLower = type.toLowerCase();
             return cat.includes(typeLower) ||
                 (typeLower === 'treatment' && (cat.includes('serum') || cat.includes('acid'))) ||
-                (typeLower === 'oil' && cat.includes('oil'));
+                (typeLower === 'oil' && cat.includes('oil')) ||
+                (typeLower === 'sunscreen' && (cat.includes('spf') || cat.includes('sun')));
         });
 
-        if (!matches.length) return null;
-        // Return random match to vary it up, or first one
-        return matches[0];
+        if (matches.length === 0) return null;
+        // Return random match
+        return matches[Math.floor(Math.random() * matches.length)];
     };
+
+    const handleSwapProduct = (stepId, type) => {
+        const currentRec = recommendations[stepId];
+        const newRec = findProductForType(type, products, currentRec?.$id);
+
+        if (newRec) {
+            setRecommendations(prev => ({
+                ...prev,
+                [stepId]: newRec
+            }));
+        } else {
+            alert("No other products found for this category.");
+        }
+    };
+
+    // Routine Bag State
+    // Routine Bag Logic Moved to RoutineBagPage.jsx
 
     const handleAddToCart = async (product) => {
         if (!user) {
@@ -113,15 +148,24 @@ function RoutinePage() {
             return;
         }
         try {
-            await addToCart(user.$id, product, 1);
-            alert(`Added ${product.name} to cart`);
+            await addToCart({
+                userId: user.$id,
+                productId: product.$id,
+                quantity: 1
+            });
+            window.dispatchEvent(new Event('cart-updated'));
+            alert(`Added ${product.name} to your Shopping Cart! 🛒`);
         } catch (err) {
             console.error(err);
+            alert("Failed to add to cart.");
         }
     };
 
     return (
         <div className="min-h-screen bg-slate-50 font-sans text-slate-800 pb-16">
+            {/* ... Hero Section code remains mostly same, skipping for brevity in replacement if possible, 
+                but I need to replace the whole block correctly. I will replace the main render loop. 
+            */}
             {/* Hero Section */}
             <div className={`relative overflow-hidden transition-colors duration-700 ${activeRoutine === 'AM' ? 'bg-orange-50/80' : 'bg-slate-900 text-white'}`}>
                 <div className="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
@@ -138,7 +182,7 @@ function RoutinePage() {
                     <h1 className="text-3xl md:text-6xl font-bold mb-4 sm:mb-6 leading-tight transition-all duration-500">
                         Good {activeRoutine === 'AM' ? 'Morning' : 'Evening'}, {user ? user.name.split(' ')[0] : 'Beautiful'}
                     </h1>
-                    <p className={`text-base sm:text-xl max-w-2xl mx-auto mb-8 sm:mb-10 ${activeRoutine === 'AM' ? 'text-slate-600' : 'text-slate-300'}`}>
+                    <p className={`text-base sm:text-lg max-w-2xl mx-auto mb-8 sm:mb-10 ${activeRoutine === 'AM' ? 'text-slate-600' : 'text-slate-300'}`}>
                         {activeRoutine === 'AM'
                             ? "Ready to protect and brighten your skin for the day ahead?"
                             : "Time to unwind, repair, and prepare for a restful sleep."}
@@ -165,6 +209,8 @@ function RoutinePage() {
                 </div>
             </div>
 
+            {/* My Routine Bag Section Removed - Moved to /routine-bag */}
+
             {/* Progress Bar Container */}
             <div className="sticky top-[64px] z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 px-4 sm:px-6 py-2.5 shadow-sm">
                 <div className="max-w-3xl mx-auto flex items-center gap-3">
@@ -184,14 +230,14 @@ function RoutinePage() {
                 <div className="space-y-4 sm:space-y-6">
                     {currentSteps.map((step, index) => {
                         const isCompleted = completedSteps[step.id];
-                        const recommendedProduct = getRecommendedProduct(step.type);
+                        const recommendedProduct = recommendations[step.id];
 
                         return (
                             <div
                                 key={step.id}
                                 className={`group relative bg-white border border-slate-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm transition-all duration-300 ${isCompleted ? 'opacity-70 bg-slate-50' : 'hover:shadow-md hover:border-primary/30 active:scale-[0.98]'}`}
                             >
-                                {/* Connector Line - Hidden on mobile */}
+                                {/* Connector Line */}
                                 {index !== currentSteps.length - 1 && (
                                     <div className="hidden sm:block absolute left-8 sm:left-9 bottom-0 top-16 sm:top-20 w-px bg-slate-100 -z-10 group-hover:bg-primary/10 transition-colors" />
                                 )}
@@ -220,7 +266,7 @@ function RoutinePage() {
 
                                         {/* Product Recommendation Card */}
                                         {!isCompleted && recommendedProduct && (
-                                            <div className="mt-3 sm:mt-4 bg-slate-50/80 border border-slate-100 rounded-lg sm:rounded-xl p-2.5 sm:p-3 flex items-center gap-2.5 sm:gap-3 md:gap-4 animate-in slide-in-from-top-2 fade-in">
+                                            <div className="mt-3 sm:mt-4 bg-slate-50/80 border border-slate-100 rounded-lg sm:rounded-xl p-2.5 sm:p-3 flex items-center gap-2.5 sm:gap-3 md:gap-4 animate-in slide-in-from-top-2 fade-in group/card">
                                                 <div className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 bg-white rounded-lg border border-slate-100 p-1 flex-shrink-0">
                                                     <img
                                                         src={recommendedProduct.imageUrl || "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&w=100"}
@@ -229,18 +275,33 @@ function RoutinePage() {
                                                     />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <div className="text-[9px] sm:text-[10px] font-bold text-primary uppercase leading-tight mb-0.5">Recommended</div>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="text-[9px] sm:text-[10px] font-bold text-primary uppercase leading-tight">Recommended</div>
+                                                    </div>
                                                     <div className="font-medium text-xs sm:text-sm text-slate-900 truncate leading-tight">{recommendedProduct.name}</div>
                                                 </div>
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    className="h-7 sm:h-8 text-[10px] sm:text-xs bg-white hover:bg-primary hover:text-white transition-colors active:scale-95 px-2 sm:px-3"
-                                                    onClick={() => handleAddToCart(recommendedProduct)}
-                                                >
-                                                    <ShoppingBag className="w-3 h-3 sm:mr-1.5" />
-                                                    <span className="hidden sm:inline">Add</span>
-                                                </Button>
+
+                                                <div className="flex gap-1">
+                                                    <Button
+                                                        size="icon"
+                                                        variant="ghost"
+                                                        className="h-7 w-7 sm:h-8 sm:w-8 text-slate-400 hover:text-primary hover:bg-white"
+                                                        onClick={() => handleSwapProduct(step.id, step.type)}
+                                                        title="Swap Product"
+                                                    >
+                                                        <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
+                                                    </Button>
+
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="h-7 sm:h-8 text-[10px] sm:text-xs bg-white hover:bg-primary hover:text-white transition-colors active:scale-95 px-2 sm:px-3"
+                                                        onClick={() => handleAddToCart(recommendedProduct)}
+                                                    >
+                                                        <ShoppingBag className="w-3 h-3 sm:mr-1.5" />
+                                                        <span className="hidden sm:inline">Add</span>
+                                                    </Button>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -256,8 +317,8 @@ function RoutinePage() {
                         <p className="text-slate-600 mb-4 sm:mb-6 text-xs sm:text-sm leading-relaxed px-2">
                             Take our 2-minute skin analysis to get a routine catered exactly to your skin type and concerns.
                         </p>
-                        <Button 
-                            onClick={() => navigate('/skin-quiz')} 
+                        <Button
+                            onClick={() => navigate('/skin-quiz')}
                             className="bg-primary text-white rounded-full px-5 sm:px-6 h-10 sm:h-11 text-sm active:scale-95"
                         >
                             <RefreshCw className="w-4 h-4 mr-2" /> Take Skin Quiz

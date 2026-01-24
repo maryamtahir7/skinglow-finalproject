@@ -252,10 +252,10 @@ export async function createOrder({
     items: JSON.stringify(items),
     total: Number(total),
     name: String(name),
-    phone: String(phone),
+    phone: Number(phone), // Allow number
     address: String(address),
     city: String(city),
-    postalCode: String(postalCode),
+    postalCode: Number(postalCode), // Allow number
     notes: String(notes),
     paymentMethod: String(paymentMethod),
     status: String(status),
@@ -484,10 +484,57 @@ export async function deleteLabBooking(id) {
 }
 
 /* --------------------- REVIEWS --------------------- */
+
+export async function canUserReviewProduct(userId, productId) {
+  try {
+    // 1. Get all delivered orders for this user
+    const orders = await databases.listDocuments(
+      import.meta.env.VITE_APPWRITE_DATABASE_ID,
+      import.meta.env.VITE_APPWRITE_ORDERS_ID,
+      [
+        Query.equal("userId", String(userId)),
+        Query.equal("status", "delivered")
+      ]
+    );
+
+    // 2. Check if any delivered order contains the product
+    for (const order of orders.documents) {
+      if (!order.items) continue;
+      try {
+        const items = JSON.parse(order.items);
+        // order items usually have productId or similar field
+        // based on addToCart: { userId, productId ... } -> createOrder copies cart items
+        // Let's assume items structure matches cart structure or has productId/id
+        // In cart logic: items have productId. In OrdersPage, we see it iterates items.
+        // We need to match productId.
+        const found = items.find(item =>
+          String(item.productId) === String(productId) ||
+          String(item.$id) === String(productId) ||
+          String(item.id) === String(productId)
+        );
+        if (found) return true;
+      } catch (e) {
+        console.error("Error parsing order items:", e);
+      }
+    }
+    return false;
+  } catch (error) {
+    console.error("Error checking review eligibility:", error);
+    return false;
+  }
+}
+
 export async function addReview(review) {
   if (!import.meta.env.VITE_APPWRITE_REVIEWS_ID) {
     throw new Error("Missing VITE_APPWRITE_REVIEWS_ID in environment variables");
   }
+
+  // Verify eligibility before adding
+  const canReview = await canUserReviewProduct(review.userid, review.productId);
+  if (!canReview) {
+    throw new Error("You can only review products you have purchased and received.");
+  }
+
   return databases.createDocument(
     import.meta.env.VITE_APPWRITE_DATABASE_ID,
     import.meta.env.VITE_APPWRITE_REVIEWS_ID,
@@ -503,6 +550,7 @@ export async function getReviews(productId) {
     [Query.equal("productId", String(productId)), Query.orderDesc("$createdAt")]
   );
 }
+
 
 export async function getAllReviews() {
   return databases.listDocuments(
@@ -560,5 +608,14 @@ export async function markNotificationRead(notificationId) {
     notifId,
     String(notificationId),
     { read: true }
+  );
+}
+
+export async function deleteNotification(notificationId) {
+  const notifId = import.meta.env.VITE_APPWRITE_NOTIFICATIONS_ID || "notifications";
+  return databases.deleteDocument(
+    import.meta.env.VITE_APPWRITE_DATABASE_ID,
+    notifId,
+    String(notificationId)
   );
 }

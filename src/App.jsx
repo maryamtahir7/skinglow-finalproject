@@ -35,54 +35,69 @@ import SkinQuiz from "./pages/SkinQuiz";
 import RoutinePage from "./pages/RoutinePage";
 
 
+import SupportPage from "./pages/SupportPage";
+import ReturnsPage from "./pages/ReturnsPage";
+import ShippingPage from "./pages/ShippingPage";
+
+import ScrollToTop from "./components/ScrollToTop";
+
+import { ToastProvider } from "./context/ToastContext";
+
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Public layout with navbar, footer, etc. */}
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<Homepage />} />
-          <Route path="/home" element={<Homepage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/products/:id" element={<ProductDetailPage />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/wishlist" element={<WishlistPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/login" element={<LoginForm />} />
-          <Route path="/signup" element={<SignupForm />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/privacy-policy" element={<PolicyPage />} />
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/license" element={<LicensePage />} />
-          <Route path="/contact" element={<ContactPage />} />  {/* Contact page route */}
+    <ToastProvider>
+      <Router>
+        <ScrollToTop />
+        <Routes>
+          {/* Public layout with navbar, footer, etc. */}
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<Homepage />} />
+            <Route path="/home" element={<Homepage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/products/:id" element={<ProductDetailPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/wishlist" element={<WishlistPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/login" element={<LoginForm />} />
+            <Route path="/signup" element={<SignupForm />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/privacy-policy" element={<PolicyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/license" element={<LicensePage />} />
+            <Route path="/contact" element={<ContactPage />} />
 
-          {/* User Profile & Orders */}
-          <Route path="/profile" element={<UserProfilePage />} />
-          <Route path="/orders" element={<UserOrdersPage />} />
+            <Route path="/support" element={<SupportPage />} />
+            <Route path="/returns" element={<ReturnsPage />} />
+            <Route path="/shipping" element={<ShippingPage />} />
 
-          {/* ✅ AI Chat route */}
-          <Route path="/ai-chat" element={<AIChat />} />
-          <Route path="/skin-quiz" element={<SkinQuiz />} />
-          <Route path="/concerns" element={<ConcernPage />} /> {/* New Route */}
-          <Route path="/routine" element={<RoutinePage />} />
-          <Route path="/blog" element={<BlogPage />} />
-        </Route>
+            {/* User Profile & Orders */}
+            <Route path="/profile" element={<UserProfilePage />} />
+            <Route path="/orders" element={<UserOrdersPage />} />
 
-
-        {/* Admin-only routes */}
-        <Route element={<AdminRoute />}>
-          <Route path="/admin" element={<AdminPage />}>
-            <Route path="add-product" element={<AddProductForm />} />
-            <Route path="products" element={<AdminProducts />} />
-            <Route path="categories" element={<Categories />} />
-            <Route path="reviews" element={<AdminReviews />} />
-            <Route path="orders" element={<OrdersPage />} />
-            <Route path="reports" element={<ReportsPage />} />
-            <Route path="stock" element={<StocksPage />} />
+            {/* ✅ AI Chat route */}
+            <Route path="/ai-chat" element={<AIChat />} />
+            <Route path="/skin-quiz" element={<SkinQuiz />} />
+            <Route path="/concerns" element={<ConcernPage />} /> {/* New Route */}
+            <Route path="/routine" element={<RoutinePage />} />
+            <Route path="/blog" element={<BlogPage />} />
           </Route>
-        </Route>
-      </Routes>
-    </Router>
+
+
+          {/* Admin-only routes */}
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminPage />}>
+              <Route path="add-product" element={<AddProductForm />} />
+              <Route path="products" element={<AdminProducts />} />
+              <Route path="categories" element={<Categories />} />
+              <Route path="reviews" element={<AdminReviews />} />
+              <Route path="orders" element={<OrdersPage />} />
+              <Route path="reports" element={<ReportsPage />} />
+              <Route path="stock" element={<StocksPage />} />
+            </Route>
+          </Route>
+        </Routes>
+      </Router>
+    </ToastProvider>
   );
 }
 

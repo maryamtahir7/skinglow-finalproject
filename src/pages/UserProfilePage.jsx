@@ -1,19 +1,54 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
+import { updateUserPrefs } from "../backend/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User as UserIcon, Mail, Phone, Calendar, MapPin, Sparkles } from "lucide-react";
+import { User as UserIcon, Mail, Phone, Calendar, MapPin, Sparkles, Edit2, Check, X } from "lucide-react";
 
 export default function UserProfilePage() {
   const navigate = useNavigate();
-  const { user, loading } = useUser();
+
+
+  const { user, loading, setUser } = useUser();
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    phone: "",
+    address: "",
+    city: "",
+    postalCode: ""
+  });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate("/login");
+    } else if (user) {
+      setFormData({
+        phone: user.prefs?.phone || "",
+        address: user.prefs?.address || "",
+        city: user.prefs?.city || "",
+        postalCode: user.prefs?.postalCode || ""
+      });
     }
   }, [loading, user, navigate]);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const updatedUser = await updateUserPrefs(formData);
+      // Update local user context if possible, or just the state locally.
+      // Since updateUserPrefs returns the user object (or we re-fetch), we might need to update context.
+      // Appwrite's updatePrefs returns the User object.
+      setUser(updatedUser);
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Failed to save profile:", err);
+      alert("Failed to save changes. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (loading || !user) {
     return (
@@ -97,6 +132,93 @@ export default function UserProfilePage() {
                   </div>
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          <Card className="md:col-span-2 border-border">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardTitle className="text-base">Personal Details</CardTitle>
+              {!isEditing ? (
+                <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="h-8 gap-2 text-primary">
+                  <Edit2 className="w-4 h-4" /> Edit
+                </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} disabled={saving} className="h-8 gap-1 text-muted-foreground">
+                    <X className="w-4 h-4" /> Cancel
+                  </Button>
+                  <Button variant="default" size="sm" onClick={handleSave} disabled={saving} className="h-8 gap-1 bg-primary text-white">
+                    {saving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Check className="w-4 h-4" />} Save
+                  </Button>
+                </div>
+              )}
+            </CardHeader>
+            <CardContent className="space-y-4 text-sm">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Phone Number</label>
+                  {isEditing ? (
+                    <input
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                      placeholder="+1234567890"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    />
+                  ) : (
+                    <p className="font-medium text-slate-900 bg-slate-50 px-3 py-2 rounded-lg border border-transparent">
+                      {user.prefs?.phone || <span className="text-slate-400 italic">Not set</span>}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">City</label>
+                  {isEditing ? (
+                    <input
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                      placeholder="New York"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    />
+                  ) : (
+                    <p className="font-medium text-slate-900 bg-slate-50 px-3 py-2 rounded-lg border border-transparent">
+                      {user.prefs?.city || <span className="text-slate-400 italic">Not set</span>}
+                    </p>
+                  )}
+                </div>
+
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Address</label>
+                  {isEditing ? (
+                    <input
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                      placeholder="123 Street Name, Apt 4B"
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    />
+                  ) : (
+                    <p className="font-medium text-slate-900 bg-slate-50 px-3 py-2 rounded-lg border border-transparent">
+                      {user.prefs?.address || <span className="text-slate-400 italic">Not set</span>}
+                    </p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Postal Code</label>
+                  {isEditing ? (
+                    <input
+                      className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
+                      placeholder="10001"
+                      value={formData.postalCode}
+                      onChange={(e) => setFormData({ ...formData, postalCode: e.target.value.replace(/[^0-9]/g, '') })}
+                    />
+                  ) : (
+                    <p className="font-medium text-slate-900 bg-slate-50 px-3 py-2 rounded-lg border border-transparent">
+                      {user.prefs?.postalCode || <span className="text-slate-400 italic">Not set</span>}
+                    </p>
+                  )}
+                </div>
+              </div>
             </CardContent>
           </Card>
 

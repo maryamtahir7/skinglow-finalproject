@@ -1,315 +1,181 @@
 import React, { useState, useEffect } from "react";
 import {
-  Mail,
-  MapPin,
-  Phone,
-  Clock,
-  Award,
-  Shield,
-  Truck,
+  Sparkles,
   Heart,
-  ShoppingBag,
-  CreditCard,
-  Headphones,
-  Target,
   Globe,
-  ArrowRight,
+  Award,
   Users,
+  Leaf,
+  Droplets,
+  Microscope,
+  ShieldCheck,
   Star,
-  Calendar,
-  Package,
-  Zap,
-  Play,
-  Quote,
-  Stethoscope,
-  Pill,
-  Activity,
-  CheckCircle
+  ArrowRight,
+  Quote
 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function AboutPage() {
-  const [activeSection, setActiveSection] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
-
-    const handleScroll = () => {
-      const sections = document.querySelectorAll("[data-section]");
-      sections.forEach((section, index) => {
-        const rect = section.getBoundingClientRect();
-        if (
-          rect.top <= window.innerHeight / 2 &&
-          rect.bottom >= window.innerHeight / 2
-        ) {
-          setActiveSection(index);
-        }
-      });
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const stats = [
-    { icon: Users, value: "1M+", label: "Happy Patients", color: "text-teal-600" },
-    { icon: Pill, value: "50K+", label: "Medicines Available", color: "text-emerald-600" },
-    { icon: Award, value: "4.9", label: "Patient Rating", color: "text-yellow-600" },
-    { icon: MapPin, value: "100+", label: "Cities Served", color: "text-blue-600" },
-  ];
-
-  const features = [
-    {
-      icon: CheckCircle,
-      title: "100% Genuine Medicines",
-      description:
-        "Sourced directly from manufacturers and authorized distributors to ensure authenticity.",
-      color: "bg-gradient-to-br from-teal-500 to-teal-600",
-    },
-    {
-      icon: Truck,
-      title: "Express Delivery",
-      description: "Fast delivery within 24 hours in metro cities and efficient tracking nationwide.",
-      color: "bg-gradient-to-br from-emerald-500 to-emerald-600",
-    },
-    {
-      icon: Shield,
-      title: "Secure Payments",
-      description:
-        "Safe and secure payment gateways with cash on delivery and online options.",
-      color: "bg-gradient-to-br from-blue-500 to-blue-600",
-    },
-    {
-      icon: Headphones,
-      title: "Pharmacist Support",
-      description: "Qualified pharmacists available 24/7 to answer your health-related queries.",
-      color: "bg-gradient-to-br from-teal-400 to-teal-500",
-    },
-  ];
-
-  const timeline = [
-    {
-      year: "2022",
-      title: "The Beginning",
-      description:
-        "MediStore started with a mission to make healthcare accessible to every Pakistani.",
-    },
-    {
-      year: "2023",
-      title: "Digital Expansion",
-      description: "Launched our mobile app and expanded delivery to over 50 cities.",
-    },
-    {
-      year: "2024",
-      title: "Telemedicine Integration",
-      description:
-        "Introduced AI Pharmacist and Online Doctor Consultations.",
-    },
-    {
-      year: "2025",
-      title: "Nation's Pharmacy",
-      description:
-        "Became one of Pakistan's most trusted digital pharmacies with ISO certification.",
-    },
+    { icon: Users, value: "50K+", label: "Glowing Customers", color: "text-rose-500" },
+    { icon: Star, value: "4.9", label: "Average Rating", color: "text-amber-500" },
+    { icon: Leaf, value: "100%", label: "Vegan & Cruelty-Free", color: "text-emerald-500" },
+    { icon: Droplets, value: "24h", label: "Hydration Lock", color: "text-blue-500" },
   ];
 
   const values = [
     {
-      icon: Shield,
-      title: "Trust & Safety",
-      description: "We adhere to strict quality standards to ensure patient safety first.",
+      icon: Microscope,
+      title: "Science-Backed",
+      description: "Formulated by expert dermatologists using clinical-grade active ingredients for visible results.",
+    },
+    {
+      icon: Leaf,
+      title: "Clean Beauty",
+      description: "Free from parabens, sulfates, and harsh chemicals. We believe in effective, not aggressive, skincare.",
     },
     {
       icon: Heart,
-      title: "Patient Care",
-      description: "Compassion is at the core of our service. We care for your health like family.",
-    },
-    {
-      icon: Zap,
-      title: "Innovation",
-      description: "Leveraging technology to simplify healthcare access.",
-    },
-    {
-      icon: Target,
-      title: "Accessibility",
-      description: "Making essential medicines affordable and available to all.",
+      title: "Cruelty-Free",
+      description: "We love our furry friends. None of our products are tested on animals, ever.",
     },
   ];
 
   return (
-    <div className="min-h-screen bg-white font-sans">
-      {/* Hero Section */}
-      <section
-        className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-teal-900 to-slate-900 text-white"
-        data-section
-      >
-        <div className="absolute inset-0 opacity-50">
-          <div className="absolute inset-0 bg-black opacity-20"></div>
-        </div>
+    <div className="min-h-screen bg-white font-sans text-slate-900">
+      {/* Hero Section - Parallax/Gradient */}
+      <section className="relative overflow-hidden bg-slate-900 text-white pb-32 pt-40 md:pt-48">
+        {/* Abstract Background Shapes */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 animate-pulse-slow"></div>
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-rose-500/10 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4"></div>
 
-        <div className="relative max-w-7xl mx-auto px-6 py-32">
-          <div className="text-center max-w-4xl mx-auto">
-            <div
-              className={`transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-                }`}
-            >
-              <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-full px-6 py-3 mb-8 border border-white/20">
-                <Activity className="w-5 h-5 text-teal-400 fill-current" />
-                <span className="text-sm font-medium">
-                  Pakistan's Most Trusted Digital Pharmacy
-                </span>
+        <div className="relative max-w-7xl mx-auto px-6 text-center z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-8">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-xs uppercase tracking-widest font-semibold">The SkinGlow Story</span>
+            </div>
+
+            <h1 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight">
+              Science Meets <span className="text-primary italic">Soul</span>
+            </h1>
+
+            <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed font-light">
+              We believe skincare shouldn't be complicated. It should be effective, enjoyable, and empowering.
+              Review your natural radiance with formulas that work.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Stats Board - Floating Overlap */}
+      <div className="relative z-20 max-w-6xl mx-auto px-6 -mt-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 bg-white rounded-3xl shadow-xl shadow-slate-200/50 p-8 md:p-12 border border-slate-100">
+          {stats.map((stat, i) => (
+            <div key={i} className="text-center p-4 border-r last:border-r-0 border-slate-100/50">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 bg-slate-50 rounded-2xl">
+                  <stat.icon className={`w-6 h-6 ${stat.color}`} />
+                </div>
+              </div>
+              <div className="text-3xl md:text-4xl font-bold mb-2 text-slate-900">{stat.value}</div>
+              <div className="text-xs uppercase tracking-wider font-semibold text-slate-500">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Founder's Letter */}
+      <section className="py-32 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
+            {/* Image Side */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-primary/20 rounded-[3rem] rotate-3 transform"></div>
+              <div className="relative bg-slate-100 rounded-[3rem] overflow-hidden aspect-[4/5] shadow-2xl">
+                <img
+                  src="https://i.pinimg.com/736x/6f/a5/8f/6fa58f97ed672d12ee9521c8ba395f87.jpg"
+                  alt="Founder Maryam Tahir"
+                  className="w-full h-full object-cover grayscale-0 group-hover:grayscale transition-all duration-700 hover:scale-105"
+                />
+              </div>
+              <div className="absolute -bottom-10 -right-10 bg-white p-8 rounded-3xl shadow-xl max-w-xs hidden md:block border border-slate-100">
+                <p className="font-handwriting text-2xl text-primary mb-2">"Glow from within"</p>
+                <p className="text-xs text-slate-500 font-sans uppercase tracking-widest">Maryam Tahir, Founder</p>
+              </div>
+            </div>
+
+            {/* Text Side */}
+            <div className="space-y-8">
+              <h2 className="text-4xl md:text-5xl font-bold text-slate-900">
+                More Than Just <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-rose-400">Skincare.</span>
+              </h2>
+
+              <div className="space-y-6 text-lg text-slate-600 leading-relaxed">
+                <p>
+                  <span className="text-slate-900 font-semibold text-xl">Hello! I'm Maryam.</span> Formulating effective skincare wasn't just a business idea—it was a personal journey.
+                </p>
+                <p>
+                  Frustrated by products that were either too harsh or simply ineffective, I set out to create a solution that bridges the gap between clinical efficacy and a luxurious self-care experience.
+                </p>
+                <p>
+                  At SkinGlow, we meticulously select every ingredient. If it doesn't serve your skin, it doesn't make the cut. Our mission is simple: to give you the confidence to wear your natural skin, proudly.
+                </p>
               </div>
 
-              <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-teal-100 to-teal-200 bg-clip-text text-transparent">
-                MediStore Pharmacy
-              </h1>
-
-              <p className="text-xl md:text-2xl text-teal-100 mb-8 leading-relaxed max-w-3xl mx-auto">
-                Revolutionizing healthcare access with genuine medicines, expert advice, and trusted care.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  onClick={() =>
-                    document.getElementById("about").scrollIntoView({ behavior: "smooth" })
-                  }
-                  className="bg-teal-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-teal-500 transition-all duration-300 transform hover:scale-105 shadow-xl flex items-center justify-center gap-2"
-                >
-                  <span>Our Mission</span>
-                  <ArrowRight className="w-5 h-5" />
-                </button>
+              <div className="pt-4">
+                <div className="flex items-center gap-4">
+                  <div className="h-px flex-1 bg-slate-200"></div>
+                  <ShieldCheck className="w-6 h-6 text-emerald-500" />
+                  <span className="text-sm font-bold text-slate-900 uppercase tracking-widest">Dermatologist Tested</span>
+                  <div className="h-px flex-1 bg-slate-200"></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Stats Section */}
-        <div className="relative max-w-7xl mx-auto px-6 pb-20">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="flex justify-center mb-4">
-                  <div className="p-4 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
-                    <stat.icon className={`w-6 h-6 text-teal-300`} />
-                  </div>
+      {/* Values Section */}
+      <section className="py-32 bg-slate-50 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent"></div>
+
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center max-w-3xl mx-auto mb-20">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">Our Philosophy</h2>
+            <p className="text-slate-600 text-lg">
+              We promised ourselves we would never compromise on quality. Here are the three pillars that define every bottle we produce.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-10">
+            {values.map((v, i) => (
+              <div key={i} className="group bg-white rounded-2xl p-10 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-2 border border-slate-100">
+                <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-8 group-hover:scale-110 transition-transform duration-500">
+                  <v.icon className="w-7 h-7" />
                 </div>
-                <div className="text-3xl font-bold mb-2">{stat.value}</div>
-                <div className="text-teal-200 text-sm">{stat.label}</div>
+                <h3 className="text-xl font-bold mb-4 text-slate-900">{v.title}</h3>
+                <p className="text-slate-600 leading-relaxed">
+                  {v.description}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-24 px-6" data-section>
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-teal-50 rounded-full px-4 py-2 mb-4">
-              <Heart className="w-4 h-4 text-teal-600" />
-              <span className="text-sm font-medium text-teal-900">About MediStore</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-              Your Health, Our Priority
-            </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-              We are committed to delivering health and wellness to your doorstep with integrity and care.
-            </p>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-16 items-center mb-24">
-            <div className="space-y-8">
-              <div className="relative">
-                <Quote className="absolute -top-4 -left-4 w-8 h-8 text-teal-200" />
-                <blockquote className="text-lg text-slate-700 italic pl-8 border-l-4 border-teal-500">
-                  "At MediStore, we believe that access to genuine medicine is a basic right. We strive to make healthcare accessible, affordable, and trustworthy for every family."
-                </blockquote>
-                <div className="mt-4 pl-8">
-                  <div className="font-semibold text-slate-900">Dr. Maryam Tahir</div>
-                  <div className="text-sm text-slate-500">Founder & Chief Pharmacist</div>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                {values.map((value, index) => (
-                  <div
-                    key={index}
-                    className="flex gap-4 p-4 rounded-xl hover:bg-teal-50 transition-all duration-300 border border-transparent hover:border-teal-100"
-                  >
-                    <div className="p-3 bg-teal-100 rounded-full shrink-0">
-                      <value.icon className="w-5 h-5 text-teal-700" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-slate-900 mb-1">{value.title}</h3>
-                      <p className="text-slate-600 text-sm">{value.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="grid grid-cols-2 gap-6">
-                {features.map((feature, index) => (
-                  <div
-                    key={index}
-                    className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-slate-100"
-                  >
-                    <div className={`p-3 rounded-xl ${feature.color} w-fit mb-4`}>
-                      <feature.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="font-bold text-slate-900 mb-2">{feature.title}</h3>
-                    <p className="text-slate-600 text-sm leading-relaxed">{feature.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Timeline Section */}
-      <section className="py-24 bg-slate-50" data-section>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-white rounded-full px-4 py-2 mb-4 shadow-sm border border-slate-100">
-              <Calendar className="w-4 h-4 text-teal-500" />
-              <span className="text-sm font-medium text-slate-700">Our Journey</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
-              Milestones in Healthcare
-            </h2>
-          </div>
-
-          <div className="relative">
-            <div className="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-slate-300 hidden md:block"></div>
-
-            <div className="space-y-12">
-              {timeline.map((item, index) => (
-                <div
-                  key={index}
-                  className={`flex items-center ${index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                    }`}
-                >
-                  <div className={`w-full md:w-5/12 ${index % 2 === 0 ? "md:pr-12" : "md:pl-12"}`}>
-                    <div className="bg-white rounded-2xl p-8 shadow-md hover:shadow-lg transition-all duration-300 border-t-4 border-teal-500">
-                      <div className="text-2xl font-bold text-teal-600 mb-2">{item.year}</div>
-                      <h3 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h3>
-                      <p className="text-slate-600 leading-relaxed">{item.description}</p>
-                    </div>
-                  </div>
-
-                  <div className="hidden md:block w-2/12 flex justify-center">
-                    <div className="w-4 h-4 bg-teal-600 rounded-full border-4 border-white shadow-md"></div>
-                  </div>
-
-                  <div className="hidden md:block w-5/12"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
