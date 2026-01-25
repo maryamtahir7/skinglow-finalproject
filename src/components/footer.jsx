@@ -77,30 +77,31 @@ export default function Footer() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
 
-        {/* 2. NEWSLETTER GLASS CARD (Floating & Responsive) */}
+        {/* 2. NEWSLETTER GLASS CARD (Centered & Responsive) */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="relative -mt-32 mb-20 bg-white/5 backdrop-blur-2xl border border-white/10 p-6 md:p-12 rounded-[24px] md:rounded-[32px] overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+          className="relative mb-24 bg-white/5 backdrop-blur-2xl border border-white/10 p-8 md:p-16 rounded-[2rem] overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.5)] max-w-5xl mx-auto text-center"
         >
           {/* Shimmer Effect */}
           <div className="absolute inset-0 bg-gradient-to-tr from-white/5 via-transparent to-rose-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-10 items-center relative z-10">
-            <div className="text-center lg:text-left">
-              <div className="flex items-center justify-center lg:justify-start gap-2 mb-4">
-                <span className="w-8 h-[1px] bg-rose-400"></span>
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-rose-300">The Inner Circle</span>
-              </div>
-              <h3 className="text-3xl md:text-5xl font-serif mb-4 leading-tight">
-                Unlock 10% Off <br /><span className="text-white/50 italic">Your First Ritual.</span>
-              </h3>
-              <p className="text-white/60 font-light text-base md:text-lg max-w-md mx-auto lg:mx-0">
-                Join our community for expert skincare advice, early access to drops, and exclusive member-only rewards.
-              </p>
+          <div className="relative z-10 flex flex-col items-center">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="w-12 h-[1px] bg-rose-400"></span>
+              <span className="text-xs font-bold uppercase tracking-[0.3em] text-rose-300">The Inner Circle</span>
+              <span className="w-12 h-[1px] bg-rose-400"></span>
             </div>
+
+            <h3 className="text-3xl md:text-5xl lg:text-6xl font-serif mb-6 leading-tight">
+              Unlock 10% Off <br /><span className="text-white/50 italic">Your First Ritual.</span>
+            </h3>
+
+            <p className="text-white/60 font-light text-base md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+              Join our community for expert skincare advice, early access to drops, and exclusive member-only rewards.
+            </p>
 
             <form
               onSubmit={async (e) => {
@@ -143,7 +144,7 @@ export default function Footer() {
                   }, 3000);
                 }
               }}
-              className="w-full bg-white/5 border border-white/10 p-2 rounded-2xl flex flex-col md:flex-row gap-2"
+              className="w-full max-w-lg bg-white/5 border border-white/10 p-2 rounded-2xl flex flex-col md:flex-row gap-2"
             >
               {/* Mobile: Full Width Input */}
               <input
