@@ -62,118 +62,38 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="relative bg-[#0A0A0A] text-white pt-24 pb-8 overflow-hidden font-sans">
+    <footer className="relative bg-[#050505] text-white pt-32 pb-10 overflow-hidden font-sans border-t border-white/5">
 
       {/* 1. BACKGROUND AMBIANCE */}
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         {/* Giant Faded Typography */}
-        <div className="absolute -top-[10%] -left-[10%] text-[20vw] font-serif opacity-[0.03] text-white leading-none tracking-tighter select-none">
+        <div className="absolute -top-[5%] -left-[5%] text-[25vw] font-serif opacity-[0.02] text-white leading-none tracking-tighter select-none mix-blend-overlay">
           SkinGlow
         </div>
         {/* Soft Spotlights */}
-        <div className="absolute top-[-20%] right-[10%] w-[500px] h-[500px] bg-rose-900/20 rounded-full blur-[128px]" />
-        <div className="absolute bottom-[-20%] left-[10%] w-[600px] h-[600px] bg-indigo-900/10 rounded-full blur-[128px]" />
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-rose-900/10 rounded-full blur-[150px] opacity-40" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-indigo-900/10 rounded-full blur-[150px] opacity-30" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
 
-        {/* 2. NEWSLETTER GLASS CARD (Compact) */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="relative mb-16 bg-white/5 backdrop-blur-2xl border border-white/10 p-6 md:p-10 rounded-[1.5rem] overflow-hidden group shadow-2xl max-w-3xl mx-auto text-center"
-        >
-          {/* Shimmer Effect */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-white/5 via-transparent to-rose-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-
-          <div className="relative z-10 flex flex-col items-center">
-
-            <h3 className="text-2xl md:text-3xl font-serif mb-3 leading-tight">
-              Unlock 10% Off <span className="text-white/50 italic">Your First Ritual.</span>
-            </h3>
-
-            <p className="text-white/60 font-light text-sm max-w-lg mx-auto mb-6">
-              Join our community for expert skincare advice and exclusive rewards.
-            </p>
-
-            <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const email = e.target.elements.email.value;
-                if (!email) return;
-
-                const btn = e.target.querySelector('button');
-                const originalText = btn.innerText;
-                btn.innerText = "...";
-                btn.disabled = true;
-
-                try {
-                  const res = await fetch('/api/newsletter', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                  });
-
-                  if (res.ok) {
-                    btn.innerText = "✓";
-                    btn.classList.add('bg-emerald-400', 'text-stone-900');
-                    e.target.reset();
-                    setTimeout(() => {
-                      btn.innerText = originalText;
-                      btn.disabled = false;
-                      btn.classList.remove('bg-emerald-400', 'text-stone-900');
-                    }, 3000);
-                  } else {
-                    throw new Error("Failed");
-                  }
-                } catch (err) {
-                  console.error(err);
-                  btn.innerText = "!";
-                  btn.classList.add('bg-red-500', 'text-white');
-                  setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.disabled = false;
-                    btn.classList.remove('bg-red-500', 'text-white');
-                  }, 3000);
-                }
-              }}
-              className="w-full max-w-md bg-white/5 border border-white/10 p-1.5 rounded-xl flex flex-col md:flex-row gap-2"
-            >
-              {/* Mobile: Full Width Input */}
-              <input
-                name="email"
-                type="email"
-                required
-                placeholder="Email address"
-                className="w-full flex-1 bg-transparent border-none px-4 py-3 rounded-lg text-white placeholder:text-white/30 outline-none focus:ring-1 focus:ring-white/20 transition-all text-sm min-w-0"
-              />
-              {/* Mobile: Full Width Button */}
-              <Button type="submit" className="w-full md:w-auto rounded-lg px-6 py-3 bg-gradient-to-r from-rose-200 to-indigo-200 text-stone-900 hover:opacity-90 font-bold uppercase tracking-widest text-[10px] shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:hover:scale-100 whitespace-nowrap">
-                Subscribe
-              </Button>
-            </form>
-          </div>
-        </motion.div>
-
-        {/* 3. MAIN FOOTER GRID */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-20 border-b border-white/5 pb-20">
+        {/* 2. MAIN FOOTER GRID */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-10 mb-24 border-b border-white/5 pb-24">
 
           {/* Brand Column (Span 4) */}
-          <div className="lg:col-span-4 space-y-8">
+          <div className="lg:col-span-4 space-y-8 pr-8">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white text-stone-900 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-6 h-6" />
+              <div className="w-10 h-10 bg-gradient-to-br from-rose-100 to-rose-200 text-stone-900 rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(255,228,230,0.3)]">
+                <Sparkles className="w-5 h-5 text-rose-900" />
               </div>
-              <span className="text-2xl font-bold tracking-tight">SkinGlow</span>
+              <span className="text-3xl font-serif tracking-tight ml-1">SkinGlow</span>
             </div>
-            <p className="text-white/50 leading-relaxed font-light text-lg max-w-sm">
+            <p className="text-white/60 leading-relaxed font-light text-base max-w-sm">
               Premium skincare rooted in science, inspired by nature. We believe in transparency, sustainability, and results you can see.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {socials.map((s, i) => (
-                <a key={i} href={s.url} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 hover:scale-110 transition-all">
+                <a key={i} href={s.url} target="_blank" rel="noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-rose-200 hover:border-rose-200/30 hover:bg-rose-500/10 transition-all duration-300">
                   <s.icon className="w-4 h-4" />
                 </a>
               ))}
@@ -182,11 +102,12 @@ export default function Footer() {
 
           {/* Links Columns (Span 2 each) */}
           <div className="lg:col-span-2 lg:col-start-6">
-            <h4 className="font-bold text-sm uppercase tracking-widest text-white/40 mb-6">Explore</h4>
+            <h4 className="font-serif text-lg text-rose-100/90 mb-8">Explore</h4>
             <ul className="space-y-4">
               {quickLinks.map((l, i) => (
                 <li key={i}>
-                  <button onClick={() => navigate(l.path)} className="text-white/70 hover:text-white hover:translate-x-1 transition-all flex items-center gap-1">
+                  <button onClick={() => navigate(l.path)} className="text-white/50 hover:text-white transition-all text-sm font-medium tracking-wide flex items-center gap-2 group">
+                    <span className="w-0 group-hover:w-2 h-[1px] bg-rose-400 transition-all duration-300"></span>
                     {l.name}
                   </button>
                 </li>
@@ -195,11 +116,12 @@ export default function Footer() {
           </div>
 
           <div className="lg:col-span-2">
-            <h4 className="font-bold text-sm uppercase tracking-widest text-white/40 mb-6">Categories</h4>
+            <h4 className="font-serif text-lg text-rose-100/90 mb-8">Collections</h4>
             <ul className="space-y-4">
               {categories.map((c) => (
                 <li key={c.$id}>
-                  <button onClick={() => navigate(`/products?category=${c.name}`)} className="text-white/70 hover:text-white hover:translate-x-1 transition-all flex items-center gap-1">
+                  <button onClick={() => navigate(`/products?category=${c.name}`)} className="text-white/50 hover:text-white transition-all text-sm font-medium tracking-wide flex items-center gap-2 group">
+                    <span className="w-0 group-hover:w-2 h-[1px] bg-rose-400 transition-all duration-300"></span>
                     {c.name}
                   </button>
                 </li>
@@ -208,11 +130,12 @@ export default function Footer() {
           </div>
 
           <div className="lg:col-span-2">
-            <h4 className="font-bold text-sm uppercase tracking-widest text-white/40 mb-6">Support</h4>
+            <h4 className="font-serif text-lg text-rose-100/90 mb-8">Support</h4>
             <ul className="space-y-4">
               {support.map((l, i) => (
                 <li key={i}>
-                  <button onClick={() => navigate(l.path)} className="text-white/70 hover:text-white hover:translate-x-1 transition-all flex items-center gap-1">
+                  <button onClick={() => navigate(l.path)} className="text-white/50 hover:text-white transition-all text-sm font-medium tracking-wide flex items-center gap-2 group">
+                    <span className="w-0 group-hover:w-2 h-[1px] bg-rose-400 transition-all duration-300"></span>
                     {l.name}
                   </button>
                 </li>
@@ -222,50 +145,119 @@ export default function Footer() {
 
           {/* Contact Column */}
           <div className="lg:col-span-2">
-            <h4 className="font-bold text-sm uppercase tracking-widest text-white/40 mb-6">Contact</h4>
-            <div className="space-y-5">
+            <h4 className="font-serif text-lg text-rose-100/90 mb-8">Get in Touch</h4>
+            <div className="space-y-6">
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
-                className="text-white/70 hover:text-white transition-colors flex items-start gap-3"
+                className="group block"
               >
-                <span className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                  <Mail className="w-4 h-4" />
-                </span>
-                <span className="leading-relaxed break-all">{CONTACT_EMAIL}</span>
+                <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1 font-bold group-hover:text-rose-400 transition-colors">Email Us</div>
+                <div className="text-white/70 text-sm break-all leading-relaxed group-hover:text-white transition-colors">
+                  {CONTACT_EMAIL}
+                </div>
               </a>
 
-              <div className="text-white/70 flex items-start gap-3">
-                <span className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
-                  <MapPin className="w-4 h-4" />
-                </span>
-                <span className="leading-relaxed">{LOCATION}</span>
+              <div className="group">
+                <div className="text-[10px] uppercase tracking-widest text-white/30 mb-1 font-bold">Visit Us</div>
+                <div className="text-white/70 text-sm leading-relaxed">
+                  {LOCATION}
+                </div>
               </div>
             </div>
           </div>
 
         </div>
 
+        {/* 3. NEWSLETTER GLASS CARD (Middle & Premium) */}
+        <div className="relative mb-24 max-w-xl mx-auto text-center">
+
+          <h3 className="text-3xl md:text-4xl font-serif mb-3 leading-snug">
+            Unlock 10% Off <span className="text-white/40 italic font-light">Your First Ritual.</span>
+          </h3>
+
+          <p className="text-white/50 font-light text-sm max-w-sm mx-auto mb-8">
+            Join our community for expert skincare advice, early access to drops, and exclusive rewards.
+          </p>
+
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              const email = e.target.elements.email.value;
+              if (!email) return;
+
+              const btn = e.target.querySelector('button');
+              const originalText = btn.innerText;
+              btn.innerText = "...";
+              btn.disabled = true;
+
+              try {
+                const res = await fetch('/api/newsletter', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email })
+                });
+
+                if (res.ok) {
+                  btn.innerText = "✓";
+                  btn.classList.add('bg-emerald-400', 'text-stone-900', 'border-emerald-400');
+                  e.target.reset();
+                  setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove('bg-emerald-400', 'text-stone-900', 'border-emerald-400');
+                  }, 3000);
+                } else {
+                  throw new Error("Failed");
+                }
+              } catch (err) {
+                console.error(err);
+                btn.innerText = "!";
+                btn.classList.add('bg-red-500', 'text-white', 'border-red-500');
+                setTimeout(() => {
+                  btn.innerText = originalText;
+                  btn.disabled = false;
+                  btn.classList.remove('bg-red-500', 'text-white', 'border-red-500');
+                }, 3000);
+              }
+            }}
+            className="group relative w-full bg-white/5 border border-white/10 p-1.5 rounded-full flex gap-1 focus-within:ring-1 focus-within:ring-rose-200/30 focus-within:border-rose-200/30 focus-within:bg-white/10 transition-all duration-300 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+          >
+            <input
+              name="email"
+              type="email"
+              required
+              placeholder="Enter your email address..."
+              className="w-full flex-1 bg-transparent border-none pl-6 pr-2 py-3 rounded-full text-white placeholder:text-white/20 outline-none text-sm min-w-0"
+            />
+            <Button type="submit" className="rounded-full px-8 py-3 bg-white text-stone-950 hover:bg-rose-50 font-bold uppercase tracking-widest text-[10px] shadow-lg transition-all hover:scale-105 active:scale-95 whitespace-nowrap h-auto border border-transparent">
+              Subscribe
+            </Button>
+          </form>
+        </div>
+
         {/* 4. BOTTOM BAR */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-xs text-white/30 font-medium tracking-wide">
-          <div className="flex flex-col md:flex-row gap-6 items-center">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] uppercase tracking-widest text-white/20 font-semibold border-t border-white/5 pt-10">
+          <div className="flex flex-col md:flex-row gap-8 items-center">
             <span>© {new Date().getFullYear()} SkinGlow Inc.</span>
-            <span className="hidden md:inline w-1 h-1 rounded-full bg-white/20"></span>
-            {legal.map((l, i) => (
-              <button key={i} onClick={() => navigate(l.path)} className="hover:text-white transition-colors">
-                {l.name}
-              </button>
-            ))}
+            <div className="hidden md:flex gap-6">
+              {legal.map((l, i) => (
+                <button key={i} onClick={() => navigate(l.path)} className="hover:text-white/60 transition-colors">
+                  {l.name}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-4 py-2 rounded-full backdrop-blur-sm group hover:bg-white/10 transition-colors">
-              <span className="text-white/40">Developed by</span>
-              <span className="text-white font-bold bg-gradient-to-r from-rose-200 to-indigo-200 bg-clip-text text-transparent">Maryam Tahir</span>
-              <span className="w-1 h-1 rounded-full bg-white/20"></span>
-              <span className="text-xs font-semibold tracking-widest uppercase text-white/40 group-hover:text-white/60 transition-colors">Full Stack Developer</span>
+          <div className="flex items-center gap-6">
+            {/* Small Dev Credit */}
+            <div className="flex items-center gap-2 cursor-default text-[9px] md:text-[10px] tracking-[0.2em] font-bold uppercase text-white/20">
+              <span>Developed by</span>
+              <span className="text-white/40 hover:text-rose-200 transition-colors">Maryam Tahir</span>
+              <span className="w-1 h-1 rounded-full bg-white/10 mx-1"></span>
+              <span className="text-white/20 font-medium tracking-widest">Full Stack Developer</span>
             </div>
 
-            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white hover:text-stone-900 transition-colors">
+            <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all duration-300">
               <ArrowUp className="w-3 h-3" />
             </button>
           </div>
