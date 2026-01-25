@@ -117,7 +117,7 @@ function FeaturedArticle({ post }) {
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="relative group cursor-pointer rounded-[2rem] overflow-hidden bg-stone-900 aspect-[4/3] md:aspect-[21/9] isolate"
+                className="relative group cursor-pointer rounded-[2rem] overflow-hidden bg-stone-900 aspect-[3/4] sm:aspect-square md:aspect-[21/9] isolate"
             >
                 {/* Background Image */}
                 <img
@@ -125,36 +125,36 @@ function FeaturedArticle({ post }) {
                     alt={post.title}
                     className="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-overlay transition-transform duration-1000 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent" />
 
                 {/* Content Overlay */}
-                <div className="absolute bottom-0 left-0 p-8 md:p-16 max-w-4xl text-white">
+                <div className="absolute bottom-0 left-0 p-6 md:p-16 max-w-4xl text-white w-full">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
-                        className="space-y-6"
+                        className="space-y-4 md:space-y-6"
                     >
-                        <div className="flex items-center gap-4 text-xs font-bold tracking-widest uppercase text-rose-200">
+                        <div className="flex items-center gap-3 text-[10px] md:text-xs font-bold tracking-widest uppercase text-rose-200">
                             <span className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">{post.category}</span>
                             <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {post.readTime}</span>
                         </div>
 
-                        <h2 className="text-4xl md:text-6xl font-serif leading-none group-hover:text-rose-100 transition-colors">
+                        <h2 className="text-3xl md:text-6xl font-serif leading-tight md:leading-none group-hover:text-rose-100 transition-colors">
                             {post.title}
                         </h2>
 
-                        <p className="text-lg md:text-xl text-white/70 max-w-2xl font-light leading-relaxed line-clamp-2 md:line-clamp-none">
+                        <p className="text-base md:text-xl text-white/70 max-w-2xl font-light leading-relaxed line-clamp-3 md:line-clamp-none">
                             {post.excerpt}
                         </p>
 
-                        <div className="flex items-center gap-3 pt-4">
-                            <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur border border-white/20 flex items-center justify-center text-sm font-bold">
+                        <div className="flex items-center gap-3 pt-2 md:pt-4">
+                            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/20 backdrop-blur border border-white/20 flex items-center justify-center text-xs md:text-sm font-bold">
                                 {post.author.charAt(0)}
                             </div>
-                            <div className="text-sm">
+                            <div className="text-xs md:text-sm">
                                 <div className="font-bold text-white">{post.author}</div>
-                                <div className="text-white/50 text-xs uppercase tracking-wider">{post.role}</div>
+                                <div className="text-white/50 text-[10px] md:text-xs uppercase tracking-wider">{post.role}</div>
                             </div>
                         </div>
                     </motion.div>
