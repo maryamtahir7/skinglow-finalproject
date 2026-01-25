@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import Footer from "../components/footer";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -37,7 +38,9 @@ export default function ProductDetail() {
 
   // Sticky Bar Logic
   const [showStickyBar, setShowStickyBar] = useState(false);
+  const [isFooterVisible, setIsFooterVisible] = useState(false);
   const mainButtonRef = useRef(null);
+  const footerRef = useRef(null);
 
   useEffect(() => {
     async function load() {
@@ -66,6 +69,7 @@ export default function ProductDetail() {
     load();
   }, [id, user]);
 
+  // Observer for Main CTA (to show sticky bar)
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -74,6 +78,21 @@ export default function ProductDetail() {
       { threshold: 0 }
     );
     if (mainButtonRef.current) observer.observe(mainButtonRef.current);
+    return () => observer.disconnect();
+  }, [loading]);
+
+  // Observer for Footer (to hide sticky bars proactively)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsFooterVisible(entry.isIntersecting);
+      },
+      {
+        threshold: 0,
+        rootMargin: "0px 0px 200px 0px" // Hide 200px before it hits the footer
+      }
+    );
+    if (footerRef.current) observer.observe(footerRef.current);
     return () => observer.disconnect();
   }, [loading]);
 
@@ -140,38 +159,45 @@ export default function ProductDetail() {
   const displayPrice = parseInt(product.price).toLocaleString();
 
   return (
-    <div className="min-h-screen bg-[#FDFBF7] text-stone-900 font-sans selection:bg-rose-100 pb-32 overflow-x-hidden">
+    <div className="min-h-screen bg-[#FDFBF7] text-stone-900 font-sans selection:bg-rose-100 pb-0 overflow-x-hidden">
 
       {/* 1. TOP NAV BAR (Floating & Unified) */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-6 flex justify-between items-center pointer-events-none">
-        <motion.button
-          initial={{ x: -20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          onClick={() => navigate('/products')}
-          className="pointer-events-auto w-12 h-12 flex items-center justify-center bg-white/80 backdrop-blur-xl border border-stone-100 rounded-full shadow-sm hover:shadow-md transition-all group"
-        >
-          <ArrowLeft className="w-5 h-5 text-stone-800 group-hover:-translate-x-1 transition-transform" />
-        </motion.button>
+      <AnimatePresence>
+        {!isFooterVisible && (
+          <motion.nav
+            initial={{ y: -100 }} animate={{ y: 0 }} exit={{ y: -100 }}
+            className="fixed top-0 left-0 right-0 z-50 px-6 py-6 flex justify-between items-center pointer-events-none"
+          >
+            <motion.button
+              initial={{ x: -20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              onClick={() => navigate('/products')}
+              className="pointer-events-auto w-12 h-12 flex items-center justify-center bg-white border border-stone-100 rounded-full shadow-lg hover:shadow-xl transition-all group"
+            >
+              <ArrowLeft className="w-5 h-5 text-stone-800 group-hover:-translate-x-1 transition-transform" />
+            </motion.button>
 
-        <motion.div
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="hidden md:flex items-center gap-2 bg-white/80 backdrop-blur-xl border border-stone-100 px-6 py-3 rounded-full shadow-sm"
-        >
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-stone-400">Viewing</span>
-          <span className="text-sm font-serif italic">{product.name}</span>
-        </motion.div>
+            <motion.div
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              className="hidden md:flex items-center gap-2 bg-white/95 backdrop-blur-xl border border-stone-100 px-6 py-3 rounded-full shadow-xl"
+            >
+              <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-stone-400 pt-0.5">Viewing</span>
+              <span className="text-sm font-serif italic text-stone-800">{product.name}</span>
+            </motion.div>
 
-        <motion.div
-          initial={{ x: 20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          className="flex gap-2"
-        >
-          <button onClick={handleWishlist} className="pointer-events-auto w-12 h-12 flex items-center justify-center bg-white/80 backdrop-blur-xl border border-stone-100 rounded-full shadow-sm hover:text-rose-600 transition-all">
-            <Heart className="w-5 h-5" />
-          </button>
-        </motion.div>
-      </nav>
+            <motion.div
+              initial={{ x: 20, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              className="flex gap-2"
+            >
+              <button onClick={handleWishlist} className="pointer-events-auto w-12 h-12 flex items-center justify-center bg-white border border-stone-100 rounded-full shadow-lg hover:text-rose-600 transition-all">
+                <Heart className="w-5 h-5" />
+              </button>
+            </motion.div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
 
       <div className="max-w-[1800px] mx-auto pt-24">
         <div className="grid lg:grid-cols-2 gap-0 lg:gap-16 xl:gap-32">
@@ -196,7 +222,13 @@ export default function ProductDetail() {
 
             {/* Mobile Slider */}
             <div className="lg:hidden w-full aspect-[4/5] bg-white relative overflow-hidden">
-              <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide h-full">
+              <div
+                className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide h-full"
+                onScroll={(e) => {
+                  const idx = Math.round(e.target.scrollLeft / e.target.offsetWidth);
+                  if (idx !== selectedImage) setSelectedImage(idx);
+                }}
+              >
                 {images.map((img, i) => (
                   <div key={i} className="w-full h-full shrink-0 snap-center">
                     <img src={img} alt="" className="w-full h-full object-cover" />
@@ -253,7 +285,7 @@ export default function ProductDetail() {
               </div>
 
               {/* ACTIONS Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16" ref={mainButtonRef}>
                 <div className="flex items-center justify-between border border-stone-200 rounded-full h-16 px-6 bg-white hover:border-stone-400 transition-all">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Quantity</span>
                   <div className="flex items-center gap-6">
@@ -264,7 +296,6 @@ export default function ProductDetail() {
                 </div>
 
                 <Button
-                  ref={mainButtonRef}
                   onClick={handleAddToCart}
                   className="h-16 rounded-full bg-stone-900 text-white font-bold uppercase tracking-[0.2em] text-xs hover:bg-stone-800 transition-all shadow-[0_10px_30px_rgba(0,0,0,0.1)] hover:-translate-y-1 active:translate-y-0"
                 >
@@ -419,14 +450,14 @@ export default function ProductDetail() {
 
       {/* 4. FLOATING ACTION PILL (Mobile Only) */}
       <AnimatePresence>
-        {showStickyBar && (
+        {(showStickyBar && !isFooterVisible) && (
           <motion.div
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 50, opacity: 0 }}
             className="fixed bottom-8 left-6 right-6 z-50 flex justify-center md:hidden"
           >
-            <div className="bg-white/90 backdrop-blur-2xl border border-stone-100 rounded-full p-2 w-full flex items-center shadow-[0_20px_50px_rgba(0,0,0,0.15)] ring-1 ring-black/5">
+            <div className="bg-white border border-stone-100 rounded-full p-2 w-full flex items-center shadow-[0_20px_50px_rgba(0,0,0,0.2)] ring-1 ring-black/5">
               <div className="flex items-center gap-3 pl-4 flex-1">
                 <img src={images[0]} alt="" className="w-10 h-10 object-cover rounded-full bg-stone-50 ring-1 ring-black/5" />
                 <div className="overflow-hidden">
@@ -447,27 +478,27 @@ export default function ProductDetail() {
 
       {/* Desktop Sticky Footer (Refined) */}
       <AnimatePresence>
-        {showStickyBar && (
+        {(showStickyBar && !isFooterVisible) && (
           <motion.div
             initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-            className="hidden md:block fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-stone-100 py-6 px-12 z-40 transition-all"
+            className="hidden md:block fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-3xl border-t border-stone-100 py-6 px-12 z-40 transition-all shadow-[0_-10px_50px_rgba(0,0,0,0.05)]"
           >
             <div className="max-w-[1700px] mx-auto flex items-center justify-between">
               <div className="flex items-center gap-6">
                 <div className="relative group">
-                  <img src={images[0]} alt="" className="w-16 h-16 object-cover rounded-[2px] bg-stone-50" />
+                  <img src={images[0]} alt="" className="w-16 h-16 object-cover rounded-[2px] bg-stone-50 shadow-sm" />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Currently Viewing</div>
+                  <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Currently Viewing</div>
                   <div className="font-serif text-2xl text-stone-900 italic tracking-tight">{product.name}</div>
                 </div>
               </div>
 
               <div className="flex items-center gap-12">
                 <div className="text-right">
-                  <div className="text-xs font-bold text-stone-400 uppercase tracking-widest mb-1">Total Value</div>
-                  <div className="text-2xl font-light text-stone-900">Rs. {(parseInt(product.price) * quantity).toLocaleString()}</div>
+                  <div className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Total Value</div>
+                  <div className="text-2xl font-light text-stone-800">Rs. {(parseInt(product.price) * quantity).toLocaleString()}</div>
                 </div>
 
                 <div className="flex items-center border border-stone-100 rounded-full h-14 bg-stone-50 px-2 shadow-inner">
@@ -477,10 +508,10 @@ export default function ProductDetail() {
                 </div>
 
                 <div className="flex gap-4">
-                  <Button onClick={handleAddToCart} className="h-14 px-12 rounded-full bg-stone-900 text-white font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-stone-800 shadow-xl shadow-stone-900/10">
+                  <Button onClick={handleAddToCart} className="h-14 px-12 rounded-full bg-stone-900 text-white font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-stone-800 shadow-xl shadow-stone-900/10 transition-all hover:-translate-y-0.5">
                     Add to Ritual
                   </Button>
-                  <Button onClick={handleBuyNow} variant="outline" className="h-14 px-12 rounded-full border border-stone-200 text-stone-900 font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-stone-900 hover:text-white transition-all">
+                  <Button onClick={handleBuyNow} variant="outline" className="h-14 px-12 rounded-full border border-stone-200 text-stone-900 font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-stone-900 hover:text-white transition-all hover:-translate-y-0.5">
                     Express Checkout
                   </Button>
                 </div>
@@ -489,6 +520,10 @@ export default function ProductDetail() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <div ref={footerRef}>
+        <Footer />
+      </div>
 
     </div>
   );
