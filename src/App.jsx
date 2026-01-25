@@ -26,6 +26,7 @@ import AIChat from "./pages/AIChat";
 import ContactPage from "./pages/Contact";
 
 import BlogPage from "./pages/BlogPage";
+import BlogDetailPage from "./pages/BlogDetailPage";
 import ConcernPage from "./pages/ConcernPage"; // New Page
 import TermsPage from "./pages/TermsPage";
 import LicensePage from "./pages/LicensePage";
@@ -38,6 +39,9 @@ import RoutinePage from "./pages/RoutinePage";
 import SupportPage from "./pages/SupportPage";
 import ReturnsPage from "./pages/ReturnsPage";
 import ShippingPage from "./pages/ShippingPage";
+
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 import ScrollToTop from "./components/ScrollToTop";
 
@@ -60,6 +64,8 @@ function App() {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/signup" element={<SignupForm />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/privacy-policy" element={<PolicyPage />} />
             <Route path="/terms" element={<TermsPage />} />
@@ -80,6 +86,7 @@ function App() {
             <Route path="/concerns" element={<ConcernPage />} /> {/* New Route */}
             <Route path="/routine" element={<RoutinePage />} />
             <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:id" element={<BlogDetailPage />} />
           </Route>
 
 

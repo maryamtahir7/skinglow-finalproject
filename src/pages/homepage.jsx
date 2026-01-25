@@ -109,10 +109,10 @@ function Homepage() {
   ];
 
   const concerns = [
-    { title: "Acne & Blemishes", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSSqJuDxFdlsoip3QugPdMUa8bTq17-S81SA&s", color: "bg-rose-900" },
-    { title: "Dryness & Hydration", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=800&q=80", color: "bg-blue-900" },
-    { title: "Anti-Aging", image: "https://4.imimg.com/data4/NS/RU/MY-87113/face-pack-500x500.jpg", color: "bg-amber-900" },
-    { title: "Dullness & Brightening", image: "https://sg.ahcbeauty.com/cdn/shop/articles/optimized_Home_Aesthetic_-201209_ahc_05_0734.jpg?v=1620735508", color: "bg-orange-900" },
+    { title: "Acne & Blemishes", query: "acne", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSSqJuDxFdlsoip3QugPdMUa8bTq17-S81SA&s", color: "bg-rose-900" },
+    { title: "Dryness & Hydration", query: "dryness", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=800&q=80", color: "bg-blue-900" },
+    { title: "Anti-Aging", query: "aging", image: "https://4.imimg.com/data4/NS/RU/MY-87113/face-pack-500x500.jpg", color: "bg-amber-900" },
+    { title: "Dullness & Brightening", query: "dullness", image: "https://sg.ahcbeauty.com/cdn/shop/articles/optimized_Home_Aesthetic_-201209_ahc_05_0734.jpg?v=1620735508", color: "bg-orange-900" },
   ];
 
   if (loading) {
@@ -342,7 +342,7 @@ function Homepage() {
           {concerns.map((item, idx) => (
             <div
               key={idx}
-              onClick={() => navigate(`/products?concern=${item.title}`)}
+              onClick={() => navigate(`/products?concern=${item.query}`)}
               className={`relative group cursor-pointer overflow-hidden rounded-3xl aspect-[3/4] ${item.color} flex items-center justify-center shadow-[0_22px_55px_rgba(15,23,42,0.45)]`}
             >
               <img
@@ -441,23 +441,45 @@ function Homepage() {
         </div>
       </section>
 
-      {/* QUIZ CTA */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-primary/90">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+      {/* QUIZ CTA - PREMIUM REDESIGN */}
+      <section className="py-32 relative overflow-hidden bg-[#0A0A0A]">
+        {/* Cinematic Background */}
+        <div className="absolute inset-0">
+          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-rose-900/20 rounded-full blur-[120px] opacity-70 animate-pulse" style={{ animationDuration: '8s' }} />
+          <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-indigo-900/20 rounded-full blur-[120px] opacity-60 animate-pulse" style={{ animationDuration: '10s' }} />
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03]" />
         </div>
-        <div className="relative z-10 max-w-4xl mx-auto text-center px-6 text-white space-y-8">
-          <h2 className="text-4xl md:text-5xl font-bold">Not sure where to start?</h2>
-          <p className="text-xl text-primary-foreground/90 max-w-2xl mx-auto">
-            Take our 2-minute skin quiz to build your personalized routine and discover the products your skin will love.
-          </p>
-          <Button
-            onClick={() => navigate("/skin-quiz")}
-            className="px-10 py-8 bg-white text-primary text-lg font-bold rounded-full hover:bg-white/90 shadow-2xl transition-transform hover:scale-105"
-          >
-            Start Your Skin Analysis
-          </Button>
+
+        <div className="relative z-10 max-w-6xl mx-auto px-6">
+          <div className="relative overflow-hidden rounded-[3rem] bg-white/5 backdrop-blur-2xl border border-white/10 p-12 md:p-24 text-center group">
+
+            {/* Inner Glow */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+
+            <div className="relative z-10 space-y-8 max-w-3xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-rose-300 text-xs font-bold tracking-[0.2em] uppercase shadow-xl mb-4">
+                <Sparkles className="w-3 h-3" /> Personalized Care
+              </div>
+
+              <h2 className="text-5xl md:text-7xl font-serif text-white leading-[0.95] tracking-tight">
+                Not sure where <br className="hidden md:block" />
+                <span className="italic text-rose-200/50">to start?</span>
+              </h2>
+
+              <p className="text-xl md:text-2xl text-white/60 font-light leading-relaxed">
+                Discover your skin's unique needs in just 2 minutes. Our AI-powered analysis builds a ritual tailored specifically to you.
+              </p>
+
+              <div className="pt-8">
+                <Button
+                  onClick={() => navigate("/skin-quiz")}
+                  className="relative px-12 py-8 bg-white text-stone-900 text-sm md:text-base font-bold uppercase tracking-widest rounded-full hover:bg-rose-50 hover:text-rose-900 transition-all shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,100,100,0.4)] hover:-translate-y-1 active:scale-95 border-0"
+                >
+                  Start Analysis <ArrowRight className="ml-3 w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

@@ -25,13 +25,37 @@ export default function ContactPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert("Thank you for reaching out! A SkinGlow concierge will contact you shortly.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerText;
+
+    try {
+      btn.innerText = "Sending...";
+      btn.disabled = true;
+
+      const res = await fetch('http://localhost:3001/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (res.ok) {
+        alert("Thank you for reaching out! A SkinGlow concierge will contact you shortly.");
+        setFormData({ name: "", email: "", subject: "", message: "" });
+      } else {
+        throw new Error("Failed");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong. Please try again or email us directly.");
+    } finally {
+      btn.innerText = originalText;
+      btn.disabled = false;
+    }
   };
 
-  const CONTACT_EMAIL = "maryamtahir236@gmail.com";
+  const CONTACT_EMAIL = "skin.glow.skincare.pk@gmail.com";
   const LOCATION_LINE_1 = "Faisalabad";
   const LOCATION_LINE_2 = "Punjab, Pakistan";
 

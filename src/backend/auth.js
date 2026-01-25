@@ -111,3 +111,27 @@ export async function updateUserPrefs(prefs) {
     throw error;
   }
 }
+// --------------------- PASSWORD RECOVERY ---------------------
+export async function sendPasswordReset(email) {
+  try {
+    const origin = window.location.origin;
+    // Appwrite will verify the email exists and send a recovery link
+    // The link will point to {origin}/reset-password?userId=...&secret=...
+    return await account.createRecovery(
+      email,
+      `${origin}/reset-password`
+    );
+  } catch (error) {
+    console.error("Reset Password Request Error:", error);
+    throw error;
+  }
+}
+
+export async function confirmPasswordReset(userId, secret, password, passwordAgain) {
+  try {
+    return await account.updateRecovery(userId, secret, password, passwordAgain);
+  } catch (error) {
+    console.error("Reset Password Confirmation Error:", error);
+    throw error;
+  }
+}

@@ -7,7 +7,8 @@ import {
   FileText,
   Image as ImageIcon,
   Tag,
-  X
+  X,
+  Sparkles
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,7 @@ const EditProduct = ({ product, onSave, onCancel }) => {
         imageUrl: product.imageUrl || "",
         imageUrl2: product.imageUrl2 || "",
         imageUrl3: product.imageUrl3 || "",
+        Concerns: product.Concerns || "",
       });
     }
   }, [product, reset]);
@@ -63,8 +65,9 @@ const EditProduct = ({ product, onSave, onCancel }) => {
       imageUrl: String(data.imageUrl || "").trim(),
       imageUrl2: String(data.imageUrl2 || "").trim(),
       imageUrl3: String(data.imageUrl3 || "").trim(),
+      Concerns: String(data.Concerns || "").trim(),
     };
-    
+
     // Validate required fields
     if (!updatedData.name) {
       alert("⚠️ Product name is required");
@@ -78,7 +81,7 @@ const EditProduct = ({ product, onSave, onCancel }) => {
       alert("⚠️ Category is required");
       return;
     }
-    
+
     onSave(product.$id, updatedData);
   };
 
@@ -167,6 +170,16 @@ const EditProduct = ({ product, onSave, onCancel }) => {
                     {...register("description")}
                     placeholder="Product description, ingredients, benefits..."
                     className="pl-12 pt-3 min-h-[100px] rounded-2xl border-border bg-secondary/10 focus:ring-primary focus:border-primary resize-none"
+                  />
+                </div>
+
+                {/* Concerns */}
+                <div className="relative md:col-span-2">
+                  <Sparkles className="absolute left-4 top-3.5 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    {...register("Concerns")}
+                    placeholder="Concerns (e.g. Acne, Dullness)"
+                    className="pl-12 h-12 rounded-2xl border-border bg-secondary/10 focus:ring-primary focus:border-primary"
                   />
                 </div>
 

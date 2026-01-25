@@ -98,6 +98,7 @@ export default function AddProductForm() {
         imageUrl: finalImageUrl,
         description: data.description,
         category: selectedCategory,
+        Concerns: data.Concerns || ""
       };
 
       // Try to add extra images if they exist (will fail silently if schema doesn't support them)
@@ -244,6 +245,7 @@ export default function AddProductForm() {
           imageUrl3: imageUrl3 || "",
           description: String(description || ""),
           category: matchedCategory,
+          Concerns: row.Concerns || row.concerns || ""
         };
 
         try {
@@ -328,6 +330,19 @@ export default function AddProductForm() {
                   {...register("description", { required: "Description is required" })}
                 />
                 {errors.description && <p className="text-red-500 text-xs">{errors.description.message}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-foreground">Concerns (Optional)</Label>
+                <div className="relative">
+                  <Sparkles className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    className="pl-9 border-border bg-secondary/10 focus:ring-primary"
+                    placeholder="e.g. Acne, Dullness, Aging"
+                    {...register("Concerns")}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">Comma-separated concerns (e.g., "Acne, Dryness")</p>
               </div>
             </CardContent>
           </Card>

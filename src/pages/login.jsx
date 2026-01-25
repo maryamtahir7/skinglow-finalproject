@@ -55,7 +55,7 @@ export default function LoginForm() {
           initial={{ scale: 1.1, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
-          src="https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?q=80&w=2670&auto=format&fit=crop"
+          src="https://i.pinimg.com/1200x/24/c6/4d/24c64df4196ec4b66ab96e1b871e29c6.jpg"
           alt="Background"
           className="w-full h-full object-cover"
         />
@@ -147,7 +147,7 @@ export default function LoginForm() {
             <div className="space-y-2">
               <div className="flex justify-between items-center ml-1">
                 <label className="text-xs font-bold uppercase tracking-widest text-white/50">Password</label>
-                <a href="#" className="text-xs text-white/60 hover:text-white hover:underline transition-colors">Forgot Password?</a>
+                <Link to="/forgot-password" className="text-xs text-white/60 hover:text-white hover:underline transition-colors">Forgot Password?</Link>
               </div>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40 group-focus-within:text-white transition-colors" />

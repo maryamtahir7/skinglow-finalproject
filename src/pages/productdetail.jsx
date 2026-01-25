@@ -40,12 +40,18 @@ export default function ProductDetail() {
   useEffect(() => {
     async function load() {
       try {
-        const [p, rev] = await Promise.all([
-          getProductById(id),
-          getReviews(id)
-        ]);
+        // Fetch product first to ensure it exists
+        const p = await getProductById(id);
         setProduct(p);
-        setReviews(rev.documents || []);
+
+        // Then fetch reviews gracefully
+        try {
+          const rev = await getReviews(id);
+          setReviews(rev.documents || []);
+        } catch (error) {
+          console.warn("Reviews could not be loaded:", error);
+          setReviews([]);
+        }
 
         if (user) {
           canUserReviewProduct(user.$id, id).then(setCanReview);
@@ -131,16 +137,33 @@ export default function ProductDetail() {
     <div className="min-h-screen bg-[#FDFBF7] text-stone-900 font-sans selection:bg-rose-100 pb-32">
 
       {/* 1. STICKY HEADER (Mobile/Desktop) */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-stone-100 px-6 py-4 flex items-center justify-between">
-        <button onClick={() => navigate('/products')} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-500 hover:text-stone-900 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Shop
+      {/* 1. STICKY HEADER (Mobile/Desktop) - Floating Pill on Mobile */}
+      {/* 1. STICKY HEADER (Mobile/Desktop) - Floating Pill on Mobile */}
+      <div className="fixed top-4 left-4 right-4 z-40 flex justify-between pointer-events-none md:sticky md:top-0 md:bg-white/90 md:backdrop-blur-xl md:border-b md:border-stone-100 md:px-8 md:py-5 md:inset-x-0 md:pointer-events-auto transition-all duration-300">
+        <button
+          onClick={() => navigate('/products')}
+          className="pointer-events-auto flex items-center justify-center gap-2 group"
+        >
+          <div className="w-10 h-10 md:w-auto md:h-auto flex items-center justify-center bg-white/90 md:bg-transparent backdrop-blur rounded-full shadow-sm md:shadow-none transition-all group-hover:-translate-x-1">
+            <ArrowLeft className="w-5 h-5 md:w-4 md:h-4 text-stone-800" />
+          </div>
+          <span className="hidden md:inline text-xs font-bold uppercase tracking-[0.15em] text-stone-500 group-hover:text-stone-900 transition-colors">Back to Shop</span>
         </button>
-        <div className="hidden md:block font-serif italic text-lg opacity-0 lg:opacity-100 transition-opacity">
+
+        <div className="hidden md:block font-serif italic text-xl text-stone-900 opacity-0 lg:opacity-100 transition-opacity p-2">
           {product.name}
         </div>
-        <button className="text-stone-400 hover:text-stone-900 transition-colors">
+
+        <button className="pointer-events-auto w-10 h-10 md:hidden flex items-center justify-center text-stone-900 bg-white/90 backdrop-blur rounded-full shadow-sm hover:scale-105 transition-transform">
           <Share2 className="w-5 h-5" />
         </button>
+
+        {/* Desktop Share/Wishlist in Header */}
+        <div className="hidden md:flex items-center gap-2">
+          <button onClick={handleWishlist} className="pointer-events-auto p-2 hover:bg-rose-50 hover:text-rose-600 rounded-full transition-colors text-stone-400">
+            <Heart className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       <div className="max-w-[1600px] mx-auto">
@@ -157,14 +180,21 @@ export default function ProductDetail() {
               ))}
             </div>
 
-            {/* Mobile: Horizontal Carousel */}
-            <div className="lg:hidden w-full aspect-square bg-stone-50 overflow-hidden relative snap-x snap-mandatory flex overflow-x-auto scrollbar-hide">
-              {images.map((img, i) => (
-                <img key={i} src={img} alt="" className="w-full h-full object-cover mix-blend-multiply shrink-0 snap-center" />
-              ))}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            {/* Mobile: Full Screen Immersive Gallery */}
+            <div className="lg:hidden w-full aspect-[4/5] bg-stone-100 relative overflow-hidden">
+              <div className="absolute inset-0 flex overflow-x-auto scrollbar-hide snap-x snap-mandatory">
+                {images.map((img, i) => (
+                  <div key={i} className="w-full h-full shrink-0 snap-center relative">
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-stone-900/10 to-transparent" />
+                  </div>
+                ))}
+              </div>
+
+              {/* Pagination Dots */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 bg-black/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
                 {images.map((_, i) => (
-                  <div key={i} className="w-2 h-2 rounded-full bg-stone-800/20" />
+                  <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all ${i === selectedImage ? 'bg-white w-3' : 'bg-white/50'}`} />
                 ))}
               </div>
             </div>
@@ -176,40 +206,53 @@ export default function ProductDetail() {
             <div className="lg:sticky lg:top-24 lg:max-h-screen lg:overflow-y-auto scrollbar-hide pb-32">
 
               {/* Header */}
-              <div className="mb-8">
-                <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-rose-800 mb-4">
-                  <span>{typeof product.category === 'string' ? product.category : product.category?.name}</span>
-                  <span className="w-1 h-1 bg-rose-300 rounded-full" />
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3 h-3 fill-rose-800" /> 4.9 (128)
+              <div className="mb-8 mt-6 lg:mt-0">
+                <div className="flex flex-wrap items-center gap-3 mb-6">
+                  <div className="px-3 py-1 bg-gradient-to-r from-rose-50 to-rose-100/50 text-rose-900 text-[10px] font-bold uppercase tracking-[0.15em] rounded-full border border-rose-100">
+                    {typeof product.category === 'string' ? product.category : product.category?.name}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-stone-500 bg-stone-50 px-3 py-1 rounded-full border border-stone-100">
+                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    <span className="text-stone-800">4.9</span>
+                    <span className="text-stone-400 font-medium">(128 Reviews)</span>
                   </div>
                 </div>
 
-                <h1 className="text-4xl md:text-6xl font-serif text-stone-900 leading-[1.1] mb-6">
+                <h1 className="text-4xl lg:text-5xl xl:text-6xl font-serif text-stone-900 leading-[1.1] mb-6 tracking-tight">
                   {product.name}
                 </h1>
 
-                <p className="text-xl text-stone-600 font-light leading-relaxed mb-8">
-                  {product.description}
-                </p>
-
-                <div className="text-3xl font-medium text-stone-900 mb-8">
+                {/* Clean Price Display */}
+                <div className="text-3xl font-medium text-stone-900 mb-8 flex items-baseline gap-4">
                   Rs. {displayPrice}
+                  <span className="text-lg font-normal text-stone-400/80 line-through decoration-stone-300">
+                    Rs. {(parseInt(product.price) * 1.2).toLocaleString()}
+                  </span>
+                  {/* Discount Badge */}
+                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md">
+                    20% OFF
+                  </span>
                 </div>
 
-                {/* ACTIONS */}
-                <div className="space-y-6 border-b border-stone-200 pb-12 mb-12">
+                {/* Description with Charset Cleaning */}
+                <p className="text-lg text-stone-600 font-light leading-relaxed mb-10 max-w-xl">
+                  {product.description ? product.description.replace(/â/g, "-").replace(/[^\x00-\x7F]/g, "") : ""}
+                </p>
+
+                {/* ACTIONS - Desktop Layout Enhanced */}
+                <div className="hidden lg:block space-y-8 border-b border-stone-100 pb-12 mb-12">
                   <div className="flex items-center gap-6">
-                    <div className="flex items-center border border-stone-200 rounded-full h-14 px-4 bg-white">
+                    {/* Quantity - Desktop */}
+                    <div className="flex items-center border border-stone-200 rounded-full h-14 px-4 bg-white/50 hover:bg-white hover:shadow-sm transition-all">
                       <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-2 hover:text-rose-600 transition"><Minus className="w-4 h-4" /></button>
-                      <span className="w-12 text-center font-bold text-lg">{quantity}</span>
+                      <span className="w-12 text-center font-bold text-lg tabular-nums">{quantity}</span>
                       <button onClick={() => setQuantity(quantity + 1)} className="p-2 hover:text-rose-600 transition"><Plus className="w-4 h-4" /></button>
                     </div>
 
                     <Button
                       ref={mainButtonRef}
                       onClick={handleAddToCart}
-                      className="flex-1 h-14 rounded-full bg-stone-900 text-white font-bold uppercase tracking-widest hover:bg-stone-800 transition-all shadow-xl hover:shadow-2xl"
+                      className="flex-1 h-14 rounded-full bg-stone-900 text-white font-bold uppercase tracking-[0.15em] hover:bg-stone-800 transition-all shadow-xl shadow-stone-900/10 hover:shadow-stone-900/20 hover:-translate-y-0.5"
                     >
                       Add to Ritual
                     </Button>
@@ -217,23 +260,28 @@ export default function ProductDetail() {
                     <Button
                       onClick={handleBuyNow}
                       variant="outline"
-                      className="flex-1 h-14 rounded-full border-2 border-stone-900 text-stone-900 font-bold uppercase tracking-widest hover:bg-stone-900 hover:text-white transition-all"
+                      className="flex-1 h-14 rounded-full border border-stone-200 text-stone-900 font-bold uppercase tracking-[0.15em] bg-transparent hover:bg-stone-50 hover:border-stone-900 transition-all"
                     >
                       Buy Now
                     </Button>
-
-                    <button onClick={handleWishlist} className="w-14 h-14 border border-stone-200 rounded-full flex items-center justify-center hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600 transition-all">
-                      <Heart className="w-5 h-5" />
-                    </button>
                   </div>
 
-                  <div className="flex items-center justify-center gap-6 text-xs font-bold uppercase tracking-wider text-stone-500">
-                    <span className="flex items-center gap-2"><Sparkles className="w-4 h-4 text-rose-400" /> Free Shipping</span>
-                    <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-rose-400" /> Authentic</span>
+                  {/* Trust Badges */}
+                  <div className="grid grid-cols-3 gap-4">
+                    {[
+                      { icon: Sparkles, text: "Free Shipping" },
+                      { icon: ShieldCheck, text: "Authentic" },
+                      { icon: Check, text: "Secure Checkout" }
+                    ].map((badge, idx) => (
+                      <div key={idx} className="flex flex-col items-center gap-2 text-center p-3 rounded-xl bg-stone-50/50 border border-stone-100/50">
+                        <badge.icon className="w-5 h-5 text-rose-400" />
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-stone-500">{badge.text}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* STORY SECTIONS */}
+                {/* STORY SECTIONS - Accordions polished */}
                 <div className="space-y-12">
                   <div>
                     <h3 className="font-serif italic text-2xl mb-4 text-stone-800">The Story</h3>
@@ -332,11 +380,18 @@ export default function ProductDetail() {
       <AnimatePresence>
         {showStickyBar && (
           <motion.div
-            initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }}
-            className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-stone-200 p-4 z-50 shadow-2xl"
+            initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }} transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-100 p-4 z-50 shadow-[0_-5px_30px_rgba(0,0,0,0.05)] pb-6 md:pb-4"
           >
-            <div className="max-w-7xl mx-auto flex items-center justify-between gap-6">
-              <div className="hidden md:flex items-center gap-4">
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+              {/* Mobile Info */}
+              <div className="lg:hidden">
+                <div className="text-[10px] items-center text-stone-400 font-bold uppercase tracking-widest mb-0.5">Total</div>
+                <div className="text-lg font-serif text-stone-900">Rs. {(parseInt(product.price) * quantity).toLocaleString()}</div>
+              </div>
+
+              {/* Desktop Info */}
+              <div className="hidden lg:flex items-center gap-4">
                 <img src={images[0]} alt="" className="w-12 h-12 object-cover rounded-md bg-stone-100" />
                 <div>
                   <div className="font-bold text-stone-900">{product.name}</div>
@@ -344,17 +399,16 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 flex-1 md:flex-none justify-end">
-                <div className="hidden sm:flex items-center border border-stone-200 rounded-full h-10 px-3 bg-white">
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-1 hover:text-rose-600"><Minus className="w-3 h-3" /></button>
-                  <span className="w-8 text-center font-bold text-sm">{quantity}</span>
-                  <button onClick={() => setQuantity(quantity + 1)} className="p-1 hover:text-rose-600"><Plus className="w-3 h-3" /></button>
+              <div className="flex items-center gap-3 flex-1 lg:flex-none justify-end">
+                {/* Quantity - More compact on mobile */}
+                <div className="flex items-center border border-stone-200 rounded-full h-11 md:h-12 px-2 md:px-3 bg-stone-50">
+                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-2 hover:text-rose-600 active:scale-90 transition"><Minus className="w-3.5 h-3.5" /></button>
+                  <span className="w-6 md:w-8 text-center font-bold text-sm">{quantity}</span>
+                  <button onClick={() => setQuantity(quantity + 1)} className="p-2 hover:text-rose-600 active:scale-90 transition"><Plus className="w-3.5 h-3.5" /></button>
                 </div>
-                <Button onClick={handleAddToCart} className="flex-1 md:w-48 h-12 rounded-full bg-stone-900 text-white font-bold uppercase tracking-widest hover:bg-stone-800">
+
+                <Button onClick={handleAddToCart} className="flex-1 md:w-48 h-11 md:h-12 rounded-full bg-stone-900 text-white font-bold uppercase tracking-widest hover:bg-stone-800 shadow-lg shadow-stone-900/20">
                   Add to Bag
-                </Button>
-                <Button onClick={handleBuyNow} className="hidden md:flex flex-1 md:w-48 h-12 rounded-full border-2 border-stone-900 text-stone-900 bg-transparent font-bold uppercase tracking-widest hover:bg-stone-900 hover:text-white">
-                  Buy Now
                 </Button>
               </div>
             </div>

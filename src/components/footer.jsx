@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 export default function Footer() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
-  const CONTACT_EMAIL = "maryamtahir236@gmail.com";
+  const CONTACT_EMAIL = "skin.glow.skincare.pk@gmail.com";
   const LOCATION = "Faisalabad, Punjab, Pakistan";
 
   useEffect(() => {
@@ -77,66 +77,84 @@ export default function Footer() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
 
-        {/* 2. NEWSLETTER GLASS CARD (Floating) */}
+        {/* 2. NEWSLETTER GLASS CARD (Floating & Responsive) */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="relative -mt-40 mb-20 bg-white/5 backdrop-blur-xl border border-white/10 p-8 md:p-12 rounded-[32px] overflow-hidden group shadow-2xl"
+          className="relative -mt-32 mb-20 bg-white/5 backdrop-blur-2xl border border-white/10 p-6 md:p-12 rounded-[24px] md:rounded-[32px] overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
         >
-          {/* Shine */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+          {/* Shimmer Effect */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-white/5 via-transparent to-rose-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-          <div className="grid lg:grid-cols-2 gap-10 items-center">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
+          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-10 items-center relative z-10">
+            <div className="text-center lg:text-left">
+              <div className="flex items-center justify-center lg:justify-start gap-2 mb-4">
                 <span className="w-8 h-[1px] bg-rose-400"></span>
                 <span className="text-xs font-bold uppercase tracking-[0.2em] text-rose-300">The Inner Circle</span>
               </div>
               <h3 className="text-3xl md:text-5xl font-serif mb-4 leading-tight">
                 Unlock 10% Off <br /><span className="text-white/50 italic">Your First Ritual.</span>
               </h3>
-              <p className="text-white/60 font-light text-lg">
+              <p className="text-white/60 font-light text-base md:text-lg max-w-md mx-auto lg:mx-0">
                 Join our community for expert skincare advice, early access to drops, and exclusive member-only rewards.
               </p>
             </div>
 
             <form
-              onSubmit={(e) => {
+              onSubmit={async (e) => {
                 e.preventDefault();
                 const email = e.target.elements.email.value;
                 if (!email) return;
 
-                // Simulate API call
                 const btn = e.target.querySelector('button');
                 const originalText = btn.innerText;
                 btn.innerText = "Joining...";
                 btn.disabled = true;
 
-                setTimeout(() => {
-                  btn.innerText = "Welcome!";
-                  btn.classList.add('bg-emerald-400', 'text-stone-900');
-                  e.target.reset();
+                try {
+                  const res = await fetch('http://localhost:3001/api/newsletter', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                  });
 
-                  // Reset button after delay
+                  if (res.ok) {
+                    btn.innerText = "Welcome!";
+                    btn.classList.add('bg-emerald-400', 'text-stone-900');
+                    e.target.reset();
+                    setTimeout(() => {
+                      btn.innerText = originalText;
+                      btn.disabled = false;
+                      btn.classList.remove('bg-emerald-400', 'text-stone-900');
+                    }, 3000);
+                  } else {
+                    throw new Error("Failed");
+                  }
+                } catch (err) {
+                  console.error(err);
+                  btn.innerText = "Error";
+                  btn.classList.add('bg-red-500', 'text-white');
                   setTimeout(() => {
                     btn.innerText = originalText;
                     btn.disabled = false;
-                    btn.classList.remove('bg-emerald-400', 'text-stone-900');
+                    btn.classList.remove('bg-red-500', 'text-white');
                   }, 3000);
-                }, 1500);
+                }
               }}
-              className="bg-white/5 p-2 pr-2 rounded-full border border-white/10 flex flex-col md:flex-row gap-2"
+              className="w-full bg-transparent lg:bg-white/5 p-0 lg:p-2 lg:pr-2 rounded-2xl lg:rounded-full lg:border lg:border-white/10 flex flex-col lg:flex-row gap-3 lg:gap-2"
             >
+              {/* Mobile: Full Width Input */}
               <input
                 name="email"
                 type="email"
                 required
                 placeholder="Your email address"
-                className="flex-1 bg-transparent px-6 py-4 text-white placeholder:text-white/30 outline-none text-lg min-w-0"
+                className="w-full flex-1 bg-white/5 lg:bg-transparent border border-white/10 lg:border-none px-6 py-4 md:py-4 rounded-xl lg:rounded-none text-white placeholder:text-white/30 outline-none focus:bg-white/10 transition-colors text-base md:text-lg min-w-0 text-center lg:text-left"
               />
-              <Button type="submit" className="rounded-full px-8 py-6 bg-white text-stone-900 hover:bg-stone-100 font-bold uppercase tracking-widest text-xs shadow-lg transition-all hover:scale-105 disabled:opacity-70 disabled:hover:scale-100 min-w-[140px]">
+              {/* Mobile: Full Width Button */}
+              <Button type="submit" className="w-full lg:w-auto rounded-xl lg:rounded-full px-8 py-6 md:py-6 bg-gradient-to-r from-rose-200 to-indigo-200 text-stone-900 hover:opacity-90 font-bold uppercase tracking-widest text-xs shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:hover:scale-100 min-w-[140px]">
                 Subscribe
               </Button>
             </form>

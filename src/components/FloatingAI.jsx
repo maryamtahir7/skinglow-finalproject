@@ -62,7 +62,17 @@ export default function FloatingAI() {
     const getAIResponse = async (message) => {
         const text = message.toLowerCase();
 
-        // --- CORE WEBSITE INFO ---
+        // 1. GREETINGS & SMALL TALK
+        if (text.match(/^(hi|hello|hey|yo|greetings)/))
+            return "👋 **Hello gorgeous!**\nI'm so happy to see you. I can help you build a routine, explain ingredients, or find products. What's on your mind?";
+
+        if (text.includes('thank'))
+            return "💖 **You are so welcome!**\nYour glow is my priority. Let me know if you need anything else!";
+
+        if (text.includes('bye') || text.includes('goodbye'))
+            return "✨ **Glow on!**\nDon't forget your SPF. See you soon!";
+
+        // 2. CORE WEBSITE INFO
         if (text.includes('track') || text.includes('order') || text.includes('shipping'))
             return '🚚 **Shipping & Tracking:**\nWe offer **Free Express Shipping** on all orders over Rs. 2000! \n\n• **Standard:** 3-5 Business Days\n• **Express:** 1-2 Business Days\n\nYou can track your order in the "My Orders" section of your profile.';
 
@@ -72,76 +82,81 @@ export default function FloatingAI() {
         if (text.includes('contact') || text.includes('support') || text.includes('help'))
             return '📞 **We are here for you:**\nOur skincare experts are available Mon-Fri, 9am-6pm.\n\n• **Email:** support@skinglow.com\n• **Phone:** +91-800-GLOW-NOW';
 
-        // --- DYNAMIC PRODUCT RECOMMENDATIONS ---
-
-        // ACNE
-        if (text.includes('acne') || text.includes('pimple') || text.includes('breakout')) {
-            const matches = findProducts('acne');
-            let recommendationText = "";
-            if (matches.length > 0) {
-                recommendationText = `\n\n👉 **I recommend trying:** ${matches.map(p => `*${p.name}*`).join(" and ")}.`;
-            }
-            return `✨ **Managing Acne:**\nBreakouts happen! The key is gentle exfoliation and calming ingredients like Salicylic Acid and Niacinamide.${recommendationText}`;
+        // 3. INGREDIENT KNOWLEDGE BASE
+        if (text.includes('retinol')) {
+            const matches = findProducts('retinol');
+            return `🧬 **Ingredient Spotlight: Retinol**\nThe gold standard for anti-aging! It speeds up cell turnover, reduces fine lines, and smooths texture.\n\n⚠️ *Use only at night and always wear SPF the next day.*${matches.length ? `\n\n👉 **Try:** ${matches.map(p => `*${p.name}*`).join(", ")}` : ''}`;
+        }
+        if (text.includes('vitamin c')) {
+            const matches = findProducts('vitamin c') || findProducts('bright');
+            return `🍊 **Ingredient Spotlight: Vitamin C**\nA powerful antioxidant that brightens dull skin, fades dark spots, and protects against pollution.\n\n☀️ *Best used in the morning under sunscreen.*${matches.length ? `\n\n👉 **Try:** ${matches.map(p => `*${p.name}*`).join(", ")}` : ''}`;
+        }
+        if (text.includes('hyaluronic')) {
+            const matches = findProducts('hyaluronic') || findProducts('hydrat');
+            return `💧 **Ingredient Spotlight: Hyaluronic Acid**\nA moisture magnet! It holds 1000x its weight in water to plump and hydrate thirsty skin instantly.\n\n💧 *Apply on damp skin for best results.*${matches.length ? `\n\n👉 **Try:** ${matches.map(p => `*${p.name}*`).join(", ")}` : ''}`;
+        }
+        if (text.includes('niacinamide')) {
+            const matches = findProducts('niacinamide') || findProducts('pore');
+            return `🛡️ **Ingredient Spotlight: Niacinamide**\nThe multitasker! It strengthens the skin barrier, controls oil, and reduces redness/pores.\n\n✅ *Great for all skin types.*${matches.length ? `\n\n👉 **Try:** ${matches.map(p => `*${p.name}*`).join(", ")}` : ''}`;
+        }
+        if (text.includes('salicylic') || text.includes('bha')) {
+            const matches = findProducts('salicylic') || findProducts('acne');
+            return `🍃 **Ingredient Spotlight: Salicylic Acid (BHA)**\nOil-soluble exfoliant that dives deep into pores to clear breakouts and blackheads.\n\n⚠️ *Perfect for oily/acne-prone skin.*${matches.length ? `\n\n👉 **Try:** ${matches.map(p => `*${p.name}*`).join(", ")}` : ''}`;
         }
 
-        // DRY
-        if (text.includes('dry') || text.includes('flakey') || text.includes('tight')) {
-            const matches = findProducts('dry') || findProducts('hydrat') || findProducts('moistur');
-            let recommendationText = "";
-            if (matches.length > 0) {
-                recommendationText = `\n\n👉 **Top Picks for Hydration:** ${matches.map(p => `*${p.name}*`).join(" and ")}.`;
-            }
-            return `💧 **Dry Skin Fix:**\nYou likely need both hydration (water) and moisture (oil). Look for Hyaluronic Acid and Ceramides.${recommendationText}`;
+        // 4. ROUTINE BUILDER
+        if (text.includes('oily') && (text.includes('routine') || text.includes('suggest'))) {
+            return "🧴 **Routine for Oily Skin:**\n\n☀️ **AM:**\n1. Gel Cleanser\n2. Niacinamide Serum (Control oil)\n3. Lightweight Gel Moisturizer\n4. Matte Sunscreen\n\n🌙 **PM:**\n1. Salicylic Acid Cleanser\n2. BHA Exfoliant (2-3x week)\n3. Oil-Free Moisturizer";
+        }
+        if (text.includes('dry') && (text.includes('routine') || text.includes('suggest'))) {
+            return "🧴 **Routine for Dry Skin:**\n\n☀️ **AM:**\n1. Cream Cleanser (or just water)\n2. Vitamin C Serum\n3. Hyaluronic Acid\n4. Rich Cream + SPF\n\n🌙 **PM:**\n1. Oil Cleanser\n2. Hydrating Toner\n3. Facial Oil or Thick Cream";
+        }
+        if (text.includes('sensitive') && (text.includes('routine') || text.includes('suggest'))) {
+            return "🧴 **Routine for Sensitive Skin:**\n\n☀️ **AM:**\n1. Gentle Milk Cleanser\n2. Soothing Mist\n3. Barrier Repair Cream\n4. Mineral SPF\n\n🌙 **PM:**\n1. Gentle Cleanser\n2. Centella/Cica Serum\n3. Ceramide Moisturizer\n\n🚫 *Avoid fragrance and alcohol!*";
         }
 
-        // ANTI-AGING
-        if (text.includes('age') || text.includes('wrinkle') || text.includes('line') || text.includes('aging')) {
-            const matches = findProducts('aging') || findProducts('retinol') || findProducts('serum');
-            let recommendationText = "";
-            if (matches.length > 0) {
-                recommendationText = `\n\n👉 **Anti-Aging Heroes:** ${matches.map(p => `*${p.name}*`).join(" and ")}.`;
+
+        // 5. DYNAMIC CONCERN MATCHING
+        const concernMap = {
+            'acne': ['acne', 'pimple', 'breakout', 'clogged'],
+            'aging': ['aging', 'wrinkle', 'lines', 'sagging'],
+            'dryness': ['dry', 'flakey', 'tight', 'dehydrated'],
+            'dullness': ['dull', 'bright', 'glow', 'radiance', 'dark spot'],
+            'sensitivity': ['sensitive', 'redness', 'irritation', 'stinging']
+        };
+
+        for (const [concern, keywords] of Object.entries(concernMap)) {
+            if (keywords.some(k => text.includes(k))) {
+                const matches = findProducts(concern) || findProducts(keywords[0]);
+                let advice = "";
+
+                switch (concern) {
+                    case 'acne': advice = "Focus on **Salicylic Acid** and **Niacinamide**. Keep hydrated (don't skip moisturizer!) to prevent excess oil production."; break;
+                    case 'aging': advice = "Incorporating **Retinol** at night and **Vitamin C** in the morning is the dynamic duo for youthful skin."; break;
+                    case 'dryness': advice = "Layer your hydration! Start with **Hyaluronic Acid** on damp skin and seal it in with a **Ceramide** rich cream."; break;
+                    case 'dullness': advice = "**Exfoliation** is key! Use an **AHA** (like Glycolic Acid) to sweep away dead cells and reveal fresh skin."; break;
+                    case 'sensitivity': advice = "Less is more. focus on **Barrier Repair** ingredients like **Centella** and **Oats**. Avoid harsh scrubs."; break;
+                }
+
+                return `✨ **Let's tackle ${concern}!**\n${advice}\n\n👉 **Recommended for you:**\n${matches.length ? matches.map(p => `• [${p.name}](/products/${p.$id})`).join("\n") : "Check our 'Shop by Concern' section for a full list!"}`;
             }
-            return `⏳ **Ageless Beauty:**\nRetinoids and SPF are the gold standards for preventing fine lines and boosting collagen.${recommendationText}`;
         }
 
-        // SENSITIVE
-        if (text.includes('sensitive') || text.includes('red') || text.includes('irritat')) {
-            const matches = findProducts('sensitive') || findProducts('calm') || findProducts('sooth');
-            let recommendationText = "";
+        // 6. SMART SEARCH (If no specific concern matched but user mentions "serum", "cleaner")
+        const productTypes = ['serum', 'cleanser', 'moisturizer', 'sunscreen', 'oil', 'toner', 'mask'];
+        const foundType = productTypes.find(t => text.includes(t));
+        if (foundType) {
+            const matches = findProducts(foundType);
             if (matches.length > 0) {
-                recommendationText = `\n\n👉 **Gentle Choices:** ${matches.map(p => `*${p.name}*`).join(" and ")}.`;
+                return `🔎 **I found these ${foundType}s for you:**\n\n${matches.map(p => `• *${p.name}* (Rs. ${p.price})`).join("\n")}`;
             }
-            return `🌸 **Sensitive Skin Care:**\nLess is more! Focus on repairing your barrier with Centella Asiatica and avoiding harsh scrubs.${recommendationText}`;
-        }
-
-        // DULLNESS
-        if (text.includes('dull') || text.includes('bright') || text.includes('glow')) {
-            const matches = findProducts('bright') || findProducts('vitamin c') || findProducts('glow');
-            let recommendationText = "";
-            if (matches.length > 0) {
-                recommendationText = `\n\n👉 **For that Glow:** ${matches.map(p => `*${p.name}*`).join(" and ")}.`;
-            }
-            return `🌟 **Unlock Your Glow:**\nExfoliation + Brightening is the fix! Vitamin C and AHAs are your best friends here.${recommendationText}`;
-        }
-
-        // ROUTINE BUILDING
-        if (text.includes('routine') || text.includes('steps') || text.includes('order'))
-            return '🧴 **The Perfect Routine Order:**\n\n☀️ **Morning (Protect):**\n1. Cleanser\n2. Vitamin C / Antioxidant\n3. Moisturizer\n4. **Sunscreen (SPF 50)** – *Vital!*\n\n🌙 **Evening (Repair):**\n1. Oil Cleanser (if wearing makeup)\n2. Water Cleanser\n3. Treatment (Retinol/Acne)\n4. Moisturizer';
-
-        if (text.includes('sunscreen') || text.includes('spf')) {
-            const matches = findProducts('spf') || findProducts('sun');
-            let recommendationText = "";
-            if (matches.length > 0) {
-                recommendationText = `\n\n👉 **Our Best SPF:** ${matches.map(p => `*${p.name}*`).join(" and ")}.`;
-            }
-            return `☀️ **Sunscreen is Non-Negotiable!**\nUV rays cause 90% of premature aging. Apply SPF 30+ every single day.${recommendationText}`;
         }
 
         // --- FALLBACK ---
         const fallbackResponses = [
-            '🤔 **Good Question!**\nI recommend browsing our **"Shop by Concern"** section to filter products exactly for your needs.',
-            '✨ **Skincare is Personal!**\nCould you tell me your skin type? (e.g., *Oily, Dry, Combination, Sensitive*)',
-            '💖 **I\'m here to help!**\nAsk me about specific ingredients like *Retinol*, *Vitamin C*, or *Hyaluronic Acid*.'
+            "🤔 **I'm listening...**\nCould you tell me a bit more about your skin type? (e.g., Oily, Dry, Sensitive)",
+            "✨ **Skincare is a journey!**\nI'm not exactly sure about that, but I can help you build a routine or find specific ingredients like Retinol or Vitamin C.",
+            "💖 **Good question.**\nI'm still learning everything about beauty! Try asking me about 'Acne', 'Dryness', or to 'Suggest a routine'."
         ];
         return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
     };
@@ -172,7 +187,7 @@ export default function FloatingAI() {
             <button
                 type="button"
                 onClick={toggleChat}
-                className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 group
+                className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[9999] flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 group
                 ${isOpen
                         ? 'w-12 h-12 bg-white/80 backdrop-blur-md border border-slate-200 text-slate-600 rotate-90'
                         : 'w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-primary to-pink-600 text-white animate-bounce-slow shadow-primary/40'
@@ -195,7 +210,7 @@ export default function FloatingAI() {
             {/* Chat Interface Popup - Premium Desktop Size */}
             {isOpen && (
                 <div
-                    className="fixed bottom-0 right-0 md:bottom-24 md:right-8 z-50 w-full h-[100dvh] md:w-[450px] md:h-[650px] md:max-h-[80vh] bg-white/95 md:bg-white/90 backdrop-blur-2xl md:backdrop-blur-3xl md:rounded-[2.5rem] shadow-2xl border border-white/50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300 origin-bottom-right ring-1 ring-black/5"
+                    className="fixed bottom-0 right-0 md:bottom-24 md:right-8 z-[9999] w-full h-[100dvh] md:w-[450px] md:h-[650px] md:max-h-[80vh] bg-white/95 md:bg-white/90 backdrop-blur-2xl md:backdrop-blur-3xl md:rounded-[2.5rem] shadow-2xl border border-white/50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-300 origin-bottom-right ring-1 ring-black/5"
                     style={{
                         paddingBottom: 'safe-area-inset-bottom'
                     }}
