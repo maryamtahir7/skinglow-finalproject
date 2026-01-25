@@ -77,30 +77,25 @@ export default function Footer() {
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
 
-        {/* 2. NEWSLETTER GLASS CARD (Centered & Responsive) */}
+        {/* 2. NEWSLETTER GLASS CARD (Compact) */}
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="relative mb-24 bg-white/5 backdrop-blur-2xl border border-white/10 p-8 md:p-16 rounded-[2rem] overflow-hidden group shadow-[0_20px_50px_rgba(0,0,0,0.5)] max-w-5xl mx-auto text-center"
+          className="relative mb-16 bg-white/5 backdrop-blur-2xl border border-white/10 p-6 md:p-10 rounded-[1.5rem] overflow-hidden group shadow-2xl max-w-3xl mx-auto text-center"
         >
           {/* Shimmer Effect */}
           <div className="absolute inset-0 bg-gradient-to-tr from-white/5 via-transparent to-rose-500/10 opacity-50 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
           <div className="relative z-10 flex flex-col items-center">
-            <div className="flex items-center gap-2 mb-6">
-              <span className="w-12 h-[1px] bg-rose-400"></span>
-              <span className="text-xs font-bold uppercase tracking-[0.3em] text-rose-300">The Inner Circle</span>
-              <span className="w-12 h-[1px] bg-rose-400"></span>
-            </div>
 
-            <h3 className="text-3xl md:text-5xl lg:text-6xl font-serif mb-6 leading-tight">
-              Unlock 10% Off <br /><span className="text-white/50 italic">Your First Ritual.</span>
+            <h3 className="text-2xl md:text-3xl font-serif mb-3 leading-tight">
+              Unlock 10% Off <span className="text-white/50 italic">Your First Ritual.</span>
             </h3>
 
-            <p className="text-white/60 font-light text-base md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-              Join our community for expert skincare advice, early access to drops, and exclusive member-only rewards.
+            <p className="text-white/60 font-light text-sm max-w-lg mx-auto mb-6">
+              Join our community for expert skincare advice and exclusive rewards.
             </p>
 
             <form
@@ -111,7 +106,7 @@ export default function Footer() {
 
                 const btn = e.target.querySelector('button');
                 const originalText = btn.innerText;
-                btn.innerText = "Joining...";
+                btn.innerText = "...";
                 btn.disabled = true;
 
                 try {
@@ -122,7 +117,7 @@ export default function Footer() {
                   });
 
                   if (res.ok) {
-                    btn.innerText = "Welcome!";
+                    btn.innerText = "✓";
                     btn.classList.add('bg-emerald-400', 'text-stone-900');
                     e.target.reset();
                     setTimeout(() => {
@@ -135,7 +130,7 @@ export default function Footer() {
                   }
                 } catch (err) {
                   console.error(err);
-                  btn.innerText = "Error (Check Console)";
+                  btn.innerText = "!";
                   btn.classList.add('bg-red-500', 'text-white');
                   setTimeout(() => {
                     btn.innerText = originalText;
@@ -144,18 +139,18 @@ export default function Footer() {
                   }, 3000);
                 }
               }}
-              className="w-full max-w-lg bg-white/5 border border-white/10 p-2 rounded-2xl flex flex-col md:flex-row gap-2"
+              className="w-full max-w-md bg-white/5 border border-white/10 p-1.5 rounded-xl flex flex-col md:flex-row gap-2"
             >
               {/* Mobile: Full Width Input */}
               <input
                 name="email"
                 type="email"
                 required
-                placeholder="Your email address"
-                className="w-full flex-1 bg-transparent border-none px-6 py-4 rounded-xl text-white placeholder:text-white/30 outline-none focus:ring-1 focus:ring-white/20 transition-all text-base md:text-lg min-w-0"
+                placeholder="Email address"
+                className="w-full flex-1 bg-transparent border-none px-4 py-3 rounded-lg text-white placeholder:text-white/30 outline-none focus:ring-1 focus:ring-white/20 transition-all text-sm min-w-0"
               />
               {/* Mobile: Full Width Button */}
-              <Button type="submit" className="w-full md:w-auto rounded-xl px-8 py-4 bg-gradient-to-r from-rose-200 to-indigo-200 text-stone-900 hover:opacity-90 font-bold uppercase tracking-widest text-xs shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:hover:scale-100 whitespace-nowrap">
+              <Button type="submit" className="w-full md:w-auto rounded-lg px-6 py-3 bg-gradient-to-r from-rose-200 to-indigo-200 text-stone-900 hover:opacity-90 font-bold uppercase tracking-widest text-[10px] shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:hover:scale-100 whitespace-nowrap">
                 Subscribe
               </Button>
             </form>
