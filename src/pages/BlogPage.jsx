@@ -236,17 +236,18 @@ function Newsletter() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
             });
+            const data = await res.json();
             if (res.ok) {
                 setStatus('success');
                 setEmail('');
                 alert("🎉 Welcome to the Inner Circle! Check your email.");
             } else {
-                throw new Error("Failed");
+                throw new Error(data.message || "Subscription failed");
             }
         } catch (e) {
             console.error(e);
             setStatus('error');
-            alert("❌ Something went wrong. Please try again.");
+            alert(`❌ Error: ${e.message}`);
         } finally {
             setStatus('idle');
         }

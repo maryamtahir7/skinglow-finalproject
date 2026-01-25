@@ -134,7 +134,7 @@ export default function Footer() {
                   }
                 } catch (err) {
                   console.error(err);
-                  btn.innerText = "Error";
+                  btn.innerText = "Error (Check Console)";
                   btn.classList.add('bg-red-500', 'text-white');
                   setTimeout(() => {
                     btn.innerText = originalText;

@@ -40,15 +40,17 @@ export default function ContactPage() {
         body: JSON.stringify(formData)
       });
 
+      const data = await res.json();
+
       if (res.ok) {
         alert("Thank you for reaching out! A SkinGlow concierge will contact you shortly.");
         setFormData({ name: "", email: "", subject: "", message: "" });
       } else {
-        throw new Error("Failed");
+        throw new Error(data.message || "Failed to send message");
       }
     } catch (err) {
       console.error(err);
-      alert("Something went wrong. Please try again or email us directly.");
+      alert(`Error: ${err.message}`);
     } finally {
       btn.innerText = originalText;
       btn.disabled = false;
