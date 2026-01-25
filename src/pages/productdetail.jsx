@@ -384,32 +384,35 @@ export default function ProductDetail() {
             className="fixed bottom-0 left-0 right-0 bg-white border-t border-stone-100 p-4 z-50 shadow-[0_-5px_30px_rgba(0,0,0,0.05)] pb-6 md:pb-4"
           >
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-              {/* Mobile Info */}
-              <div className="lg:hidden">
-                <div className="text-[10px] items-center text-stone-400 font-bold uppercase tracking-widest mb-0.5">Total</div>
-                <div className="text-lg font-serif text-stone-900">Rs. {(parseInt(product.price) * quantity).toLocaleString()}</div>
-              </div>
+              <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
 
-              {/* Desktop Info */}
-              <div className="hidden lg:flex items-center gap-4">
-                <img src={images[0]} alt="" className="w-12 h-12 object-cover rounded-md bg-stone-100" />
-                <div>
-                  <div className="font-bold text-stone-900">{product.name}</div>
-                  <div className="text-xs text-stone-500">Rs. {displayPrice}</div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 flex-1 lg:flex-none justify-end">
-                {/* Quantity - More compact on mobile */}
-                <div className="flex items-center border border-stone-200 rounded-full h-11 md:h-12 px-2 md:px-3 bg-stone-50">
-                  <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-2 hover:text-rose-600 active:scale-90 transition"><Minus className="w-3.5 h-3.5" /></button>
-                  <span className="w-6 md:w-8 text-center font-bold text-sm">{quantity}</span>
-                  <button onClick={() => setQuantity(quantity + 1)} className="p-2 hover:text-rose-600 active:scale-90 transition"><Plus className="w-3.5 h-3.5" /></button>
+                {/* DESKTOP LAYOUT */}
+                <div className="hidden lg:flex items-center gap-4">
+                  <img src={images[0]} alt="" className="w-12 h-12 object-cover rounded-md bg-stone-100" />
+                  <div>
+                    <div className="font-bold text-stone-900">{product.name}</div>
+                    <div className="text-xs text-stone-500">Rs. {displayPrice}</div>
+                  </div>
                 </div>
 
-                <Button onClick={handleAddToCart} className="flex-1 md:w-48 h-11 md:h-12 rounded-full bg-stone-900 text-white font-bold uppercase tracking-widest hover:bg-stone-800 shadow-lg shadow-stone-900/20">
-                  Add to Bag
-                </Button>
+                {/* MOBILE & DESKTOP CONTROLS */}
+                <div className="flex items-center gap-3 w-full lg:w-auto">
+
+                  {/* Quantity - Hidden on smallest mobile screens to save space if needed, or keep compact */}
+                  <div className="hidden sm:flex items-center border border-stone-200 rounded-full h-11 md:h-12 px-2 md:px-3 bg-stone-50 shrink-0">
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="p-2 hover:text-rose-600 active:scale-90 transition"><Minus className="w-3.5 h-3.5" /></button>
+                    <span className="w-6 md:w-8 text-center font-bold text-sm">{quantity}</span>
+                    <button onClick={() => setQuantity(quantity + 1)} className="p-2 hover:text-rose-600 active:scale-90 transition"><Plus className="w-3.5 h-3.5" /></button>
+                  </div>
+
+                  {/* Mobile: 2 Buttons Side-by-Side */}
+                  <Button onClick={handleAddToCart} className="flex-1 h-11 md:h-12 rounded-full bg-stone-900 text-white font-bold uppercase tracking-widest hover:bg-stone-800 shadow-lg shadow-stone-900/20 text-[10px] md:text-sm">
+                    Add to Bag
+                  </Button>
+                  <Button onClick={handleBuyNow} variant="outline" className="flex-1 h-11 md:h-12 rounded-full border border-stone-300 text-stone-900 font-bold uppercase tracking-widest hover:bg-stone-50 text-[10px] md:text-sm">
+                    Buy Now
+                  </Button>
+                </div>
               </div>
             </div>
           </motion.div>

@@ -187,7 +187,7 @@ export default function FloatingAI() {
             <button
                 type="button"
                 onClick={toggleChat}
-                className={`fixed bottom-6 right-6 md:bottom-8 md:right-8 z-[9999] flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 group
+                className={`fixed bottom-24 right-6 md:bottom-8 md:right-8 z-[9999] flex items-center justify-center rounded-full shadow-2xl transition-all duration-500 hover:scale-110 active:scale-95 group
                 ${isOpen
                         ? 'w-12 h-12 bg-white/80 backdrop-blur-md border border-slate-200 text-slate-600 rotate-90'
                         : 'w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br from-primary to-pink-600 text-white animate-bounce-slow shadow-primary/40'
