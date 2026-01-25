@@ -143,7 +143,7 @@ export default function Footer() {
                   }, 3000);
                 }
               }}
-              className="w-full bg-transparent lg:bg-white/5 p-0 lg:p-2 lg:pr-2 rounded-2xl lg:rounded-full lg:border lg:border-white/10 flex flex-col lg:flex-row gap-3 lg:gap-2"
+              className="w-full bg-white/5 border border-white/10 p-2 rounded-2xl flex flex-col md:flex-row gap-2"
             >
               {/* Mobile: Full Width Input */}
               <input
@@ -151,10 +151,10 @@ export default function Footer() {
                 type="email"
                 required
                 placeholder="Your email address"
-                className="w-full flex-1 bg-white/5 lg:bg-transparent border border-white/10 lg:border-none px-6 py-4 md:py-4 rounded-xl lg:rounded-none text-white placeholder:text-white/30 outline-none focus:bg-white/10 transition-colors text-base md:text-lg min-w-0 text-center lg:text-left"
+                className="w-full flex-1 bg-transparent border-none px-6 py-4 rounded-xl text-white placeholder:text-white/30 outline-none focus:ring-1 focus:ring-white/20 transition-all text-base md:text-lg min-w-0"
               />
               {/* Mobile: Full Width Button */}
-              <Button type="submit" className="w-full lg:w-auto rounded-xl lg:rounded-full px-8 py-6 md:py-6 bg-gradient-to-r from-rose-200 to-indigo-200 text-stone-900 hover:opacity-90 font-bold uppercase tracking-widest text-xs shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:hover:scale-100 min-w-[140px]">
+              <Button type="submit" className="w-full md:w-auto rounded-xl px-8 py-4 bg-gradient-to-r from-rose-200 to-indigo-200 text-stone-900 hover:opacity-90 font-bold uppercase tracking-widest text-xs shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:hover:scale-100 whitespace-nowrap">
                 Subscribe
               </Button>
             </form>

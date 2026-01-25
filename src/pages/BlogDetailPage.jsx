@@ -190,7 +190,7 @@ export default function BlogDetailPage() {
 
 
                 {/* Article Header (Premium Redesign) */}
-                <div className="relative max-w-4xl mx-auto px-6 pt-32 pb-20 text-center z-10">
+                <div className="relative max-w-4xl mx-auto px-6 pt-24 md:pt-32 pb-12 md:pb-20 text-center z-10">
                     {/* Ambient Background Effects */}
                     <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[100vw] h-full overflow-hidden -z-10 pointer-events-none">
                         <div className="absolute top-[20%] left-[20%] w-[500px] h-[500px] bg-rose-200/20 rounded-full blur-[120px] mix-blend-multiply animate-pulse" />
@@ -214,7 +214,7 @@ export default function BlogDetailPage() {
                         </div>
 
                         {/* Title (Cinematic Fade In) */}
-                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-stone-900 leading-[0.9] mb-12 tracking-tight">
+                        <h1 className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-serif text-stone-900 leading-[1.1] md:leading-[0.9] mb-8 md:mb-12 tracking-tight">
                             {post.title.split(" ").map((word, i) => (
                                 <motion.span
                                     key={i}
@@ -229,8 +229,8 @@ export default function BlogDetailPage() {
                         </h1>
 
                         {/* Excerpt (Glass Card Style) */}
-                        <div className="max-w-2xl mx-auto backdrop-blur-sm bg-white/40 border border-white/50 rounded-2xl p-8 shadow-sm mb-12">
-                            <p className="text-xl md:text-2xl text-stone-600 leading-relaxed font-light italic">
+                        <div className="max-w-2xl mx-auto backdrop-blur-sm bg-white/40 border border-white/50 rounded-2xl p-6 md:p-8 shadow-sm mb-12">
+                            <p className="text-lg md:text-2xl text-stone-600 leading-relaxed font-light italic">
                                 "{post.excerpt}"
                             </p>
                         </div>

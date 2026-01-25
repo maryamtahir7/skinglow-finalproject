@@ -7,7 +7,7 @@ import { getCart, getWishlist } from "../backend/database";
 import InstallPWAButton from "./InstallPWAButton";
 import NotificationsDropdown from "./NotificationsDropdown";
 
-export default function Navbar() {
+export default function Navbar({ onOpenChat }) {
   const { user, setUser } = useUser();
   const navigate = useNavigate();
 
@@ -170,6 +170,15 @@ export default function Navbar() {
           {/* Install App Button (PWA) */}
           <InstallPWAButton />
 
+          {/* AI Chat Trigger (New) */}
+          <button
+            onClick={onOpenChat}
+            className="w-10 h-10 rounded-full border border-amber-200 bg-amber-50 flex items-center justify-center text-amber-600 hover:bg-amber-100 transition shadow-[0_2px_8px_rgba(251,191,36,0.2)] group"
+            title="Ask AI Esthetician"
+          >
+            <Sparkles className="w-5 h-5 group-hover:scale-110 transition-transform" />
+          </button>
+
           {/* User Menu */}
           <div className="relative z-50">
             <button
@@ -299,6 +308,14 @@ export default function Navbar() {
             <NotificationsDropdown />
           </div>
 
+          {/* Mobile AI Chat */}
+          <button
+            onClick={onOpenChat}
+            className="p-2 rounded-lg text-amber-600 bg-amber-50 mr-1"
+          >
+            <Sparkles className="h-5 w-5" />
+          </button>
+
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -382,23 +399,15 @@ export default function Navbar() {
                   >
                     <ShoppingCart className="w-4 h-4 text-primary" /> Cart
                   </Link>
-                  <Link
-                    to="/ai-chat"
+                  <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
-                      // Trigger AI Chat open if simple navigation isn't enough (using event or state)
-                      // For now, let's assume /ai-chat is a valid route or just the floating chat toggle
-                      // Since we have a FloatingAI component, linking to /ai-chat might not trigger it unless we handle it globaly
-                      // Ideally, we should trigger the floating chat. 
-                      // But per request "add a button for ai chat", a link is fine.
-                      // However, simply navigating to a page might be better if the floating chat isn't persistent.
-                      // Let's use a Link that looks like the others but maybe toggles an event? 
-                      // Actually, simplified: create a dedicated page or simpler, just a button here.
+                      onOpenChat();
                     }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-secondary text-sm"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-secondary text-sm cursor-pointer w-full text-left"
                   >
                     <Sparkles className="w-4 h-4 text-amber-500" /> Ask AI Esthetician
-                  </Link>
+                  </button>
                   <button
                     onClick={() => {
                       handleLogout();
@@ -410,24 +419,24 @@ export default function Navbar() {
                   </button>
                 </div>
               )}
-            </div>
-
           </div>
 
-          {/* Mobile Footer */}
-          <div className="p-6 bg-slate-50 border-t border-slate-100 space-y-2">
-            <p className="text-xs text-slate-400 text-center">
-              SkinGlow &copy; {new Date().getFullYear()}
-            </p>
-            <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
-              <span className="text-slate-600">Developed by</span>
-              <span className="text-primary font-semibold tracking-wide">Maryam Tahir</span>
-              <span className="text-slate-600">•</span>
-              <span className="text-slate-500">Full Stack Developer</span>
-            </div>
+        </div>
+
+        {/* Mobile Footer */}
+        <div className="p-6 bg-slate-50 border-t border-slate-100 space-y-2">
+          <p className="text-xs text-slate-400 text-center">
+            SkinGlow &copy; {new Date().getFullYear()}
+          </p>
+          <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
+            <span className="text-slate-600">Developed by</span>
+            <span className="text-primary font-semibold tracking-wide">Maryam Tahir</span>
+            <span className="text-slate-600">•</span>
+            <span className="text-slate-500">Full Stack Developer</span>
           </div>
         </div>
       </div>
+    </div >
     </>
   );
 }

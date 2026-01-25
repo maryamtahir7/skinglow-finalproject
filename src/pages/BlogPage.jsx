@@ -64,7 +64,7 @@ export default function BlogPage() {
         <div className="min-h-screen bg-[#FDFBF7] font-sans text-stone-900 selection:bg-rose-100">
 
             {/* 1. Header Minimal */}
-            <div className="pt-32 pb-12 px-6 text-center">
+            <div className="pt-24 md:pt-32 pb-12 px-6 text-center">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -72,7 +72,7 @@ export default function BlogPage() {
                     className="max-w-2xl mx-auto space-y-4"
                 >
                     <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-rose-500">The Journal</span>
-                    <h1 className="text-5xl md:text-7xl font-serif text-stone-900 leading-[0.9]">
+                    <h1 className="text-4xl md:text-7xl font-serif text-stone-900 leading-[0.9]">
                         Beauty <span className="italic font-light text-stone-400">Insiders</span>
                     </h1>
                 </motion.div>
@@ -96,7 +96,7 @@ export default function BlogPage() {
                     </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 md:gap-y-16">
                     {otherPosts.map((post, idx) => (
                         <ArticleCard key={post.id} post={post} index={idx} />
                     ))}
@@ -261,7 +261,7 @@ function Newsletter() {
 
             <div className="max-w-4xl mx-auto px-6 relative z-10 text-center text-white">
                 <Sparkles className="w-8 h-8 text-rose-300 mx-auto mb-6 opacity-80" />
-                <h2 className="text-4xl md:text-5xl font-serif mb-6">Join the Inner Circle</h2>
+                <h2 className="text-3xl md:text-5xl font-serif mb-6">Join the Inner Circle</h2>
                 <p className="text-white/60 text-lg mb-10 max-w-xl mx-auto font-light">
                     Get weekly expert advice, ingredient deep-dives, and exclusive early access to new launches.
                 </p>
