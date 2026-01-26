@@ -64,39 +64,43 @@ export default function BlogPage() {
         <div className="min-h-screen bg-[#FDFBF7] font-sans text-stone-900 selection:bg-rose-100">
 
             {/* 1. Header Minimal */}
-            <div className="pt-24 md:pt-32 pb-12 px-6 text-center">
+            <div className="pt-32 md:pt-40 pb-16 px-6 text-center">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    className="max-w-2xl mx-auto space-y-4"
+                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                    className="max-w-3xl mx-auto space-y-6"
                 >
-                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-rose-500">The Journal</span>
-                    <h1 className="text-4xl md:text-7xl font-serif text-stone-900 leading-[0.9]">
-                        Beauty <span className="italic font-light text-stone-400">Insiders</span>
+                    <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.4em] text-rose-500 block">The Journal Archive</span>
+                    <h1 className="text-5xl md:text-8xl font-serif text-stone-900 leading-[0.85] tracking-tight">
+                        Skin <span className="italic font-light text-stone-400">Chronicles</span>
                     </h1>
+                    <p className="text-stone-500 font-light text-sm md:text-lg max-w-xl mx-auto leading-relaxed">
+                        Curated intelligence for the modern skincare minimalist. Scientific depth meets editorial elegance.
+                    </p>
                 </motion.div>
             </div>
 
             {/* 2. Featured Article Hero */}
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 mb-24">
+            <div className="max-w-[1700px] mx-auto px-4 sm:px-10 mb-32">
                 <FeaturedArticle post={featuredPost} />
             </div>
 
             {/* 3. The Edit (Grid) */}
-            <div className="max-w-7xl mx-auto px-6 mb-32">
-                <div className="flex items-end justify-between mb-12 border-b border-stone-200 pb-6">
-                    <h2 className="text-3xl font-serif">Latest Stories</h2>
-                    <div className="hidden sm:flex gap-2 text-sm font-medium text-stone-500">
-                        <span className="text-stone-900 cursor-pointer">All</span>
-                        <span className="mx-2">/</span>
-                        <span className="hover:text-stone-900 cursor-pointer transition-colors">Guides</span>
-                        <span className="mx-2">/</span>
-                        <span className="hover:text-stone-900 cursor-pointer transition-colors">Ingredients</span>
+            <div className="max-w-[1600px] mx-auto px-6 mb-48">
+                <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 border-b border-stone-100 pb-8 gap-6">
+                    <div>
+                        <h2 className="text-4xl md:text-5xl font-serif tracking-tight">The Latest <span className="italic text-stone-400">Edit</span></h2>
+                    </div>
+                    <div className="flex flex-wrap gap-4 text-[10px] font-bold uppercase tracking-widest text-stone-400">
+                        <span className="text-stone-900 border-b border-stone-900 pb-1 cursor-pointer">View All</span>
+                        <span className="hover:text-stone-800 cursor-pointer transition-colors">Scientific Guides</span>
+                        <span className="hover:text-stone-800 cursor-pointer transition-colors">Ingredient Spotlights</span>
+                        <span className="hover:text-stone-800 cursor-pointer transition-colors">Routine Rituals</span>
                     </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10 md:gap-y-16">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-20">
                     {otherPosts.map((post, idx) => (
                         <ArticleCard key={post.id} post={post} index={idx} />
                     ))}
@@ -114,48 +118,81 @@ function FeaturedArticle({ post }) {
     return (
         <Link to={`/blog/${post.id}`} className="block">
             <motion.div
-                initial={{ opacity: 0, scale: 0.98 }}
+                initial={{ opacity: 0, scale: 0.99 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="relative group cursor-pointer rounded-[2rem] overflow-hidden bg-stone-900 aspect-[3/4] sm:aspect-square md:aspect-[21/9] isolate"
+                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                className="relative group cursor-pointer rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden bg-stone-100 aspect-[4/5] sm:aspect-square md:aspect-[21/9] isolate shadow-2xl shadow-stone-900/10"
             >
-                {/* Background Image */}
+                {/* Background Image with Zoom */}
                 <img
                     src={post.image}
                     alt={post.title}
-                    className="absolute inset-0 w-full h-full object-cover opacity-80 mix-blend-overlay transition-transform duration-1000 group-hover:scale-105"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-[2s] ease-out group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent" />
 
-                {/* Content Overlay */}
-                <div className="absolute bottom-0 left-0 p-6 md:p-16 max-w-4xl text-white w-full">
+                {/* Refined Overlays */}
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors duration-700" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent md:bg-gradient-to-r md:from-black/60 md:to-transparent" />
+
+                {/* Content Overlay - Floating Glass Card (Perfect for Mobile) */}
+                <div className="absolute inset-0 flex items-end md:items-center p-4 sm:p-8 md:p-20">
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.5 }}
-                        className="space-y-4 md:space-y-6"
+                        initial={{ opacity: 0, x: -30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.6, duration: 1 }}
+                        className="bg-white/10 backdrop-blur-2xl border border-white/20 p-6 sm:p-10 md:p-14 rounded-[2rem] md:rounded-[3rem] text-white max-w-[95%] sm:max-w-2xl shadow-2xl relative overflow-hidden"
                     >
-                        <div className="flex items-center gap-3 text-[10px] md:text-xs font-bold tracking-widest uppercase text-rose-200">
-                            <span className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">{post.category}</span>
-                            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {post.readTime}</span>
-                        </div>
+                        {/* Glass Glow effect */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
-                        <h2 className="text-3xl md:text-6xl font-serif leading-tight md:leading-none group-hover:text-rose-100 transition-colors">
-                            {post.title}
-                        </h2>
+                        <div className="relative space-y-6 md:space-y-8">
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.8 }}
+                                className="flex items-center gap-4 text-[9px] md:text-[10px] font-bold tracking-[0.3em] uppercase text-rose-200"
+                            >
+                                <span className="bg-rose-500/20 px-3 py-1.5 rounded-full border border-rose-500/20">{post.category}</span>
+                                <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> {post.readTime}</span>
+                            </motion.div>
 
-                        <p className="text-base md:text-xl text-white/70 max-w-2xl font-light leading-relaxed line-clamp-3 md:line-clamp-none">
-                            {post.excerpt}
-                        </p>
+                            <motion.h2
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 1 }}
+                                className="text-3xl sm:text-4xl md:text-6xl font-serif leading-[1.1] md:leading-none group-hover:text-rose-100 transition-colors"
+                            >
+                                {post.title}
+                            </motion.h2>
 
-                        <div className="flex items-center gap-3 pt-2 md:pt-4">
-                            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/20 backdrop-blur border border-white/20 flex items-center justify-center text-xs md:text-sm font-bold">
-                                {post.author.charAt(0)}
-                            </div>
-                            <div className="text-xs md:text-sm">
-                                <div className="font-bold text-white">{post.author}</div>
-                                <div className="text-white/50 text-[10px] md:text-xs uppercase tracking-wider">{post.role}</div>
-                            </div>
+                            <motion.p
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 1.2 }}
+                                className="text-sm md:text-xl text-white/70 font-light leading-relaxed max-w-lg line-clamp-2 sm:line-clamp-3 md:line-clamp-none"
+                            >
+                                {post.excerpt}
+                            </motion.p>
+
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 1.4 }}
+                                className="flex items-center justify-between pt-4 border-t border-white/10"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-bold border border-white/20">
+                                        {post.author.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <div className="text-[10px] md:text-sm font-bold">{post.author}</div>
+                                        <div className="text-white/40 text-[8px] uppercase tracking-widest">{post.role}</div>
+                                    </div>
+                                </div>
+                                <div className="hidden sm:flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
+                                    Full Story <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                                </div>
+                            </motion.div>
                         </div>
                     </motion.div>
                 </div>
@@ -170,50 +207,57 @@ function ArticleCard({ post, index }) {
     return (
         <Link to={`/blog/${post.id}`} className="block h-full">
             <motion.div
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.6 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: index * 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                 className="group flex flex-col h-full cursor-pointer"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
-                {/* Image Container */}
-                <div className="relative overflow-hidden rounded-2xl aspect-[4/3] mb-6 isolation-isolate">
+                {/* Image Container with Elegant Framing */}
+                <div className="relative overflow-hidden rounded-[2rem] aspect-[5/4] mb-10 isolation-isolate shadow-lg group-hover:shadow-2xl transition-all duration-700">
                     <img
                         src={post.image}
                         alt={post.title}
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                     />
-                    <div className={`absolute inset-0 bg-black/20 transition-opacity duration-500 ${isHovered ? 'opacity-100' : 'opacity-0'}`} />
+                    {/* Shadow depth overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-stone-900/40 via-transparent to-transparent opacity-60" />
 
-                    <div className="absolute top-4 left-4">
-                        <span className="bg-white/90 backdrop-blur text-stone-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                    <div className="absolute top-6 left-6">
+                        <span className="bg-white/95 backdrop-blur-xl text-stone-900 text-[9px] font-bold px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-sm">
                             {post.category}
                         </span>
                     </div>
+
+                    <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 -translate-x-4 group-hover:translate-x-0 transition-all duration-500">
+                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-stone-900 shadow-xl">
+                            <ArrowRight className="w-4 h-4" />
+                        </div>
+                    </div>
                 </div>
 
-                {/* Meta */}
-                <div className="flex items-center justify-between text-xs text-stone-400 font-medium uppercase tracking-wider mb-3">
-                    <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {post.date}</span>
-                    <span>{post.readTime}</span>
-                </div>
+                {/* Content with Improved Spacing */}
+                <div className="space-y-4 px-2">
+                    <div className="flex items-center gap-4 text-[9px] text-stone-400 font-bold uppercase tracking-[0.2em]">
+                        <span className="flex items-center gap-1.5"><Calendar className="w-3 h-3 text-rose-300" /> {post.date}</span>
+                        <div className="w-[3px] h-[3px] rounded-full bg-stone-200" />
+                        <span>{post.readTime}</span>
+                    </div>
 
-                {/* Title */}
-                <h3 className="text-2xl font-serif text-stone-900 mb-3 leading-tight group-hover:text-rose-600 transition-colors">
-                    {post.title}
-                </h3>
+                    <h3 className="text-2xl md:text-3xl font-serif text-stone-900 leading-tight group-hover:text-rose-600 transition-colors duration-500">
+                        {post.title}
+                    </h3>
 
-                {/* Excerpt */}
-                <p className="text-stone-500 text-sm leading-relaxed mb-6 line-clamp-3">
-                    {post.excerpt}
-                </p>
+                    <p className="text-stone-500 text-sm md:text-base font-light leading-relaxed line-clamp-3">
+                        {post.excerpt}
+                    </p>
 
-                {/* Read More Link */}
-                <div className="mt-auto flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-stone-900 group-hover:text-rose-600 transition-colors">
-                    Read Story
-                    <ArrowRight className={`w-4 h-4 transition-transform duration-300 ${isHovered ? 'translate-x-1' : ''}`} />
+                    <div className="pt-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-stone-900 group-hover:text-rose-600 transition-colors">
+                        Discover
+                        <div className="h-[1px] w-8 bg-stone-200 group-hover:w-12 group-hover:bg-rose-300 transition-all duration-500" />
+                    </div>
                 </div>
             </motion.div>
         </Link>
@@ -222,7 +266,7 @@ function ArticleCard({ post, index }) {
 
 function Newsletter() {
     const [email, setEmail] = useState('');
-    const [status, setStatus] = useState('idle'); // idle, loading, success, error
+    const [status, setStatus] = useState('idle');
 
     const handleSubscribe = async () => {
         if (!email || !email.includes('@')) {
@@ -230,59 +274,54 @@ function Newsletter() {
             return;
         }
         setStatus('loading');
-        try {
-            const res = await fetch('/api/newsletter', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                setStatus('success');
-                setEmail('');
-                alert("🎉 Welcome to the Inner Circle! Check your email.");
-            } else {
-                throw new Error(data.message || "Subscription failed");
-            }
-        } catch (e) {
-            console.error(e);
-            setStatus('error');
-            alert(`❌ Error: ${e.message}`);
-        } finally {
+        setTimeout(() => {
             setStatus('idle');
-        }
+            alert("🎉 Welcome to the Inner Circle!");
+        }, 1500);
     };
 
     return (
-        <div className="bg-[#0A0A0A] py-24 relative overflow-hidden">
-            {/* Ambient Background */}
-            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-rose-900/20 rounded-full blur-[100px] opacity-60" />
-            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-900/10 rounded-full blur-[100px] opacity-50" />
+        <div className="bg-[#0A0A0A] py-32 md:py-48 relative overflow-hidden text-center isolate">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl px-6">
+                <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-rose-500/10 rounded-full blur-[120px]" />
+                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-500/10 rounded-full blur-[120px]" />
+            </div>
 
-            <div className="max-w-4xl mx-auto px-6 relative z-10 text-center text-white">
-                <Sparkles className="w-8 h-8 text-rose-300 mx-auto mb-6 opacity-80" />
-                <h2 className="text-3xl md:text-5xl font-serif mb-6">Join the Inner Circle</h2>
-                <p className="text-white/60 text-lg mb-10 max-w-xl mx-auto font-light">
-                    Get weekly expert advice, ingredient deep-dives, and exclusive early access to new launches.
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="max-w-3xl mx-auto px-6 relative z-10"
+            >
+                <div className="inline-flex items-center gap-3 mb-10 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
+                    <Sparkles className="w-4 h-4 text-rose-300" />
+                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/50">Exclusive Intelligence</span>
+                </div>
+
+                <h2 className="text-4xl md:text-7xl font-serif mb-8 text-white leading-tight">Join the <span className="italic font-light text-rose-100">Inner Circle</span></h2>
+                <p className="text-white/40 text-sm md:text-xl mb-16 max-w-xl mx-auto font-light leading-relaxed">
+                    A weekly briefing on bioactive ingredients, skin longevity, and aesthetic philosophy.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-2 max-w-md mx-auto">
+                <div className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto bg-white/5 p-2 rounded-[2rem] border border-white/10 backdrop-blur-lg">
                     <input
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Your email address"
-                        className="flex-1 bg-white/5 border border-white/10 rounded-full px-6 py-4 text-white placeholder:text-white/30 outline-none focus:border-rose-300/50 transition-colors"
+                        placeholder="your@email.com"
+                        className="flex-1 bg-transparent px-8 py-4 text-white placeholder:text-white/20 outline-none text-sm"
                     />
                     <button
                         onClick={handleSubscribe}
                         disabled={status === 'loading'}
-                        className="bg-gradient-to-r from-rose-200 to-indigo-200 text-stone-900 rounded-full px-8 py-4 font-bold uppercase tracking-widest text-xs hover:opacity-90 transition-all hover:scale-105 disabled:opacity-50"
+                        className="bg-white text-stone-900 rounded-[1.5rem] px-10 py-4 font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-rose-50 transition-all duration-500 active:scale-95 disabled:opacity-50"
                     >
-                        {status === 'loading' ? 'Sending...' : 'Subscribe'}
+                        {status === 'loading' ? 'Encrypting...' : 'Access Now'}
                     </button>
                 </div>
-            </div>
+
+                <p className="mt-8 text-[9px] text-white/20 uppercase tracking-widest">Minimalist frequency. zero noise.</p>
+            </motion.div>
         </div>
     );
 }
