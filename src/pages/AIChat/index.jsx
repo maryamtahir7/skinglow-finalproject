@@ -15,6 +15,7 @@ const AIChat = () => {
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [chatHistory, setChatHistory] = useState([]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -27,40 +28,6 @@ const AIChat = () => {
     "✨ How to treat acne marks?"
   ];
 
-  const getAIResponse = async (message) => {
-    const text = message.toLowerCase();
-
-    // Skincare Responses
-    if (text.includes('hi') || text.includes('hello')) {
-      return '👋 Hi there! Ready to achieve your best skin? Ask me about products, ingredients, or routines!';
-    }
-    if (text.includes('acne') || text.includes('pimple') || text.includes('breakout')) {
-      return '✨ For acne-prone skin, I recommend looking for products with Salicylic Acid or Niacinamide. Our "Clear Skin Serum" is a great choice! Would you like to see it?';
-    }
-    if (text.includes('dry') || text.includes('flakey')) {
-      return '💧 Hydration is key! Look for Hyaluronic Acid and Ceramides. Our "Deep Hydration Moisturizer" locks in moisture for 24 hours. Try layering it over a damp face!';
-    }
-    if (text.includes('routine') || text.includes('order')) {
-      return '🧴 A basic routine order is: Cleanser ➝ Toner ➝ Serum ➝ Moisturizer ➝ Sunscreen (AM). Consistency is the secret to glowing skin!';
-    }
-    if (text.includes('glow') || text.includes('dull')) {
-      return '✨ To get that glow, try Vitamin C in the morning! It brightens skin and protects against pollution. Our "Radiance Vitamin C Serum" is a customer favorite.';
-    }
-    if (text.includes('sunscreen') || text.includes('spf')) {
-      return '☀️ Yes! Sunscreen is the most important step. Wear SPF 30+ every day, even when it\'s cloudy, to prevent premature aging and dark spots.';
-    }
-    if (text.includes('delivery') || text.includes('shipping')) {
-      return '🚚 We offer free shipping on orders over $50! Most orders arrive within 2-3 business days.';
-    }
-
-    const fallbackResponses = [
-      '🤔 That’s a great question! While I’m an AI, I suggest checking our "Skin Concern" filters to find exactly what you need.',
-      '✨ I’d love to help with that. Could you tell me a bit more about your skin type (Oily, Dry, Combination)?',
-      '💖 Skincare is a journey! If you are looking for specific ingredients, let me know.'
-    ];
-    return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
-  };
-
   const handleSend = async (txt = input) => {
     if (!txt.trim()) return;
 
@@ -69,12 +36,34 @@ const AIChat = () => {
     setInput('');
     setLoading(true);
 
-    // Simulate network delay for realism
-    setTimeout(async () => {
-      const botReply = await getAIResponse(txt);
-      setMessages(prev => [...prev, { text: botReply, sender: 'bot' }]);
+    const newHistory = [...chatHistory, { role: 'user', parts: [{ text: txt }] }];
+    setChatHistory(newHistory);
+
+    try {
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: txt,
+          history: chatHistory,
+          userId: 'guest'
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.reply) {
+        setMessages(prev => [...prev, { text: data.reply, sender: 'bot' }]);
+        setChatHistory(data.updatedHistory || [...newHistory, { role: 'model', parts: [{ text: data.reply }] }]);
+      } else {
+        setMessages(prev => [...prev, { text: 'I apologize, but I am currently experiencing a high volume of requests. Please try again.', sender: 'bot' }]);
+      }
+    } catch (error) {
+      console.error(error);
+      setMessages(prev => [...prev, { text: 'I apologize, but I am unable to connect to the SkinGlow intelligence server right now.', sender: 'bot' }]);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -86,18 +75,20 @@ const AIChat = () => {
       <div className="relative w-full max-w-4xl rounded-3xl shadow-xl border border-border bg-card flex flex-col h-[700px] overflow-hidden">
 
         {/* Header */}
-        <div className="relative z-10 bg-primary/5 px-6 py-5 flex items-center justify-between border-b border-primary/10">
+        <div className="relative z-10 bg-gradient-to-r from-primary/10 via-pink-500/5 to-purple-500/10 px-6 py-5 flex items-center justify-between border-b border-primary/10">
           <div className="flex items-center gap-4">
             <div className="relative">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shadow-sm">
-                <Sparkles className="w-6 h-6 text-primary" />
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary to-pink-500 p-[2px] shadow-sm flex items-center justify-center">
+                <div className="w-full h-full rounded-xl bg-white flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-primary fill-primary/20" />
+                </div>
               </div>
-              <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-card rounded-full"></span>
+              <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
             </div>
             <div>
-              <h1 className="text-xl font-semibold text-foreground tracking-tight">SkinGlow AI</h1>
-              <p className="text-xs text-muted-foreground flex items-center gap-1">
-                <span className="inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Virtual esthetician for your routine
+              <h1 className="text-xl font-bold text-slate-800 tracking-tight">SkinGlow AI</h1>
+              <p className="text-xs text-slate-500 font-medium uppercase tracking-wide flex items-center gap-1 mt-0.5">
+                <span className="inline-flex h-1.5 w-1.5 rounded-full bg-primary/60 animate-pulse" /> Virtual Esthetician
               </p>
             </div>
           </div>
@@ -121,18 +112,18 @@ const AIChat = () => {
               <div
                 className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${
                   msg.sender === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-secondary text-primary border border-border'
+                    ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white'
+                    : 'bg-white border border-primary/20 text-primary'
                 }`}
               >
                 {msg.sender === 'user' ? <User className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
               </div>
 
               <div
-                className={`max-w-[78%] sm:max-w-[75%] px-4 sm:px-5 py-3.5 rounded-3xl text-[13px] sm:text-sm leading-relaxed shadow-sm ${
+                className={`max-w-[78%] sm:max-w-[75%] px-5 py-4 rounded-3xl text-[13px] sm:text-sm leading-relaxed shadow-sm whitespace-pre-line ${
                   msg.sender === 'user'
-                    ? 'bg-primary text-primary-foreground rounded-tr-sm'
-                    : 'bg-muted text-foreground border border-border rounded-tl-sm'
+                    ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-tr-sm shadow-slate-900/10'
+                    : 'bg-white text-slate-700 border border-primary/5 rounded-tl-sm shadow-sm'
                 }`}
               >
                 {msg.text}

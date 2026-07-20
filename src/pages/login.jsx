@@ -1,7 +1,8 @@
 // src/pages/login.jsx
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { login, loginWithGoogle } from "../backend/auth";
+import { login, processGoogleUser } from "../backend/auth";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useUser } from "../context/UserContext";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Mail, Lock, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
@@ -15,6 +16,27 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setLoading(true);
+        const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        }).then(res => res.json());
+        
+        await processGoogleUser(userInfo);
+      } catch (err) {
+        console.error("Google login error:", err);
+        setError("Could not sign in with Google.");
+        setLoading(false);
+      }
+    },
+    onError: errorResponse => {
+      console.error(errorResponse);
+      setError("Google login was cancelled or failed.");
+    },
+  });
 
   // Check if redirected from signup
   useEffect(() => {
@@ -188,14 +210,7 @@ export default function LoginForm() {
             {/* Social Login */}
             <button
               type="button"
-              onClick={async () => {
-                try {
-                  await loginWithGoogle();
-                } catch (err) {
-                  console.error("Google login error:", err);
-                  setError("Could not sign in with Google.");
-                }
-              }}
+              onClick={() => handleGoogleLogin()}
               className="w-full h-12 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl flex items-center justify-center gap-3 text-white font-medium transition-all group/google"
             >
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5 grayscale group-hover/google:grayscale-0 transition-all duration-300" />

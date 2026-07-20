@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, ShoppingCart, User as UserIcon, LogOut, LogIn, UserPlus, Menu, X, Sparkles, Search, Package, IdCard, ShoppingBag } from "lucide-react";
+import { Heart, ShoppingCart, User as UserIcon, LogOut, LogIn, UserPlus, Menu, X, Sparkles, Search, Package, IdCard, ShieldAlert } from "lucide-react";
 import { useUser } from "../context/UserContext";
 import { logout } from "../backend/auth";
 import { getCart, getWishlist } from "../backend/database";
@@ -31,7 +31,7 @@ export default function Navbar({ onOpenChat }) {
   };
 
   // Skincare-themed nav items
-  const navItems = ["Home", "Shop", "Routine", "Concerns", "Quiz", "Journal"];
+  const navItems = ["Home", "Shop", "Routine", "Concerns", "Quiz", "Scan", "Journal"];
 
   const fetchCounts = async () => {
     if (!user) return;
@@ -76,6 +76,7 @@ export default function Navbar({ onOpenChat }) {
     if (item === "Routine") route = "/routine"; // page to be created
     if (item === "Concerns") route = "/concerns";
     if (item === "Quiz") route = "/skin-quiz";
+    if (item === "Scan") route = "/face-scan";
     if (item === "Journal") route = "/blog";
     if (item === "Home") route = "/";
 
@@ -140,6 +141,15 @@ export default function Navbar({ onOpenChat }) {
         <div className="hidden md:flex items-center gap-5">
           {/* Notifications */}
           <NotificationsDropdown />
+
+          {/* Admin Dashboard Icon */}
+          {user?.role === 'ADMIN' && (
+            <Link to="/admin" className="relative group">
+              <div className="p-2 rounded-full hover:bg-slate-50 transition-colors">
+                <ShieldAlert className="h-6 w-6 text-slate-600 group-hover:text-amber-500 transition-colors" />
+              </div>
+            </Link>
+          )}
 
           {/* Wishlist */}
           <Link to="/wishlist" className="relative group">
@@ -250,6 +260,16 @@ export default function Navbar({ onOpenChat }) {
                           <X className="w-4 h-4" />
                         </button>
                       </div>
+
+                      {user?.role === 'ADMIN' && (
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-3 px-5 py-3 hover:bg-secondary transition text-sm"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <ShieldAlert className="w-4 h-4 text-amber-500" /> Admin Dashboard
+                        </Link>
+                      )}
 
                       <Link
                         to="/profile"
@@ -371,6 +391,15 @@ export default function Navbar({ onOpenChat }) {
                   <p className="text-xs text-slate-400 px-1 mb-1">
                     Signed in as <span className="font-semibold text-slate-700">{user.name || user.email}</span>
                   </p>
+                  {user?.role === 'ADMIN' && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-secondary text-sm"
+                    >
+                      <ShieldAlert className="w-4 h-4 text-amber-500" /> Admin Dashboard
+                    </Link>
+                  )}
                   <Link
                     to="/profile"
                     onClick={() => setIsMobileMenuOpen(false)}

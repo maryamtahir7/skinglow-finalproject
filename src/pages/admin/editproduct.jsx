@@ -65,7 +65,7 @@ const EditProduct = ({ product, onSave, onCancel }) => {
       imageUrl: String(data.imageUrl || "").trim(),
       imageUrl2: String(data.imageUrl2 || "").trim(),
       imageUrl3: String(data.imageUrl3 || "").trim(),
-      Concerns: String(data.Concerns || "").trim(),
+      concerns: String(data.Concerns || "").trim(),
     };
 
     // Validate required fields

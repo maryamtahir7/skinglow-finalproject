@@ -227,7 +227,7 @@ export default function UserOrdersPage() {
                   </div>
                   <div className="space-y-1">
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Date Placed</span>
-                    <div className="text-sm font-medium text-foreground">{new Date(order.$createdAt).toLocaleDateString()}</div>
+                    <div className="text-sm font-medium text-foreground">{new Date(order.createdAt || order.$createdAt).toLocaleDateString()}</div>
                   </div>
                   <div className="space-y-1">
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Total Amount</span>

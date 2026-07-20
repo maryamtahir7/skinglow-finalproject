@@ -1,137 +1,102 @@
-import { account } from "./appwrite";
+// db-proxy client for Auth
+
+async function dbCall(action, payload = {}) {
+  const res = await fetch('/api/db-proxy', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, payload })
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error(`Auth Error [${action}]:`, errorText);
+    throw new Error(JSON.parse(errorText).error || 'Auth failed');
+  }
+  return res.json();
+}
 
 // --------------------- SIGNUP ---------------------
 export async function signup(email, password, name) {
-  // Check if user is already logged in and logout first
-  try {
-    await account.get();
-    // If we get here, user is logged in - delete current session
-    await account.deleteSession("current");
-  } catch {
-    // No active session, continue
-  }
-
-  // Create user account (without creating a session)
-  const user = await account.create("unique()", email, password, name);
-
-  // Return success - don't create session, user will login separately
-  // Returning user ID is crucial for OTP generation
-  return { success: true, email, userId: user.$id };
+  const data = await dbCall('signup', { email, password, name });
+  localStorage.setItem('user', JSON.stringify({ ...data, $id: data.id }));
+  return { success: true, email, userId: data.id };
 }
 
 // --------------------- LOGIN WITH EMAIL/PASSWORD ---------------------
 export async function login(email, password) {
-  await account.createEmailPasswordSession(email, password);
-  return await account.get();
+  const data = await dbCall('login', { email, password });
+  const user = { ...data, $id: data.id };
+  localStorage.setItem('user', JSON.stringify(user));
+  return user;
 }
 
 // --------------------- LOGIN WITH GOOGLE OAUTH ---------------------
-export async function loginWithGoogle() {
+export async function processGoogleUser(userInfo) {
   try {
-    // Get current origin (localhost:5173 or your production domain)
-    const origin = window.location.origin;
-
-    // Success redirect - Appwrite will redirect here after successful OAuth
-    // This is where the user lands after Google authentication
-    const successRedirect = `${origin}/`;
-
-    // Failure redirect - go back to login page if OAuth fails
-    const failureRedirect = `${origin}/login`;
-
-    // Get Appwrite endpoint to show in console for debugging
-    const appwriteEndpoint = import.meta.env.VITE_APPWRITE_ENDPOINT;
-    const expectedCallbackUrl = `${appwriteEndpoint.replace('/v1', '')}/v1/account/sessions/oauth2/callback/google`;
-
-    console.log('🔍 Google OAuth Debug Info:');
-    console.log('Appwrite Endpoint:', appwriteEndpoint);
-    console.log('Expected Callback URL in Google Console:', expectedCallbackUrl);
-    console.log('Success Redirect:', successRedirect);
-    console.log('Failure Redirect:', failureRedirect);
-    console.log('⚠️ Make sure this callback URL is added to Google Cloud Console:');
-    console.log('   ', expectedCallbackUrl);
-
-    // Appwrite will handle the OAuth flow
-    // The redirect URI configured in Google Console should be Appwrite's callback URL
-    await account.createOAuth2Session("google", successRedirect, failureRedirect);
+    // Try to login if user already exists
+    const data = await dbCall('login', { email: userInfo.email, password: 'GOOGLE_AUTH_PLACEHOLDER' });
+    const user = { ...data, $id: data.id };
+    localStorage.setItem('user', JSON.stringify(user));
+    window.location.href = '/';
   } catch (error) {
-    console.error('❌ Google OAuth Error:', error);
-    throw error;
+    try {
+      // If not exists, signup
+      const data = await dbCall('signup', { email: userInfo.email, password: 'GOOGLE_AUTH_PLACEHOLDER', name: userInfo.name });
+      const user = { ...data, $id: data.id };
+      localStorage.setItem('user', JSON.stringify(user));
+      window.location.href = '/';
+    } catch (e) {
+      console.error(e);
+      throw new Error("Failed to authenticate with Google");
+    }
   }
 }
 
-// --------------------- OTP FUNCTIONS ---------------------
-
-// Generate OTP (Email Token)
+// --------------------- OTP FUNCTIONS (Mock) ---------------------
 export async function sendOtp(userId, email) {
-  try {
-    // createEmailToken sends an email with a code/link
-    // userId: The user ID to create the token for
-    // email: The email to send it to (must match user's email)
-    // true: Set 'phrase' to true to get a generic "login" style email, 
-    // or we might depend on Appwrite's templates. 
-    // For manual entry, we need the secret.
-    return await account.createEmailToken(userId, email);
-  } catch (error) {
-    console.error("STUPID createEmailToken Error:", error);
-    throw error;
-  }
+  console.log("OTP requested for", email);
+  return { success: true };
 }
 
-// Verify OTP
 export async function verifyOtp(userId, secret) {
-  try {
-    // createSession completes the login using the userId and secret code
-    return await account.createSession(userId, secret);
-  } catch (error) {
-    console.error("Verify OTP Error:", error);
-    throw error;
-  }
+  // Mock verification
+  return { success: true };
 }
 
 // --------------------- LOGOUT ---------------------
 export async function logout() {
-  return await account.deleteSession("current");
+  localStorage.removeItem('user');
+  return { success: true };
 }
 
 // --------------------- GET CURRENT USER ---------------------
 export async function getCurrentUser() {
-  try {
-    return await account.get();
-  } catch {
-    return null;
+  const u = localStorage.getItem('user');
+  if (u) {
+     const parsed = JSON.parse(u);
+     return { ...parsed, $id: parsed.id };
   }
+  return null;
 }
 
 // --------------------- UPDATE PREFS ---------------------
 export async function updateUserPrefs(prefs) {
-  try {
-    return await account.updatePrefs(prefs);
-  } catch (error) {
-    console.error("Update Prefs Error:", error);
-    throw error;
+  const u = localStorage.getItem('user');
+  if (u) {
+     const parsed = JSON.parse(u);
+     const updated = { ...parsed, prefs: { ...parsed.prefs, ...prefs } };
+     localStorage.setItem('user', JSON.stringify(updated));
+     return updated;
   }
+  return null;
 }
-// --------------------- PASSWORD RECOVERY ---------------------
+
+// --------------------- PASSWORD RECOVERY (Mock) ---------------------
 export async function sendPasswordReset(email) {
-  try {
-    const origin = window.location.origin;
-    // Appwrite will verify the email exists and send a recovery link
-    // The link will point to {origin}/reset-password?userId=...&secret=...
-    return await account.createRecovery(
-      email,
-      `${origin}/reset-password`
-    );
-  } catch (error) {
-    console.error("Reset Password Request Error:", error);
-    throw error;
-  }
+  console.log("Password reset requested for", email);
+  return { success: true };
 }
 
 export async function confirmPasswordReset(userId, secret, password, passwordAgain) {
-  try {
-    return await account.updateRecovery(userId, secret, password, passwordAgain);
-  } catch (error) {
-    console.error("Reset Password Confirmation Error:", error);
-    throw error;
-  }
+  console.log("Password reset confirmed");
+  return { success: true };
 }

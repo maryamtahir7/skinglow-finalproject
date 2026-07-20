@@ -61,12 +61,17 @@ export default function OrdersPage() {
       if (status === "delivered") {
         const order = orders.find(o => o.$id === orderId);
         if (order) {
+          let linkUrl = `/orders?highlight=${order.$id}`;
+          if (Array.isArray(order.items) && order.items.length > 0 && order.items[0].productId) {
+             linkUrl = `/products/${order.items[0].productId}`;
+          }
+
           await addNotification({
             userId: order.userId,
             message: `Your order #${order.$id.substring(0, 5)} has been delivered! You can now review your products.`,
             type: "order_update",
             read: false,
-            link: `/orders?highlight=${order.$id}`
+            link: linkUrl
           });
         }
       }
@@ -192,7 +197,7 @@ export default function OrdersPage() {
                     <div>
                       <div className="font-bold text-foreground text-sm">Order #{order.$id}</div>
                       <div className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> {new Date(order.$createdAt).toLocaleString()}
+                        <Clock className="w-3 h-3" /> {new Date(order.createdAt || order.$createdAt).toLocaleString()}
                       </div>
                     </div>
                   </div>

@@ -104,9 +104,9 @@ export default function ReportsPage() {
         // Try to get current user ID to helper user
         let userId = "unknown";
         try {
-          const { account } = await import("../../backend/appwrite");
-          const user = await account.get();
-          userId = user.$id;
+          const { getCurrentUser } = await import("../../backend/auth");
+          const user = await getCurrentUser();
+          userId = user ? user.$id : 'unknown';
         } catch (uErr) { console.error(uErr); }
 
         alert(`PERMISSION DENIED: You do not have 'create' permissions for Reports.\n\nPlease go to Appwrite Console > Database > Reports > Settings > Permissions.\n\nAdd this User ID to 'Create':\n${userId}\n\nTechnical Details:\n${error.message}`);
@@ -182,9 +182,9 @@ export default function ReportsPage() {
       if (error.message && error.message.includes('Missing "create" permission')) {
         let userId = "unknown";
         try {
-          const { account } = await import("../../backend/appwrite");
-          const user = await account.get();
-          userId = user.$id;
+          const { getCurrentUser } = await import("../../backend/auth");
+          const user = await getCurrentUser();
+          userId = user ? user.$id : 'unknown';
         } catch (uErr) { console.error(uErr); }
 
         alert(`PERMISSION DENIED: You cannot create/update reports.\n\nPlease update Appwrite Permissions for User ID:\n${userId}\n\nTechnical Details:\n${error.message}`);

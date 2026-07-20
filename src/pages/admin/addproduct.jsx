@@ -25,7 +25,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 import { addProduct, getCategories, getProductByName } from "../../backend/database.js";
-import { uploadImage } from "@/backend/imageHandle.js";
 import * as XLSX from "xlsx";
 
 export default function AddProductForm() {
@@ -35,7 +34,6 @@ export default function AddProductForm() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
-  const [useUrl, setUseUrl] = useState(false);
   const [bulkFileName, setBulkFileName] = useState("");
 
   useEffect(() => {
@@ -50,16 +48,7 @@ export default function AddProductForm() {
     fetchData();
   }, []);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+
 
   const onSubmit = async (data) => {
     if (!selectedCategory) {
@@ -74,23 +63,9 @@ export default function AddProductForm() {
         return;
       }
 
-      let finalImageUrl = "";
-      let extraImageUrl2 = "";
-      let extraImageUrl3 = "";
-
-      if (useUrl) {
-        finalImageUrl = data.imageUrl || "https://via.placeholder.com/150";
-        // Optional extra URLs when using URL mode
-        if (data.imageUrl2) extraImageUrl2 = data.imageUrl2;
-        if (data.imageUrl3) extraImageUrl3 = data.imageUrl3;
-      } else {
-        if (data.image && data.image[0]) {
-          finalImageUrl = await uploadImage(data.image[0]);
-        }
-        // For now, additional images can still be added via URL fields even if main is uploaded
-        if (data.imageUrl2) extraImageUrl2 = data.imageUrl2;
-        if (data.imageUrl3) extraImageUrl3 = data.imageUrl3;
-      }
+      let finalImageUrl = data.imageUrl || "https://via.placeholder.com/150";
+      let extraImageUrl2 = data.imageUrl2 || "";
+      let extraImageUrl3 = data.imageUrl3 || "";
 
       const product = {
         name: data.name,
@@ -98,7 +73,7 @@ export default function AddProductForm() {
         imageUrl: finalImageUrl,
         description: data.description,
         category: selectedCategory,
-        Concerns: data.Concerns || ""
+        concerns: data.Concerns || ""
       };
 
       // Try to add extra images if they exist (will fail silently if schema doesn't support them)
@@ -127,7 +102,6 @@ export default function AddProductForm() {
       reset();
       setSelectedCategory("");
       setImagePreview(null);
-      setUseUrl(false);
     } catch (error) {
       console.error("❌ Add product error:", error);
       alert("❌ Failed to add product");
@@ -219,8 +193,17 @@ export default function AddProductForm() {
         }
         fileNameSet.add(normalizedName);
 
-        const categoryKey = String(categoryNameRaw).toLowerCase().trim();
-        const matchedCategory = categoryMap.get(categoryKey);
+        let categoryKey = String(categoryNameRaw).toLowerCase().trim();
+        let matchedCategory = categoryMap.get(categoryKey);
+
+        // Fallback for UK/US spelling differences
+        if (!matchedCategory) {
+          if (categoryKey.includes('moisturiser')) {
+            matchedCategory = categoryMap.get(categoryKey.replace('moisturiser', 'moisturizer'));
+          } else if (categoryKey.includes('moisturizer')) {
+            matchedCategory = categoryMap.get(categoryKey.replace('moisturizer', 'moisturiser'));
+          }
+        }
 
         if (!matchedCategory) {
           failCount++;
@@ -245,7 +228,7 @@ export default function AddProductForm() {
           imageUrl3: imageUrl3 || "",
           description: String(description || ""),
           category: matchedCategory,
-          Concerns: row.Concerns || row.concerns || ""
+          concerns: row.Concerns || row.concerns || ""
         };
 
         try {
@@ -394,64 +377,33 @@ export default function AddProductForm() {
             <CardTitle className="text-lg text-foreground">Product Image</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex gap-2 mb-2 p-1 bg-secondary rounded-lg">
-              <button
-                type="button"
-                onClick={() => setUseUrl(false)}
-                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${!useUrl ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                Upload File
-              </button>
-              <button
-                type="button"
-                onClick={() => setUseUrl(true)}
-                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${useUrl ? 'bg-card text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                Image URL
-              </button>
-            </div>
-
-            {useUrl ? (
-              <div className="space-y-3">
-                <div className="space-y-2">
-                  <Label className="text-foreground text-xs">Main Image URL</Label>
-                  <Input
-                    placeholder="https://example.com/main-image.jpg"
-                    {...register("imageUrl")}
-                    className="bg-secondary/10 border-border"
-                    onChange={(e) => setImagePreview(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-foreground text-xs">Additional Image URL 1 (optional)</Label>
-                  <Input
-                    placeholder="https://example.com/angle-1.jpg"
-                    {...register("imageUrl2")}
-                    className="bg-secondary/10 border-border"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-foreground text-xs">Additional Image URL 2 (optional)</Label>
-                  <Input
-                    placeholder="https://example.com/angle-2.jpg"
-                    {...register("imageUrl3")}
-                    className="bg-secondary/10 border-border"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="border-2 border-dashed border-border rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-secondary/10 transition min-h-[150px]" onClick={() => document.getElementById('image-upload').click()}>
-                <ImageIcon className="w-8 h-8 text-muted-foreground mb-2" />
-                <p className="text-sm text-foreground font-medium">Click to upload image</p>
-                <input
-                  id="image-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  {...register("image", { onChange: handleImageChange })}
+            <div className="space-y-3">
+              <div className="space-y-2">
+                <Label className="text-foreground text-xs">Main Image URL</Label>
+                <Input
+                  placeholder="https://example.com/main-image.jpg"
+                  {...register("imageUrl")}
+                  className="bg-secondary/10 border-border"
+                  onChange={(e) => setImagePreview(e.target.value)}
                 />
               </div>
-            )}
+              <div className="space-y-2">
+                <Label className="text-foreground text-xs">Additional Image URL 1 (optional)</Label>
+                <Input
+                  placeholder="https://example.com/angle-1.jpg"
+                  {...register("imageUrl2")}
+                  className="bg-secondary/10 border-border"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-foreground text-xs">Additional Image URL 2 (optional)</Label>
+                <Input
+                  placeholder="https://example.com/angle-2.jpg"
+                  {...register("imageUrl3")}
+                  className="bg-secondary/10 border-border"
+                />
+              </div>
+            </div>
 
             {/* Preview */}
             {imagePreview && (

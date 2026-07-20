@@ -7,7 +7,6 @@ import {
   updateCategory,
   deleteCategory,
 } from "../../backend/database.js";
-import { uploadImage } from "@/backend/imageHandle.js";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +38,6 @@ export default function Categories() {
 
   // Image State for Add Form
   const [imagePreview, setImagePreview] = useState(null);
-  const [useUrl, setUseUrl] = useState(false);
 
   // Fetch categories
   const fetchCategories = useCallback(async () => {
@@ -58,43 +56,24 @@ export default function Categories() {
     fetchCategories();
   }, [fetchCategories]);
 
-  // Handle Image Selection for Add Form
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+
 
   // Add Category Submit
   const onAddSubmit = async (data) => {
     setAdding(true);
     try {
-      let finalImageUrl = "";
+      let finalImageUrl = data.imageUrl || "https://via.placeholder.com/150";
 
-      if (useUrl) {
-        finalImageUrl = data.imageUrl || "https://via.placeholder.com/150";
-
-        // Validation: Check for Data URIs (Base64) which are too long
-        if (finalImageUrl.startsWith("data:")) {
-          alert("❌ Invalid URL format.\n\nYou pasted a Base64 image data string (starting with 'data:'), which is too long for the database.\n\nPlease use the 'Upload File' tab to upload this image instead, or paste a standard short URL (starting with 'http').");
-          setAdding(false);
-          return;
-        }
-        if (finalImageUrl.length > 2000) {
-          alert("❌ URL is too long.\n\nPlease use a shorter URL or upload the image directly using the 'Upload File' tab.");
-          setAdding(false);
-          return;
-        }
-
-      } else {
-        if (data.image && data.image[0]) {
-          finalImageUrl = await uploadImage(data.image[0]);
-        }
+      // Validation: Check for Data URIs (Base64) which are too long
+      if (finalImageUrl.startsWith("data:")) {
+        alert("❌ Invalid URL format.\n\nYou pasted a Base64 image data string (starting with 'data:'), which is too long for the database.\n\nPlease paste a standard short URL (starting with 'http').");
+        setAdding(false);
+        return;
+      }
+      if (finalImageUrl.length > 2000) {
+        alert("❌ URL is too long.\n\nPlease use a shorter URL.");
+        setAdding(false);
+        return;
       }
 
       await addCategory({
@@ -105,7 +84,6 @@ export default function Categories() {
       // Reset
       reset();
       setImagePreview(null);
-      setUseUrl(false);
       fetchCategories();
 
     } catch (err) {
@@ -172,49 +150,18 @@ export default function Categories() {
             {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>}
           </div>
 
-          {/* Image Source Toggle */}
+          {/* Image Source */}
           <div>
-            <Label className="mb-2 block text-foreground">Category Image</Label>
-            <div className="flex gap-2 mb-3">
-              <button
-                type="button"
-                onClick={() => setUseUrl(false)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-all ${!useUrl ? 'bg-secondary/50 border-primary text-primary' : 'bg-card border-border text-muted-foreground'} `}
-              >
-                Upload File
-              </button>
-              <button
-                type="button"
-                onClick={() => setUseUrl(true)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-all ${useUrl ? 'bg-secondary/50 border-primary text-primary' : 'bg-card border-border text-muted-foreground'} `}
-              >
-                Image URL
-              </button>
-            </div>
-
-            {useUrl ? (
-              <Input
-                placeholder="https://example.com/image.jpg"
-                {...register("imageUrl")}
-                onChange={(e) => {
-                  setValue("imageUrl", e.target.value);
-                  setImagePreview(e.target.value);
-                }}
-                className="bg-secondary/10 border-border"
-              />
-            ) : (
-              <div className="border-2 border-dashed border-border rounded-lg p-3 flex flex-col items-center justify-center text-center cursor-pointer hover:bg-secondary/10 transition" onClick={() => document.getElementById('cat-image-upload').click()}>
-                <ImageIcon className="w-5 h-5 text-muted-foreground mb-1" />
-                <span className="text-xs text-muted-foreground">Click to upload</span>
-                <input
-                  id="cat-image-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  {...register("image", { onChange: handleImageChange })}
-                />
-              </div>
-            )}
+            <Label className="mb-2 block text-foreground">Category Image URL</Label>
+            <Input
+              placeholder="https://example.com/image.jpg"
+              {...register("imageUrl")}
+              onChange={(e) => {
+                setValue("imageUrl", e.target.value);
+                setImagePreview(e.target.value);
+              }}
+              className="bg-secondary/10 border-border"
+            />
           </div>
         </div>
 

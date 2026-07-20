@@ -1,37 +1,50 @@
-
 import React, { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { getCurrentUser } from "../backend/auth.js";
-import { Loader2 } from "lucide-react";
+import { useUser } from "../context/UserContext";
+import { Loader2, ShieldAlert } from "lucide-react";
+import { motion } from "framer-motion";
 
-export default function AdminRoute({ children }) {
-  const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+export default function AdminRoute() {
+  const { user, loading: userLoading } = useUser();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    async function checkUser() {
-      const user = await getCurrentUser();
-      console.log("Current user:", user);
-      // Only allow skin.glow.skincare.pk@gmail.com to access admin page
-      if (user && user.email === "skin.glow.skincare.pk@gmail.com") {
-        setIsAdmin(true);
+    if (!userLoading) {
+      // Check if user exists and has the ADMIN role
+      if (user && user.role === 'ADMIN') {
+        setIsAuthorized(true);
       } else {
-        // Log unauthorized access attempt
         if (user) {
           console.warn(`Unauthorized admin access attempt by: ${user.email}`);
         }
-        setIsAdmin(false);
+        setIsAuthorized(false);
       }
-      setLoading(false);
+      setIsChecking(false);
     }
-    checkUser();
-  }, []);
+  }, [user, userLoading]);
 
-  if (loading) return (
-    <div className="flex h-screen items-center justify-center bg-gradient-to-br from-indigo-200 via-purple-200 to-pink-200">
-      <Loader2 className="animate-spin w-10 h-10 text-indigo-600" />
-    </div>
-  )
+  // Premium loading state while verifying admin status
+  if (userLoading || isChecking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 font-sans">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center gap-4"
+        >
+          <div className="relative">
+            <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse" />
+            <div className="w-16 h-16 bg-white border border-slate-100 shadow-xl rounded-2xl flex items-center justify-center relative z-10">
+              <ShieldAlert className="w-8 h-8 text-primary animate-pulse" />
+            </div>
+          </div>
+          <p className="text-sm font-semibold text-slate-500 uppercase tracking-widest animate-pulse">Verifying Access</p>
+        </motion.div>
+      </div>
+    );
+  }
 
-  return isAdmin ? <Outlet /> : <Navigate to="/" replace />;
+  // Redirect to home if unauthorized
+  return isAuthorized ? <Outlet /> : <Navigate to="/" replace />;
 }

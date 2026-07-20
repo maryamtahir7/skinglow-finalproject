@@ -1,7 +1,10 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+// Initialize Groq
+const groq = new Groq({ 
+    apiKey: import.meta.env.VITE_GROQ_API_KEY, 
+    dangerouslyAllowBrowser: true 
+});
 
 const SYSTEM_INSTRUCTION = `
 You are the "SkinGlow Virtual Esthetician", a premium AI skincare consultant for the luxury beauty brand SkinGlow.
@@ -26,31 +29,31 @@ You: "Hydration is key for a radiant glow! 💧 I recommend layering a *Hyaluron
 
 export async function getSkinGlowAdvice(userMessage) {
     try {
-        const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-flash",
-            systemInstruction: SYSTEM_INSTRUCTION
-        });
-
-        const chat = model.startChat({
-            history: [
+        const completion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: "system",
+                    content: SYSTEM_INSTRUCTION
+                },
                 {
                     role: "user",
-                    parts: [{ text: "Hello" }],
+                    content: "Hello"
                 },
                 {
-                    role: "model",
-                    parts: [{ text: "Hello! Welcome to SkinGlow. ✨ I'm here to help you achieve your most radiant skin. Tell me a bit about your skin type or concerns today." }],
+                    role: "assistant",
+                    content: "Hello! Welcome to SkinGlow. ✨ I'm here to help you achieve your most radiant skin. Tell me a bit about your skin type or concerns today."
                 },
+                {
+                    role: "user",
+                    content: userMessage
+                }
             ],
-            generationConfig: {
-                maxOutputTokens: 300,
-                temperature: 0.7,
-            },
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.7,
+            max_completion_tokens: 300,
         });
 
-        const result = await chat.sendMessage(userMessage);
-        const response = await result.response;
-        return response.text();
+        return completion.choices[0].message.content;
 
     } catch (error) {
         console.error("AI Service Error:", error);

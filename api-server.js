@@ -24,7 +24,7 @@ if (fs.existsSync(envPath)) {
     console.log('✅ Loaded .env variables');
 }
 
-const PORT = 3001;
+const PORT = process.env.PORT || 8085;
 
 const server = http.createServer(async (req, res) => {
     // Add CORS headers

@@ -70,7 +70,7 @@ export default function AdminProducts() {
         category: String(updatedData.category || ""),
         description: String(updatedData.description || ""),
         imageUrl: images.length > 0 ? images[0] : "", // Keep main image in imageUrl
-        Concerns: String(updatedData.Concerns || "")
+        concerns: String(updatedData.concerns || "")
         // Store additional images as JSON in description or use a separate field if available
         // For now, we'll try to save imageUrl2 and imageUrl3, but catch the error gracefully
       };
@@ -81,6 +81,7 @@ export default function AdminProducts() {
           ...dataToSave,
           imageUrl2: String(updatedData.imageUrl2 || ""),
           imageUrl3: String(updatedData.imageUrl3 || ""),
+          concerns: String(updatedData.concerns || "").trim(),
         };
         const updated = await updateProduct(id, dataWithExtraImages);
         console.log("Product updated successfully with multiple images:", updated);

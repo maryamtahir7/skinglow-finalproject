@@ -136,7 +136,7 @@ export default function NotificationsDropdown() {
                                                     {notif.message}
                                                 </p>
                                                 <p className="text-[10px] text-muted-foreground/70 mt-1.5 font-medium flex items-center gap-1">
-                                                    {new Date(notif.$createdAt).toLocaleDateString()} • {new Date(notif.$createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    {new Date(notif.createdAt || notif.$createdAt).toLocaleDateString()} • {new Date(notif.createdAt || notif.$createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </p>
                                             </div>
 

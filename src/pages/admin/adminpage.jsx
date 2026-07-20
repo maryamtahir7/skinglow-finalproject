@@ -17,7 +17,8 @@ import {
   Star,
   TrendingUp,
   AlertCircle,
-  BarChart3
+  BarChart3,
+  Bot
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,7 @@ export default function AdminPage() {
     { icon: Layers, label: "Categories", path: "/admin/categories" },
     { icon: Boxes, label: "Inventory", path: "/admin/stock" },
     { icon: BarChart3, label: "Reports", path: "/admin/reports" },
+    { icon: Bot, label: "AI Employee", path: "/admin/ai-employee" },
   ];
 
   const isActive = (path) => {

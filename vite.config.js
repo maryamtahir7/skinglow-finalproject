@@ -14,7 +14,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3001',
+        target: 'http://localhost:8085',
         changeOrigin: true,
       }
     }
@@ -25,8 +25,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'ui-vendor': ['framer-motion', 'lucide-react', 'clsx', 'tailwind-merge'],
-          'appwrite': ['appwrite'],
+          'ui-vendor': ['framer-motion', 'lucide-react', 'clsx', 'tailwind-merge']
         }
       }
     }

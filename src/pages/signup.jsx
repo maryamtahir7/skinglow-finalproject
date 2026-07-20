@@ -1,7 +1,8 @@
 // src/pages/signup.jsx
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signup, loginWithGoogle, sendOtp, verifyOtp } from "../backend/auth";
+import { signup, processGoogleUser, sendOtp, verifyOtp } from "../backend/auth";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useUser } from "../context/UserContext";
 import { Button } from "@/components/ui/button";
 import { Sparkles, User, Mail, Lock, AlertCircle, Hash, ArrowRight, ArrowLeft, Check } from "lucide-react";
@@ -24,6 +25,27 @@ export default function SignupForm() {
   const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        setLoading(true);
+        const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
+        }).then(res => res.json());
+        
+        await processGoogleUser(userInfo);
+      } catch (err) {
+        console.error("Google login error:", err);
+        setError("Could not sign in with Google.");
+        setLoading(false);
+      }
+    },
+    onError: errorResponse => {
+      console.error(errorResponse);
+      setError("Google login was cancelled or failed.");
+    },
+  });
 
   // Handle Initial Signup (Account Creation)
   const handleSignup = async (e) => {
@@ -243,14 +265,7 @@ export default function SignupForm() {
 
                 <button
                   type="button"
-                  onClick={async () => {
-                    try {
-                      await loginWithGoogle();
-                    } catch (err) {
-                      console.error("Google signup error:", err);
-                      setError("Could not sign up with Google.");
-                    }
-                  }}
+                  onClick={() => handleGoogleLogin()}
                   className="w-full h-12 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl flex items-center justify-center gap-3 text-white font-medium transition-all group/google"
                 >
                   <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-5 h-5 grayscale group-hover/google:grayscale-0 transition-all duration-300" />

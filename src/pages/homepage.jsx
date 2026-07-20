@@ -441,44 +441,97 @@ function Homepage() {
         </div>
       </section>
 
-      {/* QUIZ CTA - PREMIUM REDESIGN */}
-      <section className="py-32 relative overflow-hidden bg-[#0A0A0A]">
-        {/* Cinematic Background */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-rose-900/20 rounded-full blur-[120px] opacity-70 animate-pulse" style={{ animationDuration: '8s' }} />
-          <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-indigo-900/20 rounded-full blur-[120px] opacity-60 animate-pulse" style={{ animationDuration: '10s' }} />
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03]" />
+      {/* QUIZ CTA - LUXURY SKINCARE */}
+      <section className="py-20 md:py-28 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0c0a09 0%, #1c1917 40%, #0c0a09 100%)' }}>
+        {/* Ambient light effects */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-rose-500/8 rounded-full blur-[120px]" />
+          <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-amber-500/5 rounded-full blur-[100px]" />
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <div className="relative overflow-hidden rounded-[3rem] bg-white/5 backdrop-blur-2xl border border-white/10 p-12 md:p-24 text-center group">
+          <div className="grid md:grid-cols-2 gap-0 rounded-[2rem] overflow-hidden border border-white/[0.06] shadow-2xl shadow-black/40">
 
-            {/* Inner Glow */}
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+            {/* Left: Image Side */}
+            <div className="relative h-64 md:h-auto min-h-[360px] overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=80"
+                alt="Skincare routine"
+                className="absolute inset-0 w-full h-full object-cover scale-105 hover:scale-110 transition-transform duration-[3s]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-stone-950/90 hidden md:block" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-stone-950/30 md:hidden" />
 
-            <div className="relative z-10 space-y-8 max-w-3xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-rose-300 text-xs font-bold tracking-[0.2em] uppercase shadow-xl mb-4">
-                <Sparkles className="w-3 h-3" /> Personalized Care
-              </div>
-
-              <h2 className="text-5xl md:text-7xl font-serif text-white leading-[0.95] tracking-tight">
-                Not sure where <br className="hidden md:block" />
-                <span className="italic text-rose-200/50">to start?</span>
-              </h2>
-
-              <p className="text-xl md:text-2xl text-white/60 font-light leading-relaxed">
-                Discover your skin's unique needs in just 2 minutes. Our AI-powered analysis builds a ritual tailored specifically to you.
-              </p>
-
-              <div className="pt-8">
-                <Button
-                  onClick={() => navigate("/skin-quiz")}
-                  className="relative px-12 py-8 bg-white text-stone-900 text-sm md:text-base font-bold uppercase tracking-widest rounded-full hover:bg-rose-50 hover:text-rose-900 transition-all shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,100,100,0.4)] hover:-translate-y-1 active:scale-95 border-0"
-                >
-                  Start Analysis <ArrowRight className="ml-3 w-4 h-4" />
-                </Button>
+              {/* Floating stat badges */}
+              <div className="absolute bottom-6 left-6 right-6 flex gap-3">
+                <div className="px-3 py-2 rounded-xl bg-white/10 backdrop-blur-xl border border-white/10 text-white">
+                  <div className="text-lg font-bold">2 min</div>
+                  <div className="text-[9px] uppercase tracking-wider text-white/50 font-medium">Analysis</div>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-white/10 backdrop-blur-xl border border-white/10 text-white">
+                  <div className="text-lg font-bold">AI</div>
+                  <div className="text-[9px] uppercase tracking-wider text-white/50 font-medium">Powered</div>
+                </div>
+                <div className="px-3 py-2 rounded-xl bg-white/10 backdrop-blur-xl border border-white/10 text-white">
+                  <div className="text-lg font-bold">100%</div>
+                  <div className="text-[9px] uppercase tracking-wider text-white/50 font-medium">Personal</div>
+                </div>
               </div>
             </div>
+
+            {/* Right: Content Side */}
+            <div className="relative bg-gradient-to-br from-stone-900 via-stone-950 to-stone-900 p-8 md:p-14 flex flex-col justify-center">
+              {/* Subtle texture */}
+              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02]" />
+
+              <div className="relative z-10 space-y-6">
+                {/* Tag */}
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-rose-500/15 to-amber-500/10 border border-rose-400/15 text-rose-300 text-[10px] font-bold tracking-[0.25em] uppercase">
+                  <Sparkles className="w-3 h-3" /> Personalized Care
+                </div>
+
+                {/* Heading */}
+                <h2 className="text-3xl md:text-[2.5rem] font-serif text-white leading-[1.15] tracking-tight">
+                  Your skin is unique.{' '}
+                  <br className="hidden sm:block" />
+                  <span className="italic font-light text-rose-200/70">Your routine should be too.</span>
+                </h2>
+
+                {/* Description */}
+                <p className="text-sm text-white/40 leading-relaxed max-w-md font-light">
+                  Take our AI-powered skin analysis and get a curated routine built around your exact skin type, concerns, and goals.
+                </p>
+
+                {/* Divider */}
+                <div className="w-16 h-px bg-gradient-to-r from-rose-400/40 to-transparent" />
+
+                {/* Features */}
+                <div className="space-y-3">
+                  {[
+                    'Instant AI skin type detection',
+                    'Personalized product recommendations',
+                    'Custom morning & night routines'
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 text-sm text-white/60">
+                      <CheckCircle className="w-4 h-4 text-rose-400/60 shrink-0" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* CTA Button */}
+                <div className="pt-4">
+                  <Button
+                    onClick={() => navigate("/skin-quiz")}
+                    className="group relative px-10 py-4 h-auto bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-[0.2em] rounded-full hover:from-rose-400 hover:to-rose-500 transition-all duration-500 shadow-[0_8px_32px_rgba(244,63,94,0.3)] hover:shadow-[0_12px_48px_rgba(244,63,94,0.5)] hover:-translate-y-0.5 active:scale-[0.98] border-0"
+                  >
+                    Start My Analysis
+                    <ArrowRight className="ml-2.5 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>

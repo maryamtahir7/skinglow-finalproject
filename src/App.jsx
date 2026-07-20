@@ -9,6 +9,7 @@ import AdminPage from "./pages/admin/adminpage";
 import OrdersPage from "./pages/admin/OrdersPage";
 import ReportsPage from "./pages/admin/ReportsPage";
 import StocksPage from "./pages/admin/StocksPage";
+import AIEmployee from "./pages/admin/AIEmployee";
 import Homepage from "./pages/homepage";
 import ProductsPage from "./pages/products";
 import ProductDetailPage from "./pages/productdetail";
@@ -34,6 +35,7 @@ import LicensePage from "./pages/LicensePage";
 import AdminReviews from "./pages/admin/reviews";
 import SkinQuiz from "./pages/SkinQuiz";
 import RoutinePage from "./pages/RoutinePage";
+import FaceScanPage from "./pages/FaceScanPage";
 
 
 import SupportPage from "./pages/SupportPage";
@@ -75,6 +77,7 @@ function App() {
             <Route path="/support" element={<SupportPage />} />
             <Route path="/returns" element={<ReturnsPage />} />
             <Route path="/shipping" element={<ShippingPage />} />
+            <Route path="/face-scan" element={<FaceScanPage />} />
 
             {/* User Profile & Orders */}
             <Route path="/profile" element={<UserProfilePage />} />
@@ -100,6 +103,7 @@ function App() {
               <Route path="orders" element={<OrdersPage />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="stock" element={<StocksPage />} />
+              <Route path="ai-employee" element={<AIEmployee />} />
             </Route>
           </Route>
         </Routes>
