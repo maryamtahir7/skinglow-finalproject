@@ -23,6 +23,7 @@ export default function SignupForm() {
   });
 
   const [otpCode, setOtpCode] = useState("");
+  const [otpToken, setOtpToken] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -78,7 +79,8 @@ export default function SignupForm() {
 
       if (result && result.userId) {
         setUserId(result.userId);
-        await sendOtp(result.userId, formData.email);
+        const otpResponse = await sendOtp(result.userId, formData.email);
+        setOtpToken(otpResponse.token);
         setSignupStep('otp');
       } else {
         throw new Error("Failed to retrieve user ID.");
@@ -105,7 +107,7 @@ export default function SignupForm() {
     setError("");
 
     try {
-      await verifyOtp(userId, otpCode);
+      await verifyOtp(userId, otpCode, otpToken);
       navigate("/", {
         state: { message: "Welcome to SkinGlow! Your email has been verified." }
       });

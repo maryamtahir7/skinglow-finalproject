@@ -1,45 +1,237 @@
-// src/pages/Homepage.jsx
-import React, { useEffect, useState } from "react";
-import { getProducts, getCategories } from "../backend/database";
-import { useNavigate } from "react-router-dom";
-import { useUser } from "../context/UserContext";
-import { getCurrentUser } from "../backend/auth";
-import { Button } from "@/components/ui/button";
-import {
-  Sparkles,
-  ShieldCheck,
-  Truck,
-  ArrowRight,
-  Heart,
-  Leaf,
-  Droplets,
-  Sun,
-  Star,
-  CheckCircle,
-  Play,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import React, { useEffect, useState, useRef } from 'react';
+import { motion, useScroll, useTransform, useMotionValue, useSpring } from 'framer-motion';
+import { getProducts, getCategories } from '../backend/database';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
+import { getCurrentUser } from '../backend/auth';
+import { ArrowRight } from 'lucide-react';
+import './homepage.css';
+
+/* Premium cinematic beauty imagery — your pin URLs (1200x for clarity) */
+const HERO_IMAGES = [
+  {
+    src: 'https://i.pinimg.com/1200x/34/e4/5b/34e45b6b6158f541b6fa9f70c55fe41a.jpg',
+    position: 'center 20%',
+  },
+  {
+    src: 'https://i.pinimg.com/736x/f4/d0/94/f4d094963e6105cf33716d47a52ab7cd.jpg',
+    position: 'center 28%',
+  },
+  {
+    src: 'https://i.pinimg.com/736x/3e/a0/2c/3ea02cc6668815589bc0a6df2c86145d.jpg',
+    position: 'center 24%',
+  },
+];
+
+const FLOAT_LAYERS = [
+  {
+    src: 'https://i.pinimg.com/1200x/a1/32/e2/a132e2bd0ae39c1b56c3dfd4b4f6a75a.jpg',
+    className: 'sg-float sg-float--1',
+    depth: 55,
+    delay: 0,
+  },
+  {
+    src: 'https://i.pinimg.com/1200x/98/f9/88/98f9889c8d63fbf1f73f0959bc38dd68.jpg',
+    className: 'sg-float sg-float--2',
+    depth: 90,
+    delay: 0.4,
+  },
+  {
+    src: 'https://i.pinimg.com/1200x/68/c8/5a/68c85a578825f1aaf47f461455bbb8ee.jpg',
+    className: 'sg-float sg-float--3',
+    depth: 70,
+    delay: 0.8,
+  },
+];
+
+const PILLARS = [
+  { title: 'Botanical purity', desc: 'Plant-led formulas, free from harsh fillers and empty promises.', img: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=700&q=85' },
+  { title: 'Cruelty free', desc: 'Ethically crafted — never tested on animals, always kind by design.', img: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=700&q=85' },
+  { title: 'Clean science', desc: 'No parabens, sulfates, or toxins. Only what your skin needs.', img: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?auto=format&fit=crop&w=700&q=85' },
+  { title: 'Clinic trusted', desc: 'Dermatologist-tested for sensitive, reactive, and radiant skin alike.', img: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=700&q=85' },
+];
+
+const CONCERNS = [
+  {
+    title: 'Acne & blemishes',
+    query: 'acne',
+    image: 'https://i.pinimg.com/1200x/f4/d0/94/f4d094963e6105cf33716d47a52ab7cd.jpg',
+    position: 'center 30%',
+  },
+  {
+    title: 'Dryness & hydration',
+    query: 'dryness',
+    image: 'https://i.pinimg.com/1200x/d6/56/67/d656677dee0b0c3c7a6ead98256a6e04.jpg',
+    position: 'center 35%',
+  },
+  {
+    title: 'Anti-aging',
+    query: 'aging',
+    image: 'https://i.pinimg.com/1200x/25/c2/ac/25c2ac42d0755eb68d93e38bb8170794.jpg',
+    position: 'center 28%',
+  },
+  {
+    title: 'Dullness & brightening',
+    query: 'dullness',
+    image: 'https://i.pinimg.com/1200x/68/2d/11/682d11136e2e7e0ff4af4e2678a02547.jpg',
+    position: 'center 32%',
+  },
+];
+
+const CAT_FALLBACKS = [
+  'https://i.pinimg.com/1200x/d3/2b/46/d32b46b053bab5ede76153cefd912d8b.jpg',
+  'https://images.unsplash.com/photo-1620916565600-cfab6c5dca22?auto=format&fit=crop&w=1200&q=90',
+  'https://images.unsplash.com/photo-1570554880355-ea666b55a237?auto=format&fit=crop&w=1200&q=90',
+  'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?auto=format&fit=crop&w=1200&q=90',
+  'https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=1200&q=90',
+];
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 48, rotateX: 12 },
+  show: (i = 0) => ({
+    opacity: 1,
+    y: 0,
+    rotateX: 0,
+    transition: { duration: 0.85, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] },
+  }),
+};
+
+/** Pinterest CDN often blocks hotlinking unless referrer is omitted */
+function PremiumImg({ src, alt = '', className = '', style, loading = 'eager', ...rest }) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      className={className}
+      style={style}
+      loading={loading}
+      decoding="async"
+      referrerPolicy="no-referrer"
+      {...rest}
+    />
+  );
+}
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduced(mq.matches);
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return reduced;
+}
+
+/** Floating 3D plane — mouse parallax on outer, continuous motion on inner */
+function FloatLayer({ src, className, depth, smoothX, smoothY, delay = 0 }) {
+  const x = useTransform(smoothX, (v) => v * depth);
+  const y = useTransform(smoothY, (v) => v * (depth * 0.75));
+  const rotateY = useTransform(smoothX, (v) => v * 14);
+  const rotateX = useTransform(smoothY, (v) => -v * 10);
+
+  return (
+    <motion.div
+      className={className}
+      style={{ x, y, rotateY, rotateX }}
+      initial={{ opacity: 0, scale: 0.88 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 1.1, delay: 0.35 + delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <div className="sg-float__bob" style={{ animationDelay: `${delay}s` }}>
+        <div className="sg-float__card">
+          <PremiumImg src={src} alt="" />
+          <span className="sg-float__rim" aria-hidden="true" />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/** Mouse-driven 3D tilt card */
+function Tilt3D({ children, className = '', max = 14, onClick }) {
+  const ref = useRef(null);
+  const reduced = usePrefersReducedMotion();
+  const rx = useMotionValue(0);
+  const ry = useMotionValue(0);
+  const springRx = useSpring(rx, { stiffness: 180, damping: 18 });
+  const springRy = useSpring(ry, { stiffness: 180, damping: 18 });
+
+  const onMove = (e) => {
+    if (reduced || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width;
+    const py = (e.clientY - rect.top) / rect.height;
+    ry.set((px - 0.5) * max * 2);
+    rx.set((0.5 - py) * max * 2);
+  };
+
+  const onLeave = () => {
+    rx.set(0);
+    ry.set(0);
+  };
+
+  return (
+    <motion.div
+      ref={ref}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      className={`sg-tilt ${className}`}
+      style={{
+        rotateX: springRx,
+        rotateY: springRy,
+        transformStyle: 'preserve-3d',
+      }}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      onClick={onClick}
+      onKeyDown={
+        onClick
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onClick(e);
+              }
+            }
+          : undefined
+      }
+    >
+      <div className="sg-tilt__inner" style={{ transform: 'translateZ(28px)', transformStyle: 'preserve-3d' }}>
+        {children}
+      </div>
+    </motion.div>
+  );
+}
 
 function Homepage() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [heroIndex, setHeroIndex] = useState(0);
   const navigate = useNavigate();
   const { setUser } = useUser();
+  const reduced = usePrefersReducedMotion();
+  const heroRef = useRef(null);
 
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const smoothX = useSpring(mouseX, { stiffness: 90, damping: 18 });
+  const smoothY = useSpring(mouseY, { stiffness: 90, damping: 18 });
 
-  // Check for user after OAuth redirect
+  // Window scroll — avoid useScroll({ target: ref }) while hero may be unmounted during loading
+  const { scrollY } = useScroll();
+  const heroY = useTransform(scrollY, [0, 900], [0, reduced ? 0 : 180]);
+  const heroScale = useTransform(scrollY, [0, 900], [1, reduced ? 1 : 1.12]);
+  const textY = useTransform(scrollY, [0, 900], [0, reduced ? 0 : -80]);
+
   useEffect(() => {
     async function checkOAuthUser() {
       try {
         const user = await getCurrentUser();
-        if (user) {
-          setUser(user);
-        }
-      } catch (err) {
-        // User not logged in, that's okay
+        if (user) setUser(user);
+      } catch {
+        /* guest ok */
       }
     }
     checkOAuthUser();
@@ -49,16 +241,10 @@ function Homepage() {
     async function fetchData() {
       try {
         const [prodData, catData] = await Promise.all([getProducts(), getCategories()]);
-
-        const productsList = prodData.documents || [];
-        console.log(`✅ Homepage: Fetched ${productsList.length} products`);
-
-        // Filter or just take first few for now
-        setProducts(productsList.slice(0, 4));
-        setCategories(catData.documents || []);
-
+        setProducts((prodData.documents || []).slice(0, 4));
+        setCategories((catData.documents || []).slice(0, 5));
       } catch (error) {
-        console.error("❌ Error fetching data:", error);
+        console.error('Homepage fetch error:', error);
       } finally {
         setLoading(false);
       }
@@ -66,476 +252,425 @@ function Homepage() {
     fetchData();
   }, []);
 
-  const heroSlides = [
-    {
-      image: 'https://i.pinimg.com/736x/93/71/8c/93718c4fee2260ae11240d9030afec2c.jpg',
-      title: <>Natural & <span className="font-light italic text-rose-200/90 font-serif">Organic</span></>,
-      subtitle: 'Premium Skincare Collection',
-      text: 'Transform your skin with nature\'s finest ingredients'
-    },
-    {
-      image: 'https://theindustry.beauty/wp-content/uploads/2023/01/Pacifica.jpg',
-      title: <>Glowing <span className="font-light italic text-rose-200/90 font-serif">Skin</span></>,
-      subtitle: 'Your Journey Starts Here',
-      text: 'Discover products that make a real difference'
-    },
-    {
-      image: 'https://i.pinimg.com/1200x/83/af/ca/83afcaddd4e79b05cb4348340fead68c.jpg',
-      title: <>Clean <span className="font-light italic text-rose-200/90 font-serif">Beauty</span></>,
-      subtitle: 'Ethically Sourced',
-      text: 'Pure ingredients for radiant, healthy skin'
-    },
-    {
-      image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=1920&q=80',
-      title: <>Radiant <span className="font-light italic text-rose-200/90 font-serif">You</span></>,
-      subtitle: 'Best Skincare Experience',
-      text: 'Experience the luxury of premium organic skincare'
-    },
-  ];
-
-  // Auto-rotate hero slides
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 6000);
-    return () => clearInterval(interval);
+    const id = setInterval(() => {
+      setHeroIndex((i) => (i + 1) % HERO_IMAGES.length);
+    }, 7500);
+    return () => clearInterval(id);
   }, []);
 
-  const values = [
-    { icon: Leaf, title: "100% Vegan", desc: "Plant-based formulas without animal derivatives." },
-    { icon: ShieldCheck, title: "Cruelty Free", desc: "Never tested on animals, ethically sourced." },
-    { icon: Droplets, title: "Clean Ingredients", desc: "Free from parabens, sulfates, and toxins." },
-    { icon: Star, title: "Dermatologist Tested", desc: "Safe and effective for sensitive skin." },
-  ];
-
-  const concerns = [
-    { title: "Acne & Blemishes", query: "acne", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSSSqJuDxFdlsoip3QugPdMUa8bTq17-S81SA&s", color: "bg-rose-900" },
-    { title: "Dryness & Hydration", query: "dryness", image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?auto=format&fit=crop&w=800&q=80", color: "bg-blue-900" },
-    { title: "Anti-Aging", query: "aging", image: "https://4.imimg.com/data4/NS/RU/MY-87113/face-pack-500x500.jpg", color: "bg-amber-900" },
-    { title: "Dullness & Brightening", query: "dullness", image: "https://sg.ahcbeauty.com/cdn/shop/articles/optimized_Home_Aesthetic_-201209_ahc_05_0734.jpg?v=1620735508", color: "bg-orange-900" },
-  ];
+  const onHeroMove = (e) => {
+    if (reduced || !heroRef.current) return;
+    const rect = heroRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2.4;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2.4;
+    mouseX.set(x);
+    mouseY.set(y);
+  };
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="text-center space-y-6">
-          <Sparkles className="w-16 h-16 text-primary animate-pulse mx-auto" />
-          <h2 className="text-2xl font-bold text-primary">SkinGlow</h2>
-        </div>
+      <div className="sg-home-loader">
+        <div className="sg-home-loader__orb" />
+        <p className="sg-home-loader__brand">SkinGlow</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground">
-
-      {/* HERO SLIDESHOW - ULTIMATE PREMIUIM */}
-      <section className="relative h-screen w-full overflow-hidden bg-black font-sans">
-        {heroSlides.map((slide, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-[2000ms] ease-in-out ${index === currentSlide
-              ? "opacity-100 z-10"
-              : "opacity-0 z-0"
-              }`}
-          >
-            {/* Ken Burns Effect Image */}
-            <img
-              src={slide.image}
-              alt="Hero"
-              className={`w-full h-full object-cover ${index === currentSlide ? 'animate-ken-burns' : ''}`}
+    <div className="sg-home">
+      {/* ═══════════ HERO 3D ═══════════ */}
+      <section
+        className="sg-hero"
+        ref={heroRef}
+        aria-label="SkinGlow hero"
+        onMouseMove={onHeroMove}
+        onMouseLeave={() => { mouseX.set(0); mouseY.set(0); }}
+      >
+        <motion.div className="sg-hero__media" style={{ y: heroY, scale: heroScale }} aria-hidden="true">
+          {HERO_IMAGES.map((slide, i) => (
+            <PremiumImg
+              key={slide.src}
+              src={slide.src}
+              alt=""
+              className={`sg-hero__img${i === heroIndex ? ' is-active' : ''}`}
+              style={{ objectPosition: slide.position }}
             />
+          ))}
+          <div className="sg-hero__veil" />
+          <div className="sg-hero__grain" />
+          <div className="sg-hero__orb sg-hero__orb--a" />
+          <div className="sg-hero__orb sg-hero__orb--b" />
+        </motion.div>
 
-            {/* Cinematic Noise Overlay */}
-            <div className="absolute inset-0 z-[1] animate-noise pointer-events-none" />
+        {/* Floating 3D product planes */}
+        <div className="sg-hero__stage" aria-hidden="true">
+          {FLOAT_LAYERS.map((layer) => (
+            <FloatLayer
+              key={layer.className}
+              src={layer.src}
+              className={layer.className}
+              depth={layer.depth}
+              delay={layer.delay}
+              smoothX={smoothX}
+              smoothY={smoothY}
+            />
+          ))}
+        </div>
 
-            {/* Vignette & Gradients */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/60 z-[2]" />
-            <div className="absolute inset-0 bg-black/20 mix-blend-overlay z-[2]" />
-          </div>
-        ))}
-
-        {/* Slide content + controls */}
-        <div className="relative z-20 h-full w-full flex flex-col items-center justify-center text-center px-6 md:px-12 pt-16">
-
-          <div className="max-w-6xl mx-auto space-y-10">
-            {/* Subtitle tag */}
-            <div className="overflow-hidden">
-              <div key={`sub-${currentSlide}`} className="animate-fade-up-blur">
-                <span className="inline-block px-6 py-2 border border-white/20 rounded-full bg-white/5 backdrop-blur-md text-white/90 text-[10px] md:text-sm font-bold uppercase tracking-[0.3em] shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-                  {heroSlides[currentSlide].subtitle}
-                </span>
-              </div>
-            </div>
-
-            {/* Main Title - Playfair Display - Massive & Elegant w/ Mixed Typography */}
-            <div key={`title-${currentSlide}`} className="overflow-hidden py-4">
-              <h1 className="text-6xl md:text-8xl lg:text-[7.5rem] font-medium text-white leading-[0.95] font-['Playfair_Display'] animate-fade-up-blur delay-200 drop-shadow-2xl tracking-tighter">
-                {heroSlides[currentSlide].title}
-              </h1>
-            </div>
-
-            {/* Body Text */}
-            <div key={`text-${currentSlide}`} className="overflow-hidden">
-              <p className="text-lg md:text-2xl text-white/70 font-light leading-relaxed max-w-2xl mx-auto animate-fade-up-blur delay-300 font-sans tracking-wide">
-                {heroSlides[currentSlide].text}
-              </p>
-            </div>
-
-            {/* Buttons - Magnetic Feel */}
-            <div key={`btns-${currentSlide}`} className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-8 animate-fade-up-blur delay-500">
-              <Button
-                onClick={() => navigate("/products")}
-                className="relative group overflow-hidden min-w-[200px] h-14 rounded-full bg-white text-black hover:text-white transition-colors duration-500 border border-white"
-              >
-                <span className="relative z-10 text-sm uppercase tracking-[0.2em] font-bold group-hover:tracking-[0.3em] transition-all duration-500">Shop Now</span>
-                <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-              </Button>
-
-              <Button
-                onClick={() => navigate("/skin-quiz")}
-                className="relative group overflow-hidden min-w-[200px] h-14 rounded-full bg-transparent text-white border border-white/40 hover:border-white transition-colors duration-500"
-              >
-                <span className="relative z-10 text-sm uppercase tracking-[0.2em] font-bold group-hover:tracking-[0.3em] transition-all duration-500">Discover</span>
-                <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Bottom Indicators */}
-          <div className="absolute bottom-12 left-0 right-0 flex justify-center gap-4 z-30">
-            {heroSlides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentSlide(index)}
-                className={`h-[2px] transition-all duration-1000 ease-in-out ${index === currentSlide
-                  ? "w-24 bg-rose-200/80 shadow-[0_0_15px_rgba(253,224,71,0.6)]"
-                  : "w-12 bg-white/20 hover:bg-white/50"
-                  }`}
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-
-          {/* Navigation Arrows */}
-          <button
-            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-            className="absolute left-8 top-1/2 -translate-y-1/2 group hidden md:block p-6 z-30 opacity-60 hover:opacity-100 transition-opacity"
+        <motion.div className="sg-hero__content" style={{ y: textY }}>
+          <motion.h1
+            className="sg-hero__brand"
+            initial={{ opacity: 0, y: 40, rotateX: 18 }}
+            animate={{ opacity: 1, y: 0, rotateX: 0 }}
+            transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="w-16 h-16 border border-white/10 rounded-full flex items-center justify-center text-white/50 group-hover:border-white/40 group-hover:text-white group-hover:scale-110 transition-all duration-500 backdrop-blur-[2px]">
-              <ChevronLeft className="w-6 h-6" />
-            </div>
-          </button>
-
-          <button
-            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-            className="absolute right-8 top-1/2 -translate-y-1/2 group hidden md:block p-6 z-30 opacity-60 hover:opacity-100 transition-opacity"
+            SkinGlow
+          </motion.h1>
+          <motion.p
+            className="sg-hero__headline"
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="w-16 h-16 border border-white/10 rounded-full flex items-center justify-center text-white/50 group-hover:border-white/40 group-hover:text-white group-hover:scale-110 transition-all duration-500 backdrop-blur-[2px]">
-              <ChevronRight className="w-6 h-6" />
-            </div>
-          </button>
+            Radiance, refined for the ritual of everyday beauty.
+          </motion.p>
+          <motion.p
+            className="sg-hero__sub"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.28 }}
+          >
+            Clean botanical skincare — crafted to leave skin luminous, calm, and unmistakably you.
+          </motion.p>
+          <motion.div
+            className="sg-hero__ctas"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.4 }}
+          >
+            <button type="button" className="sg-btn sg-btn--solid" onClick={() => navigate('/products')}>
+              Shop the collection
+              <ArrowRight size={15} strokeWidth={2} />
+            </button>
+            <button type="button" className="sg-btn sg-btn--ghost" onClick={() => navigate('/skin-quiz')}>
+              Find your ritual
+            </button>
+          </motion.div>
+        </motion.div>
+
+        <div className="sg-hero__scroll" aria-hidden="true">
+          <span>Scroll</span>
+          <span className="sg-hero__scroll-line" />
         </div>
       </section>
 
-      {/* SHOP BY CATEGORY */}
-      {categories.length > 0 && (
-        <section className="py-18 md:py-20 bg-gradient-to-b from-background via-primary/5 to-background">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-center justify-between mb-10">
-              <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-3 uppercase tracking-wide">
-                  Curated Routines
-                </div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-1">
-                  Shop by Category
-                </h2>
-                <p className="text-muted-foreground text-sm md:text-base max-w-xl">
-                  Build your ritual step-by-step with cleansers, serums, moisturizers and more.
-                </p>
-              </div>
-            </div>
+      {/* ═══════════ MANIFESTO ═══════════ */}
+      <section className="sg-manifesto">
+        <div className="sg-manifesto__orb" aria-hidden="true" />
+        <motion.div
+          className="sg-manifesto__inner"
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.4 }}
+          variants={fadeUp}
+          style={{ perspective: 1000 }}
+        >
+          <p className="sg-manifesto__quote">
+            Beauty is not a performance — it is a quiet return to your own light.
+          </p>
+          <div className="sg-manifesto__rule" />
+          <p className="sg-manifesto__text">
+            At SkinGlow, every formula is a study in restraint: fewer ingredients, deeper care,
+            and results you can feel before you see.
+          </p>
+        </motion.div>
+      </section>
 
-            {/* Auto-scrolling marquee of categories */}
-            <div className="category-marquee pt-2">
-              <div className="category-marquee-track">
-                {[...categories.slice(0, 10), ...categories.slice(0, 10)].map(
-                  (cat, index) => (
-                    <button
-                      key={`${cat.$id}-${index}`}
-                      onClick={() =>
-                        navigate(
-                          `/products?category=${encodeURIComponent(cat.name)}`
-                        )
-                      }
-                      className="group rounded-2xl overflow-hidden bg-gradient-to-b from-white/90 to-primary/5 border border-white/70 hover:border-primary/60 hover:shadow-2xl hover:-translate-y-1 transition-all flex flex-col items-center text-center px-3 py-3 md:px-4 md:py-4 float-soft"
-                      style={{ minWidth: "155px", maxWidth: "180px" }}
-                    >
-                      <div className="w-full aspect-[4/5] rounded-xl overflow-hidden bg-secondary/20 mb-2 shadow-inner">
-                        {cat.imageUrl ? (
-                          <img
-                            src={cat.imageUrl}
-                            alt={cat.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            onError={(e) => {
-                              e.target.style.display = "none";
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-primary/40">
-                            {cat.name?.charAt(0)}
-                          </div>
-                        )}
-                      </div>
-                      <span className="text-sm font-semibold text-foreground group-hover:text-primary">
-                        {cat.name}
+      {/* ═══════════ PILLARS 3D ═══════════ */}
+      <section className="sg-section sg-pillars">
+        <div className="sg-section__inner">
+          <motion.div
+            className="sg-section__head"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.5 }}
+            variants={fadeUp}
+          >
+            <span className="sg-section__eyebrow">Our promise</span>
+            <h2 className="sg-section__title">Clean. Conscious. Clinical.</h2>
+            <p className="sg-section__sub">
+              Four pillars that guide every serum, cream, and cleanser we place in your hands.
+            </p>
+          </motion.div>
+
+          <div className="sg-pillars__grid sg-scene-3d">
+            {PILLARS.map((p, i) => (
+              <motion.div
+                key={p.title}
+                custom={i}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.25 }}
+                variants={fadeUp}
+              >
+                <Tilt3D className="sg-pillar-tilt" max={12}>
+                  <article className="sg-pillar sg-pillar--3d">
+                    <div className="sg-pillar__media">
+                      <img src={p.img} alt="" loading="lazy" />
+                    </div>
+                    <div className="sg-pillar__index">0{i + 1}</div>
+                    <h3 className="sg-pillar__title">{p.title}</h3>
+                    <p className="sg-pillar__desc">{p.desc}</p>
+                  </article>
+                </Tilt3D>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ CATEGORIES 3D ═══════════ */}
+      {categories.length > 0 && (
+        <section className="sg-section sg-cats">
+          <div className="sg-section__inner">
+            <motion.div
+              className="sg-section__head"
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.5 }}
+              variants={fadeUp}
+            >
+              <span className="sg-section__eyebrow">The collection</span>
+              <h2 className="sg-section__title">Shop by ritual</h2>
+              <p className="sg-section__sub">
+                From first cleanse to final glow — build a routine that feels like ceremony.
+              </p>
+            </motion.div>
+            <div className="sg-cats__grid sg-scene-3d">
+              {categories.map((cat, i) => (
+                <motion.div
+                  key={cat.$id || cat.id || i}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="show"
+                  viewport={{ once: true, amount: 0.2 }}
+                  variants={fadeUp}
+                  className="sg-cats__cell"
+                >
+                  <Tilt3D
+                    className="sg-cat-tilt"
+                    max={10}
+                    onClick={() =>
+                      navigate(`/products?category=${encodeURIComponent(cat.name)}`)
+                    }
+                  >
+                    <span className="sg-cat">
+                      <PremiumImg
+                        src={cat.imageUrl || CAT_FALLBACKS[i % CAT_FALLBACKS.length]}
+                        alt={cat.name || ''}
+                        loading="lazy"
+                      />
+                      <span className="sg-cat__veil" />
+                      <span className="sg-cat__label">
+                        <span className="sg-cat__name">{cat.name}</span>
+                        <span className="sg-cat__hint">Explore</span>
                       </span>
-                    </button>
-                  )
-                )}
-              </div>
+                    </span>
+                  </Tilt3D>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
       )}
 
-      {/* VALUES SECTION */}
-      <section className="py-18 md:py-20 bg-gradient-to-r from-secondary/40 via-card to-secondary/40 border-y border-border/60">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between mb-10">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/60 text-foreground/80 text-[11px] font-semibold uppercase tracking-wide mb-3">
-                Why SkinGlow
-              </div>
-              <h2 className="text-2xl md:text-3xl font-bold">Clean, Conscious, Clinical</h2>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {values.map((val, idx) => (
-              <div
-                key={idx}
-                className="flex flex-col items-center text-center space-y-3 group cursor-default float-soft"
+      {/* ═══════════ CONCERNS 3D ═══════════ */}
+      <section className="sg-section sg-concerns">
+        <div className="sg-section__inner">
+          <motion.div
+            className="sg-section__head"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.5 }}
+            variants={fadeUp}
+          >
+            <span className="sg-section__eyebrow">Targeted care</span>
+            <h2 className="sg-section__title">Shop by concern</h2>
+            <p className="sg-section__sub">
+              Precise edits for the skin you have — and the glow you want.
+            </p>
+          </motion.div>
+          <div className="sg-concerns__grid sg-scene-3d">
+            {CONCERNS.map((item, i) => (
+              <motion.div
+                key={item.query}
+                custom={i}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true, amount: 0.2 }}
+                variants={fadeUp}
               >
-                <div className="w-16 h-16 rounded-2xl bg-white shadow-[0_12px_35px_rgba(15,23,42,0.12)] flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
-                  <val.icon className="w-7 h-7" />
-                </div>
-                <h3 className="font-bold text-sm md:text-base">{val.title}</h3>
-                <p className="text-xs md:text-sm text-muted-foreground max-w-xs">{val.desc}</p>
-              </div>
+                <Tilt3D
+                  className="sg-concern-tilt"
+                  max={11}
+                  onClick={() => navigate(`/products?concern=${item.query}`)}
+                >
+                  <span className="sg-concern">
+                    <span className="sg-concern__frame" aria-hidden="true" />
+                    <PremiumImg
+                      src={item.image}
+                      alt={item.title}
+                      className="sg-concern__img"
+                      loading="lazy"
+                      style={{ objectPosition: item.position || 'center center' }}
+                    />
+                    <span className="sg-concern__shine" />
+                    <span className="sg-concern__body">
+                      <span className="sg-concern__index">0{i + 1}</span>
+                      <span className="sg-concern__title">{item.title}</span>
+                      <span className="sg-concern__cta">Explore the edit →</span>
+                    </span>
+                  </span>
+                </Tilt3D>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* SHOP BY CONCERN */}
-      <section className="py-24 px-6 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Shop by Concern</h2>
-          <p className="text-muted-foreground text-lg">
-            Targeted solutions for your unique skin needs. Tap a card to explore a full edit for
-            that concern.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {concerns.map((item, idx) => (
-            <div
-              key={idx}
-              onClick={() => navigate(`/products?concern=${item.query}`)}
-              className={`relative group cursor-pointer overflow-hidden rounded-3xl aspect-[3/4] ${item.color} flex items-center justify-center shadow-[0_22px_55px_rgba(15,23,42,0.45)]`}
+      {/* ═══════════ PRODUCTS 3D ═══════════ */}
+      <section className="sg-section sg-products">
+        <div className="sg-section__inner">
+          <div className="sg-products__head">
+            <motion.div
+              className="sg-section__head"
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.5 }}
+              variants={fadeUp}
             >
-              <img
-                src={item.image}
-                alt={item.title}
-                onError={(e) => e.target.style.display = 'none'}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              {/* Fallback pattern/icon visible when image fails or loads */}
-              <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay" />
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent pointer-events-none" />
-              <div className="absolute inset-x-0 bottom-6 px-6 text-white z-10">
-                <h3 className="text-xl font-bold mb-1">{item.title}</h3>
-                <div className="h-1 w-12 bg-white rounded-full group-hover:w-20 transition-all duration-300" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* FEATURED PRODUCTS */}
-      <section className="py-24 bg-gradient-to-b from-secondary/40 via-background to-background">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-end justify-between mb-12">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-2">Trending Essentials</h2>
-              <p className="text-muted-foreground text-lg">
-                The glow-giving heroes everyone is adding to bag right now.
+              <span className="sg-section__eyebrow">Essentials</span>
+              <h2 className="sg-section__title">Trending now</h2>
+              <p className="sg-section__sub">
+                The pieces defining SkinGlow rituals this season.
               </p>
-            </div>
-            <Button
-              onClick={() => navigate("/products")}
-              variant="link"
-              className="text-primary font-bold text-lg hidden md:block hover:text-primary/80"
+            </motion.div>
+            <button
+              type="button"
+              className="sg-products__link"
+              onClick={() => navigate('/products')}
             >
-              View All Products &rarr;
-            </Button>
+              View all →
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {products.length > 0 ? products.map((product) => (
-              <div
-                key={product.$id}
-                onClick={() => navigate(`/products/${product.$id}`)}
-                className="bg-card rounded-2xl p-4 shadow-[0_18px_45px_rgba(15,23,42,0.14)] border border-border/70 hover:border-primary/40 hover:shadow-[0_25px_60px_rgba(15,23,42,0.22)] transition-all cursor-pointer group float-soft"
-              >
-                <div className="aspect-square rounded-xl bg-secondary/20 mb-4 overflow-hidden relative">
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <button className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full text-muted-foreground hover:text-primary transition shadow-sm opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 duration-300">
-                    <Heart className="w-4 h-4" />
-                  </button>
-                  {product.salePrice && (
-                    <span className="absolute top-3 left-3 bg-red-400 text-white text-[10px] font-bold px-2 py-1 rounded-full">
-                      SALE
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <div className="text-xs font-bold text-primary mb-1 uppercase tracking-wider">
-                    {product.category || "Skincare"}
-                  </div>
-                  <h3 className="font-bold text-lg text-foreground mb-2 line-clamp-1">{product.name}</h3>
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <span className="text-lg font-bold text-foreground">Rs. {product.price}</span>
-                      {product.originalPrice && <span className="text-xs text-muted-foreground line-through">Rs. {product.originalPrice}</span>}
-                    </div>
-                    <button className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary/90 transition shadow-primary/30 shadow-md transform active:scale-95">
-                      <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )) : (
-              // Empty State / Fallback
-              [1, 2, 3, 4].map((n) => (
-                <div key={n} className="bg-card rounded-2xl p-4 shadow-sm border border-border animate-pulse">
-                  <div className="aspect-square rounded-xl bg-secondary/50 mb-4" />
-                  <div className="h-4 bg-secondary/50 rounded w-2/3 mb-2" />
-                  <div className="h-6 bg-secondary/50 rounded w-1/3" />
-                </div>
-              ))
-            )}
-          </div>
-
-          <div className="mt-12 text-center md:hidden">
-            <Button onClick={() => navigate("/products")} className="w-full bg-primary text-white py-6 rounded-xl">
-              Shop All Products
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* QUIZ CTA - LUXURY SKINCARE */}
-      <section className="py-20 md:py-28 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0c0a09 0%, #1c1917 40%, #0c0a09 100%)' }}>
-        {/* Ambient light effects */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 right-1/4 w-96 h-96 bg-rose-500/8 rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-amber-500/5 rounded-full blur-[100px]" />
-        </div>
-
-        <div className="relative z-10 max-w-6xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-0 rounded-[2rem] overflow-hidden border border-white/[0.06] shadow-2xl shadow-black/40">
-
-            {/* Left: Image Side */}
-            <div className="relative h-64 md:h-auto min-h-[360px] overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=80"
-                alt="Skincare routine"
-                className="absolute inset-0 w-full h-full object-cover scale-105 hover:scale-110 transition-transform duration-[3s]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-stone-950/90 hidden md:block" />
-              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-transparent to-stone-950/30 md:hidden" />
-
-              {/* Floating stat badges */}
-              <div className="absolute bottom-6 left-6 right-6 flex gap-3">
-                <div className="px-3 py-2 rounded-xl bg-white/10 backdrop-blur-xl border border-white/10 text-white">
-                  <div className="text-lg font-bold">2 min</div>
-                  <div className="text-[9px] uppercase tracking-wider text-white/50 font-medium">Analysis</div>
-                </div>
-                <div className="px-3 py-2 rounded-xl bg-white/10 backdrop-blur-xl border border-white/10 text-white">
-                  <div className="text-lg font-bold">AI</div>
-                  <div className="text-[9px] uppercase tracking-wider text-white/50 font-medium">Powered</div>
-                </div>
-                <div className="px-3 py-2 rounded-xl bg-white/10 backdrop-blur-xl border border-white/10 text-white">
-                  <div className="text-lg font-bold">100%</div>
-                  <div className="text-[9px] uppercase tracking-wider text-white/50 font-medium">Personal</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Content Side */}
-            <div className="relative bg-gradient-to-br from-stone-900 via-stone-950 to-stone-900 p-8 md:p-14 flex flex-col justify-center">
-              {/* Subtle texture */}
-              <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.02]" />
-
-              <div className="relative z-10 space-y-6">
-                {/* Tag */}
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-rose-500/15 to-amber-500/10 border border-rose-400/15 text-rose-300 text-[10px] font-bold tracking-[0.25em] uppercase">
-                  <Sparkles className="w-3 h-3" /> Personalized Care
-                </div>
-
-                {/* Heading */}
-                <h2 className="text-3xl md:text-[2.5rem] font-serif text-white leading-[1.15] tracking-tight">
-                  Your skin is unique.{' '}
-                  <br className="hidden sm:block" />
-                  <span className="italic font-light text-rose-200/70">Your routine should be too.</span>
-                </h2>
-
-                {/* Description */}
-                <p className="text-sm text-white/40 leading-relaxed max-w-md font-light">
-                  Take our AI-powered skin analysis and get a curated routine built around your exact skin type, concerns, and goals.
-                </p>
-
-                {/* Divider */}
-                <div className="w-16 h-px bg-gradient-to-r from-rose-400/40 to-transparent" />
-
-                {/* Features */}
-                <div className="space-y-3">
-                  {[
-                    'Instant AI skin type detection',
-                    'Personalized product recommendations',
-                    'Custom morning & night routines'
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-3 text-sm text-white/60">
-                      <CheckCircle className="w-4 h-4 text-rose-400/60 shrink-0" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* CTA Button */}
-                <div className="pt-4">
-                  <Button
-                    onClick={() => navigate("/skin-quiz")}
-                    className="group relative px-10 py-4 h-auto bg-gradient-to-r from-rose-500 to-rose-600 text-white text-xs font-bold uppercase tracking-[0.2em] rounded-full hover:from-rose-400 hover:to-rose-500 transition-all duration-500 shadow-[0_8px_32px_rgba(244,63,94,0.3)] hover:shadow-[0_12px_48px_rgba(244,63,94,0.5)] hover:-translate-y-0.5 active:scale-[0.98] border-0"
+          <div className="sg-products__grid sg-scene-3d">
+            {products.length > 0
+              ? products.map((product, i) => (
+                  <motion.div
+                    key={product.$id || product.id}
+                    custom={i}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, amount: 0.2 }}
+                    variants={fadeUp}
                   >
-                    Start My Analysis
-                    <ArrowRight className="ml-2.5 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-
+                    <Tilt3D
+                      className="sg-product-tilt"
+                      max={16}
+                      onClick={() => navigate(`/products/${product.$id || product.id}`)}
+                    >
+                      <span className="sg-product sg-product--3d">
+                        <span className="sg-product__media">
+                          <img src={product.imageUrl} alt={product.name} loading="lazy" />
+                          <span className="sg-product__reflection" />
+                        </span>
+                        <span className="sg-product__cat">
+                          {product.category || 'Skincare'}
+                        </span>
+                        <span className="sg-product__name">{product.name}</span>
+                        <span className="sg-product__price">Rs. {product.price}</span>
+                      </span>
+                    </Tilt3D>
+                  </motion.div>
+                ))
+              : [1, 2, 3, 4].map((n) => (
+                  <div key={n} className="sg-product__skel" aria-hidden="true" />
+                ))}
           </div>
         </div>
       </section>
 
+      {/* ═══════════ RITUAL ═══════════ */}
+      <section className="sg-ritual">
+        <div className="sg-ritual__inner">
+          <div className="sg-ritual__copy">
+            <motion.div
+              initial="hidden"
+              whileInView="show"
+              viewport={{ once: true, amount: 0.35 }}
+              variants={fadeUp}
+            >
+              <span className="sg-ritual__eyebrow">Personalized care</span>
+              <h2 className="sg-ritual__title">
+                Your skin is unique. <em>Your routine should be too.</em>
+              </h2>
+              <p className="sg-ritual__sub">
+                A two-minute skin analysis — tailored recommendations, morning and night rituals,
+                shaped around your exact concerns.
+              </p>
+              <button
+                type="button"
+                className="sg-btn sg-btn--rose"
+                onClick={() => navigate('/skin-quiz')}
+              >
+                Begin analysis
+                <ArrowRight size={15} strokeWidth={2} />
+              </button>
+            </motion.div>
+          </div>
+
+          <motion.div
+            className="sg-ritual__visual"
+            initial={{ opacity: 0, x: 48, rotateY: -12 }}
+            whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+            transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+            viewport={{ once: true, amount: 0.3 }}
+          >
+            <div className="sg-ritual__frame">
+              <PremiumImg
+                className="sg-ritual__photo"
+                src="https://i.pinimg.com/1200x/fd/9c/92/fd9c921be8385ffea3f9c9eedfc96c61.jpg"
+                alt="Luxury skincare ritual"
+                loading="lazy"
+              />
+              <span className="sg-ritual__glow" aria-hidden="true" />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ═══════════ CLOSE ═══════════ */}
+      <section className="sg-close">
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.5 }}
+          variants={fadeUp}
+        >
+          <p className="sg-close__brand">SkinGlow</p>
+          <p className="sg-close__text">Where clean science meets quiet luxury.</p>
+          <button
+            type="button"
+            className="sg-btn sg-btn--ghost sg-close__ai"
+            onClick={() => navigate('/ai-chat')}
+          >
+            Ask the AI Esthetician
+            <ArrowRight size={15} strokeWidth={2} />
+          </button>
+        </motion.div>
+      </section>
     </div>
   );
 }

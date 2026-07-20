@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Heart, ShoppingCart, User as UserIcon, LogOut, LogIn, UserPlus, Menu, X, Sparkles, Search, Package, IdCard, ShieldAlert } from "lucide-react";
 import { useUser } from "../context/UserContext";
 import { logout } from "../backend/auth";
@@ -7,15 +7,20 @@ import { getCart, getWishlist } from "../backend/database";
 import InstallPWAButton from "./InstallPWAButton";
 import NotificationsDropdown from "./NotificationsDropdown";
 
-export default function Navbar({ onOpenChat }) {
+export default function Navbar({ variant = 'default' }) {
   const { user, setUser } = useUser();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isChatVariant = variant === 'chat';
+  const path = location.pathname.replace(/\/$/, '') || '/';
+  const isHomeRoute = path === '/' || path === '/home';
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const [homeScrolled, setHomeScrolled] = useState(false);
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
@@ -35,11 +40,13 @@ export default function Navbar({ onOpenChat }) {
 
   const fetchCounts = async () => {
     if (!user) return;
+    const uid = user.$id || user.id;
+    if (!uid) return;
     try {
-      const cart = await getCart(user.$id);
+      const cart = await getCart(uid);
       setCartCount(cart.documents?.length || 0);
 
-      const wishlist = await getWishlist(user.$id);
+      const wishlist = await getWishlist(uid);
       setWishlistCount(wishlist.documents?.length || 0);
     } catch (err) {
       console.error("Failed to fetch counts:", err);
@@ -58,6 +65,19 @@ export default function Navbar({ onOpenChat }) {
       window.removeEventListener('wishlist-updated', handleUpdates);
     };
   }, [user]);
+
+  useEffect(() => {
+    if (!isHomeRoute || isChatVariant) {
+      setHomeScrolled(false);
+      return undefined;
+    }
+    const onScroll = () => setHomeScrolled(window.scrollY > 56);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isHomeRoute, isChatVariant]);
+
+  const isHomeGlass = isHomeRoute && !isChatVariant && !homeScrolled;
 
   const handleLogout = async () => {
     try {
@@ -85,33 +105,52 @@ export default function Navbar({ onOpenChat }) {
         to={route}
         className={`relative group transition-all duration-300 font-medium ${isMobile
           ? "text-lg text-slate-700 hover:text-primary block py-3 px-4 rounded-lg hover:bg-secondary"
-          : "text-slate-600 hover:text-primary"
+          : isHomeGlass
+            ? "text-white/80 hover:text-white"
+            : "text-slate-600 hover:text-primary"
           }`}
         onClick={() => setIsMobileMenuOpen(false)}
       >
         <span className="relative z-10">{item}</span>
         {!isMobile && (
-          <span className="absolute left-0 -bottom-1 w-0 h-[3px] bg-primary group-hover:w-full transition-all duration-300 rounded-full"></span>
+          <span className={`absolute left-0 -bottom-1 w-0 h-[2px] group-hover:w-full transition-all duration-300 ${isHomeGlass ? 'bg-white/80' : 'bg-primary rounded-full'}`}></span>
         )}
       </Link>
     );
   };
 
+  const iconBtn = isHomeGlass
+    ? "p-2 rounded-full hover:bg-white/10 transition-colors"
+    : "p-2 rounded-full hover:bg-slate-50 transition-colors";
+  const iconColor = isHomeGlass
+    ? "h-6 w-6 text-white/85 group-hover:text-white transition-colors"
+    : "h-6 w-6 text-slate-600 group-hover:text-primary transition-colors";
+
   return (
     <>
-      <nav className="w-full bg-white text-slate-800 px-4 md:px-12 py-4 flex items-center justify-between shadow-sm sticky top-0 z-50 border-b border-slate-100">
+      <nav
+        className={`w-full px-4 md:px-12 flex items-center justify-between transition-all duration-500 ${
+          isChatVariant
+            ? 'relative py-3 border-b-0 shadow-none bg-white text-slate-800'
+            : isHomeGlass
+              ? 'fixed top-0 left-0 right-0 z-50 py-4 md:py-5 bg-transparent border-b border-transparent text-white'
+              : isHomeRoute
+                ? 'fixed top-0 left-0 right-0 z-50 py-3.5 md:py-4 bg-white/95 backdrop-blur-md text-slate-800 border-b border-slate-100 shadow-sm'
+                : 'sticky top-0 z-50 py-3.5 md:py-4 bg-white text-slate-800 border-b border-slate-100 shadow-sm'
+        }`}
+      >
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 text-2xl font-bold tracking-tight group">
-          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white shadow-primary/30 shadow-lg">
-            <Sparkles className="w-6 h-6 animate-pulse" />
+          <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-white transition-colors ${isHomeGlass ? 'bg-white/15 border border-white/25' : 'bg-primary shadow-primary/30 shadow-lg'}`}>
+            <Sparkles className="w-6 h-6" />
           </div>
-          <span className="text-foreground group-hover:text-primary transition-colors">
-            Skin<span className="text-primary">Glow</span>
+          <span className={`transition-colors ${isHomeGlass ? 'text-white' : 'text-foreground group-hover:text-primary'}`}>
+            Skin<span className={isHomeGlass ? 'text-rose-200' : 'text-primary'}>Glow</span>
           </span>
         </Link>
 
-        {/* Search Bar (Hidden on mobile, new addition) */}
-        <div className="hidden lg:flex flex-1 max-w-lg mx-10 relative">
+        {/* Search Bar — solid only (hidden over glass hero for clean composition) */}
+        <div className={`hidden lg:flex flex-1 max-w-lg mx-10 relative ${isHomeGlass ? 'opacity-0 pointer-events-none w-0 max-w-0 mx-0 overflow-hidden' : ''}`}>
           <input
             type="text"
             placeholder="Search for serums, cleansers..."
@@ -139,22 +178,19 @@ export default function Navbar({ onOpenChat }) {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-5">
-          {/* Notifications */}
           <NotificationsDropdown />
 
-          {/* Admin Dashboard Icon */}
           {user?.role === 'ADMIN' && (
             <Link to="/admin" className="relative group">
-              <div className="p-2 rounded-full hover:bg-slate-50 transition-colors">
-                <ShieldAlert className="h-6 w-6 text-slate-600 group-hover:text-amber-500 transition-colors" />
+              <div className={iconBtn}>
+                <ShieldAlert className={isHomeGlass ? 'h-6 w-6 text-white/85' : 'h-6 w-6 text-slate-600 group-hover:text-amber-500 transition-colors'} />
               </div>
             </Link>
           )}
 
-          {/* Wishlist */}
           <Link to="/wishlist" className="relative group">
-            <div className="p-2 rounded-full hover:bg-slate-50 transition-colors">
-              <Heart className="h-6 w-6 text-slate-600 group-hover:text-pink-500 transition-colors" />
+            <div className={iconBtn}>
+              <Heart className={isHomeGlass ? iconColor : 'h-6 w-6 text-slate-600 group-hover:text-pink-500 transition-colors'} />
             </div>
             {wishlistCount > 0 && (
               <span className="absolute top-0 right-0 bg-pink-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
@@ -163,12 +199,9 @@ export default function Navbar({ onOpenChat }) {
             )}
           </Link>
 
-
-
-          {/* Cart */}
           <Link to="/cart" className="relative group">
-            <div className="p-2 rounded-full hover:bg-secondary transition-colors">
-              <ShoppingCart className="h-6 w-6 text-slate-600 group-hover:text-primary transition-colors" />
+            <div className={isHomeGlass ? iconBtn : 'p-2 rounded-full hover:bg-secondary transition-colors'}>
+              <ShoppingCart className={iconColor} />
             </div>
             {cartCount > 0 && (
               <span className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
@@ -177,23 +210,28 @@ export default function Navbar({ onOpenChat }) {
             )}
           </Link>
 
-          {/* Install App Button (PWA) */}
           <InstallPWAButton />
 
-          {/* AI Chat Trigger (New) */}
           <button
-            onClick={onOpenChat}
-            className="w-10 h-10 rounded-full border border-amber-200 bg-amber-50 flex items-center justify-center text-amber-600 hover:bg-amber-100 transition shadow-[0_2px_8px_rgba(251,191,36,0.2)] group"
+            onClick={() => navigate('/ai-chat')}
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition group ${
+              isHomeGlass
+                ? 'border border-white/30 bg-white/10 text-white hover:bg-white/20'
+                : 'border border-amber-200 bg-amber-50 text-amber-600 hover:bg-amber-100 shadow-[0_2px_8px_rgba(251,191,36,0.2)]'
+            }`}
             title="Ask AI Esthetician"
           >
             <Sparkles className="w-5 h-5 group-hover:scale-110 transition-transform" />
           </button>
 
-          {/* User Menu */}
           <div className="relative z-50">
             <button
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-primary font-bold hover:bg-secondary transition"
+              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition ${
+                isHomeGlass
+                  ? 'bg-white/10 border border-white/30 text-white hover:bg-white/20'
+                  : 'bg-slate-100 border border-slate-200 text-primary hover:bg-secondary'
+              }`}
             >
               {user ? user.name?.charAt(0).toUpperCase() || "U" : <UserIcon className="w-5 h-5" />}
             </button>
@@ -330,8 +368,12 @@ export default function Navbar({ onOpenChat }) {
 
           {/* Mobile AI Chat */}
           <button
-            onClick={onOpenChat}
-            className="p-2 rounded-lg text-amber-600 bg-amber-50 mr-1"
+            onClick={() => navigate('/ai-chat')}
+            className={`p-2 rounded-lg mr-1 ${
+              isHomeGlass
+                ? 'text-white bg-white/10 border border-white/25'
+                : 'text-amber-600 bg-amber-50'
+            }`}
           >
             <Sparkles className="h-5 w-5" />
           </button>
@@ -339,7 +381,9 @@ export default function Navbar({ onOpenChat }) {
           {/* Mobile Menu Toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition"
+            className={`p-2 rounded-lg transition ${
+              isHomeGlass ? 'text-white hover:bg-white/10' : 'text-slate-600 hover:bg-slate-100'
+            }`}
             aria-label="Open navigation menu"
           >
             {isMobileMenuOpen ? (
@@ -431,7 +475,7 @@ export default function Navbar({ onOpenChat }) {
                   <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
-                      onOpenChat();
+                      navigate('/ai-chat');
                     }}
                     className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-secondary text-sm cursor-pointer w-full text-left"
                   >

@@ -51,15 +51,45 @@ export async function processGoogleUser(userInfo) {
   }
 }
 
-// --------------------- OTP FUNCTIONS (Mock) ---------------------
+// --------------------- OTP FUNCTIONS ---------------------
 export async function sendOtp(userId, email) {
-  console.log("OTP requested for", email);
-  return { success: true };
+  try {
+    const res = await fetch('/api/send-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('Send OTP Error:', errorText);
+      throw new Error(JSON.parse(errorText).message || 'Failed to send OTP');
+    }
+    const data = await res.json();
+    return { success: true, token: data.token };
+  } catch (error) {
+    console.error('Send OTP Error:', error);
+    throw error;
+  }
 }
 
-export async function verifyOtp(userId, secret) {
-  // Mock verification
-  return { success: true };
+export async function verifyOtp(userId, otp, token) {
+  try {
+    const res = await fetch('/api/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ otp, token })
+    });
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('Verify OTP Error:', errorText);
+      throw new Error(JSON.parse(errorText).message || 'Failed to verify OTP');
+    }
+    const data = await res.json();
+    return { success: true, email: data.email };
+  } catch (error) {
+    console.error('Verify OTP Error:', error);
+    throw error;
+  }
 }
 
 // --------------------- LOGOUT ---------------------

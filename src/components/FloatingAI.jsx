@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bot, User, Send, Sparkles, X, Minimize2, Mic, Volume2 } from 'lucide-react';
-import VoiceInterface, { speakText } from './VoiceInterface';
+import { Bot, User, Send, Sparkles, X, Minimize2, Mic, Volume2, VolumeX } from 'lucide-react';
+import VoiceInterface, { speakText, stopSpeaking } from './VoiceInterface';
+import { useUser } from '@/context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -16,6 +17,7 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
     const navigate = useNavigate();
+    const { user } = useUser();
 
     const [messages, setMessages] = useState([
         {
@@ -27,6 +29,7 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [products, setProducts] = useState([]);
+    const [speakingIndex, setSpeakingIndex] = useState(null);
 
     // History format for Gemini
     const [chatHistory, setChatHistory] = useState([]);
@@ -49,8 +52,28 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
     const toggleChat = () => setIsOpen(!isOpen);
 
     const handleClose = () => {
+        stopSpeaking();
+        setSpeakingIndex(null);
         if (onClose) onClose();
         else setIsOpen(false);
+    };
+
+    const handleSpeak = (text, idx) => {
+        if (speakingIndex === idx) {
+            stopSpeaking();
+            setSpeakingIndex(null);
+            return;
+        }
+
+        speakText(text, 'en-US', {
+            onStart: () => setSpeakingIndex(idx),
+            onEnd: () => setSpeakingIndex(null),
+        });
+    };
+
+    const handleStopVoice = () => {
+        stopSpeaking();
+        setSpeakingIndex(null);
     };
 
     const handleSend = async (txt = input) => {
@@ -71,18 +94,31 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
                 body: JSON.stringify({
                     message: txt,
                     history: chatHistory,
-                    userId: 'guest'
+                    userId: user?.$id || user?.id || 'guest',
+                    userName: user?.name || null,
+                    userPrefs: user?.prefs || null,
                 })
             });
 
             const data = await response.json();
             
             if (data.reply) {
-                setMessages(prev => [...prev, { text: data.reply, sender: 'bot' }]);
-                setChatHistory(data.updatedHistory || [...newHistory, { role: 'model', parts: [{ text: data.reply }] }]);
-                
-                // If it was a voice input, read it aloud automatically
-                // Or just provide a way to read aloud. For now, let's just add it.
+                const cleanReply = String(data.reply)
+                    .replace(/<function=\w+\s*\{[\s\S]*?\}\s*<\/function>/gi, '')
+                    .replace(/<function=[^>\n]+>[\s\S]*?<\/function>/gi, '')
+                    .replace(/<\/?function[^>]*>/gi, '')
+                    .replace(/\b(searchProducts|addToCart|placeOrder)\s*[({][\s\S]*?[)}]/gi, '')
+                    .trim();
+                setMessages(prev => [...prev, { text: cleanReply, sender: 'bot' }]);
+                setChatHistory(data.updatedHistory || [...newHistory, { role: 'model', parts: [{ text: cleanReply }] }]);
+
+                if (data.actions?.length) {
+                    for (const action of data.actions) {
+                        if (action.type === 'cart_updated' || action.type === 'order_placed') {
+                            window.dispatchEvent(new Event('cart-updated'));
+                        }
+                    }
+                }
             } else {
                 setMessages(prev => [...prev, { text: 'Sorry, I encountered an error. Please try again.', sender: 'bot' }]);
             }
@@ -94,8 +130,13 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
         }
     };
 
+    const handleVoiceInterim = (text) => {
+        setInput(text);
+    };
+
     const handleVoiceInput = (transcript) => {
-        handleSend(transcript);
+        setInput(transcript);
+        setTimeout(() => inputRef.current?.focus(), 50);
     };
 
     const handleKeyPress = (e) => {
@@ -138,14 +179,25 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
                         </div>
                     </div>
 
-                    <button
-                        onClick={handleClose}
-                        className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100/50 hover:bg-slate-200/50 transition-colors"
-                    >
+                    <div className="flex items-center gap-2">
+                        {speakingIndex !== null && (
+                            <button
+                                onClick={handleStopVoice}
+                                className="w-10 h-10 flex items-center justify-center rounded-full bg-red-50 hover:bg-red-100 text-red-500 transition-colors"
+                                title="Stop voice"
+                            >
+                                <VolumeX className="w-5 h-5" />
+                            </button>
+                        )}
+                        <button
+                            onClick={handleClose}
+                            className="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100/50 hover:bg-slate-200/50 transition-colors"
+                        >
                         {/* Close Icon */}
                         <Minimize2 className="w-5 h-5 text-slate-600 block md:hidden" />
                         <X className="w-5 h-5 text-slate-600 hidden md:block" />
-                    </button>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Chat Area */}
@@ -168,8 +220,20 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
                                     {msg.text}
                                 </ReactMarkdown>
                                 {msg.sender === 'bot' && (
-                                    <button onClick={() => speakText(msg.text)} className="absolute -right-8 bottom-0 p-1.5 bg-slate-100 rounded-full text-slate-400 hover:text-slate-600 transition-colors" title="Read Aloud">
-                                        <Volume2 className="w-4 h-4" />
+                                    <button
+                                        onClick={() => handleSpeak(msg.text, idx)}
+                                        className={`absolute -right-8 bottom-0 p-1.5 rounded-full transition-colors ${
+                                            speakingIndex === idx
+                                                ? 'bg-red-100 text-red-500 hover:bg-red-200 animate-pulse'
+                                                : 'bg-slate-100 text-slate-400 hover:text-slate-600'
+                                        }`}
+                                        title={speakingIndex === idx ? 'Stop voice' : 'Read aloud'}
+                                    >
+                                        {speakingIndex === idx ? (
+                                            <VolumeX className="w-4 h-4" />
+                                        ) : (
+                                            <Volume2 className="w-4 h-4" />
+                                        )}
                                     </button>
                                 )}
                             </div>
@@ -207,7 +271,12 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
                     </div>
 
                     <div className="relative flex items-center gap-2">
-                        <VoiceInterface onResult={handleVoiceInput} disabled={loading} />
+                        <VoiceInterface
+                            onResult={handleVoiceInput}
+                            onInterim={handleVoiceInterim}
+                            disabled={loading}
+                            lang="en-US"
+                        />
                         <input
                             ref={inputRef}
                             className="flex-1 bg-slate-50 border-0 text-slate-800 text-sm rounded-2xl px-5 py-4 focus:ring-2 focus:ring-primary/20 focus:bg-white transition-all placeholder:text-slate-400 shadow-inner"
