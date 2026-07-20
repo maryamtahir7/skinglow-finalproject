@@ -1,9 +1,9 @@
 {
-  "buildCommand": "npm run build",
+  "framework": "vite",
+  "buildCommand": "npm run vercel-build",
   "outputDirectory": "dist",
-  "env": {
-    "NODE_ENV": "production"
-  },
+  "cleanUrls": true,
+  "trailingSlash": false,
   "headers": [
     {
       "source": "/api/:path*",
@@ -12,6 +12,16 @@
         { "key": "Access-Control-Allow-Methods", "value": "GET,POST,OPTIONS" },
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ]
 }
