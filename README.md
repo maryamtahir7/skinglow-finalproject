@@ -25,27 +25,27 @@
 
 ---
 
-## 📋 Comprehensive Table of Contents
+## Comprehensive Table of Contents
 
-1. [🎓 Project Abstract](#-project-abstract)
-2. [🔍 Problem Domain & Motivation](#-problem-domain--motivation)
-3. [🚀 Core Features Matrix](#-core-features-matrix)
-4. [🧠 Deep Dive: Artificial Intelligence Architecture](#-deep-dive-artificial-intelligence-architecture)
-5. [🏗️ System Architecture & Engineering](#-system-architecture--engineering)
-6. [🛠️ Detailed Technology Stack](#-detailed-technology-stack)
-7. [📊 Database Schema (ER Model)](#-database-schema-er-model)
-8. [🔒 Security & Authentication Protocols](#-security--authentication-protocols)
-9. [💳 Payment Gateway Integration](#-payment-gateway-integration)
-10. [📸 Application Interfaces (Screenshots)](#-application-interfaces-screenshots)
-11. [🎥 AI Chat Demonstration](#-ai-chat-demonstration)
-12. [⚙️ Installation & Local Deployment](#-installation--local-deployment)
-13. [🧪 Quality Assurance & Testing Strategy](#-quality-assurance--testing-strategy)
-14. [💡 Technical Challenges & Solutions](#-technical-challenges--solutions)
-15. [🔮 Conclusion & Future Scope](#-conclusion--future-scope)
+1. [Project Abstract](#-project-abstract)
+2. [Problem Domain & Motivation](#-problem-domain--motivation)
+3. [Core Features Matrix](#-core-features-matrix)
+4. [Deep Dive: Artificial Intelligence Architecture](#-deep-dive-artificial-intelligence-architecture)
+5. [System Architecture & Engineering](#-system-architecture--engineering)
+6. [Detailed Technology Stack](#-detailed-technology-stack)
+7. [Database Schema (ER Model)](#-database-schema-er-model)
+8. [Security & Authentication Protocols](#-security--authentication-protocols)
+9. [Payment Gateway Integration](#-payment-gateway-integration)
+10. [Application Interfaces (Screenshots)](#-application-interfaces-screenshots)
+11. [AI Chat Demonstration](#-ai-chat-demonstration)
+12. [Installation & Local Deployment](#-installation--local-deployment)
+13. [Quality Assurance & Testing Strategy](#-quality-assurance--testing-strategy)
+14. [Technical Challenges & Solutions](#-technical-challenges--solutions)
+15. [Conclusion & Future Scope](#-conclusion--future-scope)
 
 ---
 
-## 🎓 Project Abstract
+##  Project Abstract
 
 **SkinGlow** is a comprehensive, production-grade AI-powered skincare e-commerce platform designed and developed as a **Final Year Project**. The platform addresses the "personalization deficit" in modern e-commerce by bridging the gap between generic online shopping and personalized dermatological consultation. 
 
@@ -53,7 +53,7 @@ By leveraging a micro-services-inspired monolithic architecture, the system empl
 
 ---
 
-## 🔍 Problem Domain & Motivation
+## Problem Domain & Motivation
 
 The modern skincare industry is vast, yet consumers face several critical barriers:
 
@@ -65,15 +65,15 @@ The modern skincare industry is vast, yet consumers face several critical barrie
 
 ---
 
-## 🚀 Core Features Matrix
+##  Core Features Matrix
 
-### 🛍️ Customer-Facing Application
+###  Customer-Facing Application
 - **Interactive Skin Quiz**: A dynamic, state-driven multi-step form built with `react-hook-form` and `zod` that constructs a persistent user profile to alter global store recommendations.
 - **Routine Builder**: An intelligent AM/PM tracking system utilizing `localStorage` and date-diffing to monitor daily skincare adherence and progress.
 - **Smart Catalog & Search**: Advanced filtering by specific concerns (Hyperpigmentation, Acne, Aging) with real-time stock validation and client-side pagination.
 - **Checkout Pipeline**: Seamless cart-to-order flow supporting both **Stripe Credit Card Processing** and **Cash on Delivery (COD)**.
 
-### 🛡️ Administrator Operations Portal
+###  Administrator Operations Portal
 - **Financial Analytics**: Auto-generated dashboard calculating monthly revenue, profit margins, and platform growth metrics.
 - **Inventory Orchestration**: Real-time stock tracking with visual low-stock indicators, category mapping, and full CRUD capabilities.
 - **Order Fulfillment Engine**: Strict state management for the complete order lifecycle (`PENDING` → `SHIPPED` → `DELIVERED`).
@@ -81,7 +81,7 @@ The modern skincare industry is vast, yet consumers face several critical barrie
 
 ---
 
-## 🧠 Deep Dive: Artificial Intelligence Architecture
+##  Deep Dive: Artificial Intelligence Architecture
 
 SkinGlow implements AI not as an afterthought, but as core infrastructure utilizing state-of-the-art LLMs and Machine Learning models.
 
@@ -122,7 +122,7 @@ The Admin portal features an AI employee with **Tool Calling Capabilities**. Adm
 
 ---
 
-## 🏗️ System Architecture & Engineering
+##  System Architecture & Engineering
 
 The application follows a modern **Serverless Monorepo** architectural pattern, ensuring high scalability and clean separation of concerns.
 
@@ -166,7 +166,7 @@ graph TD
 
 ---
 
-## 🛠️ Detailed Technology Stack
+##  Detailed Technology Stack
 
 ### Frontend Architecture
 - **Framework**: React 19 (Hooks-first approach)
@@ -196,7 +196,7 @@ graph TD
 
 ---
 
-## 📊 Database Schema (ER Model)
+##  Database Schema (ER Model)
 
 The database utilizes strict referential integrity across multiple relational tables.
 
@@ -257,7 +257,7 @@ erDiagram
 
 ---
 
-## 🔒 Security & Authentication Protocols
+##  Security & Authentication Protocols
 
 Enterprise-grade security measures were implemented to protect user data and financial transactions:
 1. **Multi-Factor OTP Registration**: Nodemailer generates cryptographically random 6-digit OTPs sent via branded email.
@@ -268,7 +268,7 @@ Enterprise-grade security measures were implemented to protect user data and fin
 
 ---
 
-## 💳 Payment Gateway Integration
+##  Payment Gateway Integration
 
 SkinGlow features a fully operational, PCI-compliant payment pipeline utilizing **Stripe**.
 - Uses Stripe Elements (`@stripe/react-stripe-js`) for secure card tokenization.
@@ -277,7 +277,7 @@ SkinGlow features a fully operational, PCI-compliant payment pipeline utilizing 
 
 ---
 
-## 📸 Application Interfaces (Screenshots)
+##  Application Interfaces (Screenshots)
 
 > **Note to Evaluators:** The platform features a responsive, mobile-first design language prioritizing aesthetic micro-animations and accessibility.
 
@@ -301,7 +301,7 @@ SkinGlow features a fully operational, PCI-compliant payment pipeline utilizing 
 
 ---
 
-## 🎥 AI Chat Demonstration
+##  AI Chat Demonstration
 
 Watch our **Conversational Commerce Agent** seamlessly interact, understand natural language context, and recommend hyper-specific products in real-time.
 
@@ -313,7 +313,7 @@ Watch our **Conversational Commerce Agent** seamlessly interact, understand natu
 
 ---
 
-## ⚙️ Installation & Local Deployment
+##  Installation & Local Deployment
 
 ### Prerequisites
 - **Node.js** v18.x or higher
@@ -351,7 +351,7 @@ Watch our **Conversational Commerce Agent** seamlessly interact, understand natu
 
 ---
 
-## 🧪 Quality Assurance & Testing Strategy
+##  Quality Assurance & Testing Strategy
 
 To ensure enterprise-level stability, SkinGlow incorporates a rigorous testing framework:
 - **Unit Testing (Vitest)**: Validates utility functions, custom hooks, and AI string parsing algorithms.
@@ -360,7 +360,7 @@ To ensure enterprise-level stability, SkinGlow incorporates a rigorous testing f
 
 ---
 
-## 💡 Technical Challenges & Solutions
+##  Technical Challenges & Solutions
 
 During development, several complex engineering challenges were resolved:
 
@@ -373,7 +373,7 @@ During development, several complex engineering challenges were resolved:
 
 ---
 
-## 🔮 Conclusion & Future Scope
+##  Conclusion & Future Scope
 
 **SkinGlow** successfully demonstrates that the integration of complex Artificial Intelligence into a modern web ecosystem is not only feasible but entirely redefines the standard for consumer e-commerce. It transforms a static catalog into an interactive, empathetic, and intelligent dermatological assistant.
 
