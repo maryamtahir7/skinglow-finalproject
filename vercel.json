@@ -1,6 +1,11 @@
 {
   "buildCommand": "vite build",
   "outputDirectory": "dist",
+  "build": {
+    "env": {
+      "DATABASE_URL": "postgresql://build:build@localhost:5432/build"
+    }
+  },
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]

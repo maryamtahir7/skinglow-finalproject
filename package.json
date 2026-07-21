@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"vite\" \"node api-server.js\"",
     "build": "vite build",
-    "prisma:generate": "prisma generate --skip-engine-check 2>/dev/null || echo 'Prisma generation skipped'",
+    "prisma:generate": "prisma generate",
     "postinstall": "npm run prisma:generate",
     "start": "node api-server.js",
     "lint": "eslint .",
