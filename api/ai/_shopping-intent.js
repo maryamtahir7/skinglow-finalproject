@@ -1,6 +1,7 @@
+import { tools, resolveShippingDetails } from './_tools.js';
+
 async function loadTools() {
-  const mod = await import('./_tools.js');
-  return mod.tools;
+  return tools;
 }
 
 const ADD_TO_CART_PATTERNS = [
@@ -125,7 +126,7 @@ export async function previewShoppingAction(message, context = {}) {
       };
     }
 
-    const { resolveShippingDetails } = await import('./_tools.js');
+    // using top-level import
     const { shipping, missing } = await resolveShippingDetails(userId, userName, userPrefs || {});
 
     if (missing.length > 0) {

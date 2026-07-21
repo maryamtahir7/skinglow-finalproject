@@ -1,6 +1,8 @@
+import { tools } from './_tools.js';
+import prisma from '../_db.js';
+
 async function loadTools() {
-  const mod = await import('./_tools.js');
-  return mod.tools;
+  return tools;
 }
 
 const PLACE_ORDER_PATTERNS = [
@@ -266,8 +268,7 @@ async function resolveProductByName(query, orderDraft, context) {
     step: 'select_product',
   };
 
-  const toolsMod = await import(`./_tools.js?t=${Date.now()}`);
-  const findProduct = toolsMod.findProduct;
+  const findProduct = tools.findProduct;
   const found = findProduct ? await findProduct({ query }) : null;
 
   if (found && found.stock > 0) {
@@ -372,7 +373,7 @@ function mapProductCard(p) {
 }
 
 async function getProductsBySkinType(skinKey) {
-  const { default: prisma } = await import('../_db.js');
+  // using top-level prisma import
 
   const products = await prisma.product.findMany({
     where: { stock: { gt: 0 } },
@@ -520,7 +521,7 @@ export async function selectProductForOrder(productId, orderDraft, context) {
   let selected = null;
 
   if (productId) {
-    const { default: prisma } = await import('../_db.js');
+    // using top-level prisma import
     selected = await prisma.product.findUnique({ where: { id: productId } });
   }
 

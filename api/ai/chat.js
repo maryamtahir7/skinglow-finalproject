@@ -2,9 +2,8 @@ import Groq from 'groq-sdk';
 import { sanitizeAIResponse, buildUserContext } from './_response-utils.js';
 import { previewShoppingAction, executeConfirmedAction } from './_shopping-intent.js';
 
-async function loadOrderFlow() {
-    return import(`./_order-flow.js?t=${Date.now()}`);
-}
+import { processOrderFlow, selectProductForOrder, executeOrderConfirmation, handleOrderSourceChoice } from './_order-flow.js';
+import { previewProductRecommendations as previewRecs } from './_recommend-intent.js';
 
 const apiKey = process.env.GROQ_API_KEY;
 if (!apiKey) {
@@ -90,7 +89,6 @@ export default async function handler(req, res) {
 
     try {
         const context = { userId, userName, userPrefs };
-        const { processOrderFlow, selectProductForOrder, executeOrderConfirmation, handleOrderSourceChoice } = await loadOrderFlow();
 
         // ── Confirm cart / order (button tap) ──
         if (confirmAction) {
@@ -137,8 +135,7 @@ export default async function handler(req, res) {
         }
 
         // ── Product recommendations (real catalog + clickable cards) ──
-        // Reload recommend module so edits apply in dev
-        const { previewProductRecommendations: previewRecs } = await import(`./_recommend-intent.js?t=${Date.now()}`);
+        // Reload recommend module so edits apply in dev (Removed for Vercel support)
         const recommendOutcome = await previewRecs(message);
         if (recommendOutcome?.handled && recommendOutcome.productPicker?.products?.length) {
             return res.status(200).json(buildFlowResponse({

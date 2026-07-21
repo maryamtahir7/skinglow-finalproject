@@ -1,6 +1,8 @@
+import { tools } from './_tools.js';
+import prisma from '../_db.js';
+
 async function loadTools() {
-  const mod = await import('./_tools.js');
-  return mod.tools;
+  return tools;
 }
 
 const RECOMMEND_PATTERNS = [
@@ -84,7 +86,7 @@ export async function previewProductRecommendations(message) {
   const tools = await loadTools();
 
   // Pull a wider set, then rank (skinTypes often empty in DB)
-  const { default: prisma } = await import('../_db.js');
+  // using top-level prisma import
   const all = await prisma.product.findMany({
     where: { stock: { gt: 0 } },
     take: 60,
