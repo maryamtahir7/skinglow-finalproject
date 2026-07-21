@@ -1,39 +1,43 @@
-<p align="center">
+<div align="center">
   <img src="https://img.shields.io/badge/SkinGlow-Premium%20Skincare-be123c?style=for-the-badge&logo=sparkles&logoColor=white" alt="SkinGlow Badge" />
-</p>
+  
+  <br />
+  <br />
 
-<h1 align="center">✨ SkinGlow — Next-Generation AI Skincare Platform</h1>
+  <h1>✨ SkinGlow — Next-Generation AI Skincare Platform</h1>
 
-<p align="center">
-  <strong>An intelligent, full-stack e-commerce ecosystem integrating Computer Vision, Generative AI, and Conversational Commerce to revolutionize personalized skincare.</strong>
-</p>
+  <p>
+    <strong>An intelligent, full-stack e-commerce ecosystem integrating Computer Vision, Generative AI, and Conversational Commerce to revolutionize personalized skincare.</strong>
+  </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react" />
-  <img src="https://img.shields.io/badge/Vite-6.4-646CFF?style=flat-square&logo=vite" />
-  <img src="https://img.shields.io/badge/TailwindCSS-4.0-06B6D4?style=flat-square&logo=tailwindcss" />
-  <img src="https://img.shields.io/badge/Prisma-5.22-2D3748?style=flat-square&logo=prisma" />
-  <img src="https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=flat-square&logo=postgresql" />
-  <img src="https://img.shields.io/badge/TensorFlow.js-BlazeFace-FF6F00?style=flat-square&logo=tensorflow" />
-  <img src="https://img.shields.io/badge/Groq-LLaMA%203.3-000000?style=flat-square" />
-  <img src="https://img.shields.io/badge/Deployed-Vercel-000000?style=flat-square&logo=vercel" />
-</p>
+  <p>
+    <a href="#-tech-stack"><img src="https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react" alt="React" /></a>
+    <a href="#-tech-stack"><img src="https://img.shields.io/badge/Vite-6.4-646CFF?style=flat-square&logo=vite" alt="Vite" /></a>
+    <a href="#-tech-stack"><img src="https://img.shields.io/badge/TailwindCSS-4.0-06B6D4?style=flat-square&logo=tailwindcss" alt="TailwindCSS" /></a>
+    <a href="#-tech-stack"><img src="https://img.shields.io/badge/Prisma-5.22-2D3748?style=flat-square&logo=prisma" alt="Prisma" /></a>
+    <a href="#-tech-stack"><img src="https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=flat-square&logo=postgresql" alt="Neon Postgres" /></a>
+    <a href="#-artificial-intelligence-integration"><img src="https://img.shields.io/badge/TensorFlow.js-BlazeFace-FF6F00?style=flat-square&logo=tensorflow" alt="Tensorflow" /></a>
+    <a href="#-artificial-intelligence-integration"><img src="https://img.shields.io/badge/Groq-LLaMA%203.3-000000?style=flat-square" alt="Groq LLaMA" /></a>
+    <a href="#-cloud-deployment-strategy"><img src="https://img.shields.io/badge/Deployed-Vercel-000000?style=flat-square&logo=vercel" alt="Vercel" /></a>
+  </p>
+</div>
 
 ---
 
 ## 📋 Table of Contents
 
-1. [Executive Summary](#-executive-summary)
-2. [Problem Domain & Motivation](#-problem-domain--motivation)
-3. [System Architecture & Engineering](#-system-architecture--engineering)
-4. [Artificial Intelligence Integration](#-artificial-intelligence-integration)
-5. [Core System Modules](#-core-system-modules)
-6. [Database Schema (ER Model)](#-database-schema-er-model)
-7. [Security & Authentication](#-security--authentication)
-8. [Application Interfaces (Screenshots)](#-application-interfaces-screenshots)
-9. [Installation & Local Deployment](#-installation--local-deployment)
-10. [Cloud Deployment Strategy](#-cloud-deployment-strategy)
-11. [Conclusion & Future Scope](#-conclusion--future-scope)
+1. [🌟 Executive Summary](#-executive-summary)
+2. [🔍 Problem Domain & Motivation](#-problem-domain--motivation)
+3. [🚀 Key Features](#-key-features)
+4. [🧠 Artificial Intelligence Integration](#-artificial-intelligence-integration)
+5. [🏗️ System Architecture & Engineering](#-system-architecture--engineering)
+6. [📊 Database Schema (ER Model)](#-database-schema-er-model)
+7. [🔒 Security & Authentication](#-security--authentication)
+8. [📸 Application Interfaces (Screenshots)](#-application-interfaces-screenshots)
+9. [🎥 AI Chat Demonstration](#-ai-chat-demonstration)
+10. [⚙️ Installation & Local Deployment](#-installation--local-deployment)
+11. [☁️ Cloud Deployment Strategy](#-cloud-deployment-strategy)
+12. [🔮 Conclusion & Future Scope](#-conclusion--future-scope)
 
 ---
 
@@ -57,118 +61,146 @@ The skincare industry suffers from a severe **personalization deficit**. Consume
 
 ---
 
-## 🏗️ System Architecture & Engineering
-
-The application follows a modern **Serverless Monorepo** architectural pattern, ensuring high scalability and separation of concerns.
-
-```text
-┌──────────────────────────────────────────────────────────────────┐
-│                        CLIENT TIER (React)                      │
-│  ┌────────────────────────────────────────────────────────────┐  │
-│  │  State Management: Context API & Custom Hooks              │  │
-│  │  Routing: React Router DOM (Protected & Admin Routes)      │  │
-│  │  Styling: Tailwind CSS & Framer Motion                     │  │
-│  └────────────────────────────────────────────────────────────┘  │
-│         │ RESTful API over HTTPS                                 │
-└─────────┼────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                  SERVERLESS TIER (Vercel Node.js)                │
-│  ┌─────────────────────────────────────────────────────────┐     │
-│  │  API Gateway & Middleware Routing                       │     │
-│  │  ┌──────────────┐ ┌──────────────┐ ┌─────────────────┐  │     │
-│  │  │ CRUD Handlers│ │ Auth (OTP/JWT)│ │ AI Orchestrator │  │     │
-│  │  └──────────────┘ └──────────────┘ └─────────────────┘  │     │
-│  └─────────────────────────────────────────────────────────┘     │
-│         │ TCP / SSL                                              │
-└─────────┼────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌──────────────────────────────────────────────────────────────────┐
-│                  DATA TIER (Cloud PostgreSQL)                    │
-│  ┌─────────────────────────────────────────────────────────┐     │
-│  │  Prisma ORM Layer (Type-Safe Query Builder)             │     │
-│  │  Relational Database (Neon Tech)                        │     │
-│  └─────────────────────────────────────────────────────────┘     │
-└──────────────────────────────────────────────────────────────────┘
-```
-
-### Engineering Highlights:
-- **Custom Algorithm Design**: Implemented a weighted heuristic scoring algorithm (`scoreProductForSkin`) that ranks products based on string matching across ingredients, benefits, and skin-type tags against detected user concerns.
-- **Dynamic Import Bypassing**: Engineered custom static routing for Serverless environments to ensure Vercel's `@vercel/nft` bundler successfully compiles AI intent modules.
-- **Optimized Asset Delivery**: Utilized Vite for aggressive code-splitting and chunk size optimization, ensuring rapid load times despite heavy ML dependencies.
-
----
-
-## 🧠 Artificial Intelligence Integration
-
-SkinGlow implements AI not as a gimmick, but as core infrastructure.
-
-### 1. Conversational Commerce (NLP)
-Powered by **Groq LLaMA 3.3 70B Versatile**, the chatbot acts as a state machine. It uses custom **Intent Detection** (Regex + NLP mapping) to route user messages:
-- **Order Flow Engine**: Autonomously collects missing shipping details, handles cart selection, and executes orders entirely through chat.
-- **Recommendation Engine**: Parses complex user queries ("I have dry skin and acne") and queries the database for mathematically optimized product matches.
-
-### 2. Computer Vision (TensorFlow.js)
-The platform performs on-device ML inference using **BlazeFace**.
-- Captures real-time webcam feeds.
-- Detects facial boundaries and extracts localized image crops.
-- Passes extracted visual data to the backend AI heuristic engine to detect redness, dryness, or oiliness and recommend corrective products.
-
-### 3. Voice Interactivity
-Integrated the **Web Speech API** to provide bi-directional accessibility:
-- Voice-to-Text command interpretation.
-- Text-to-Speech response generation utilizing a custom voice-filtering algorithm to select professional female AI voices across different operating systems.
-
-### 4. Autonomous Business Analyst
-The Admin portal features an AI employee with **Tool Calling Capabilities**. The LLM can autonomously decide to execute predefined database queries (e.g., `getRevenueReport()`, `getLowStockItems()`) based on the admin's natural language questions, translating complex SQL operations into simple chat.
-
----
-
-## 📦 Core System Modules
+## 🚀 Key Features
 
 ### 🛍️ Customer Experience
 - **Interactive Skin Quiz**: A dynamic state-driven form that builds a persistent user profile and dynamically alters the store's default recommendations.
 - **Routine Builder**: An intelligent AM/PM tracking system utilizing `localStorage` and date-diffing to monitor daily skincare adherence.
 - **Comprehensive Catalog**: Advanced filtering by specific concerns (Hyperpigmentation, Acne, Aging) with real-time stock validation.
-- **Checkout Flow**: Seamless cart-to-order pipeline with Cash on Delivery (COD) processing and order status tracking.
+- **Checkout Flow**: Seamless cart-to-order pipeline with Cash on Delivery (COD) processing and secure order status tracking.
 
 ### 🛡️ Administrator Dashboard
-- **Analytics & Reporting**: Auto-generated monthly financial reports calculating revenue and profit margins.
-- **Inventory Management**: Real-time stock tracking with visual low-stock indicators and CRUD capabilities.
+- **Analytics & Reporting**: Auto-generated monthly financial reports calculating revenue, profit margins, and platform growth.
+- **Inventory Management**: Real-time stock tracking with visual low-stock indicators and comprehensive CRUD capabilities.
 - **Order Fulfillment**: State management for the complete order lifecycle (Pending → Shipped → Delivered).
 - **Review Moderation**: Centralized hub for monitoring and managing user-generated content and product reviews.
 
 ---
 
+## 🧠 Artificial Intelligence Integration
+
+SkinGlow implements AI not as a gimmick, but as core infrastructure to redefine the shopping experience.
+
+### 1. Conversational Commerce (NLP)
+Powered by **Groq LLaMA 3.3 70B Versatile**, the chatbot acts as a smart state machine. It uses custom **Intent Detection** (Regex + NLP mapping) to route user messages:
+- **Order Flow Engine**: Autonomously collects missing shipping details, handles cart selection, and executes orders entirely through chat.
+- **Recommendation Engine**: Parses complex user queries (*"I have dry skin and acne"*) and queries the database for mathematically optimized product matches based on ingredients and formulas.
+
+### 2. Computer Vision (TensorFlow.js)
+The platform performs lightning-fast on-device ML inference using **BlazeFace**.
+- Captures real-time webcam feeds securely within the browser.
+- Detects facial boundaries and extracts localized image crops.
+- Passes extracted visual data to the backend AI heuristic engine to visually detect redness, dryness, or oiliness and recommend corrective products on the spot.
+
+### 3. Voice Interactivity
+Integrated the **Web Speech API** to provide bi-directional accessibility:
+- **Voice-to-Text**: Command interpretation for hands-free shopping.
+- **Text-to-Speech**: Response generation utilizing a custom voice-filtering algorithm to select professional female AI voices across different operating systems.
+
+### 4. Autonomous Business Analyst
+The Admin portal features an AI employee with **Tool Calling Capabilities**. The LLM can autonomously decide to execute predefined database queries (e.g., `getRevenueReport()`, `getLowStockItems()`) based on the admin's natural language questions, translating complex business intelligence requests into instant, readable insights.
+
+---
+
+## 🏗️ System Architecture & Engineering
+
+The application follows a modern **Serverless Monorepo** architectural pattern, ensuring high scalability and clean separation of concerns.
+
+### System Flow
+```mermaid
+graph TD
+  subgraph Client [Client Tier - React & Tailwind]
+    UI[User Interface]
+    State[Context & Hooks]
+    CV[TF.js BlazeFace Inference]
+  end
+
+  subgraph Gateway [API Gateway - Vercel Serverless]
+    Auth[JWT & OTP Auth]
+    API[REST Endpoints]
+  end
+
+  subgraph AI_Engine [AI Core Engine]
+    LLM[Groq LLaMA 3.3 70B]
+    Intent[Intent & State Manager]
+    Analyst[Autonomous BI Analyst]
+  end
+
+  subgraph DB [Data Tier - Neon PostgreSQL]
+    Prisma[Prisma ORM]
+    Postgres[(Relational Database)]
+  end
+
+  UI <-->|HTTPS / JSON| API
+  UI <--> Auth
+  State <--> UI
+  CV -->|Visual Payload| API
+  API <-->|Contextual Queries| LLM
+  API <--> Intent
+  API <--> Prisma
+  Intent <--> Analyst
+  Prisma <--> Postgres
+  
+  style Client fill:#f9f9f9,stroke:#333,stroke-width:2px
+  style Gateway fill:#e6f7ff,stroke:#0050b3,stroke-width:2px
+  style AI_Engine fill:#fff0f6,stroke:#c41d7f,stroke-width:2px
+  style DB fill:#f6ffed,stroke:#389e0d,stroke-width:2px
+```
+
+### Engineering Highlights:
+- **Custom Algorithm Design**: Implemented a weighted heuristic scoring algorithm (`scoreProductForSkin`) that ranks products based on string matching across ingredients, benefits, and skin-type tags against detected user concerns.
+- **Optimized Asset Delivery**: Utilized Vite for aggressive code-splitting and chunk size optimization, ensuring rapid load times despite heavy ML dependencies.
+
+---
+
 ## 📊 Database Schema (ER Model)
 
-The robust backend is defined using **Prisma ORM**, ensuring referential integrity across 13 tables.
+The robust backend is defined using **Prisma ORM**, ensuring strict referential integrity across 13 core tables.
 
-```text
-┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
-│      User       │       │     Product     │       │      Order      │
-├─────────────────┤       ├─────────────────┤       ├─────────────────┤
-│ id (PK)         │───┐   │ id (PK)         │   ┌───│ id (PK)         │
-│ email (UNIQUE)  │   │   │ name            │   │   │ userId (FK)     │
-│ password        │   │   │ category        │   │   │ shippingDetails │
-│ role (ENUM)     │   │   │ price           │   │   │ total           │
-└─────────────────┘   │   │ stock           │   │   │ status (ENUM)   │
-          │           │   │ imageUrls[]     │   │   └─────────────────┘
-          ▼           │   │ attributes[]    │   │            │
-┌─────────────────┐   │   └─────────────────┘   │            ▼
-│ CustomerProfile │   │            │            │   ┌─────────────────┐
-├─────────────────┤   │            │            └──►│    OrderItem    │
-│ id (PK)         │   │            ▼                ├─────────────────┤
-│ userId (FK)     │   │   ┌─────────────────┐       │ id (PK)         │
-│ skinType        │   └──►│    CartItem     │       │ orderId (FK)    │
-│ concerns[]      │       ├─────────────────┤       │ productId (FK)  │
-└─────────────────┘       │ userId (FK)     │       │ quantity        │
-                          │ productId (FK)  │       └─────────────────┘
-                          └─────────────────┘
+```mermaid
+erDiagram
+    USER ||--o{ ORDER : places
+    USER ||--o{ CUSTOMER_PROFILE : has
+    USER ||--o{ CART_ITEM : owns
+    USER ||--o{ REVIEW : writes
+    PRODUCT ||--o{ ORDER_ITEM : included_in
+    PRODUCT ||--o{ CART_ITEM : included_in
+    PRODUCT ||--o{ REVIEW : receives
+    ORDER ||--|{ ORDER_ITEM : contains
+
+    USER {
+        string id PK
+        string email UK
+        string password
+        enum role "ADMIN | CUSTOMER"
+    }
+    CUSTOMER_PROFILE {
+        string id PK
+        string userId FK
+        string skinType
+        string[] concerns
+    }
+    PRODUCT {
+        string id PK
+        string name
+        float price
+        int stock
+        string category
+    }
+    ORDER {
+        string id PK
+        string userId FK
+        float total
+        enum status "PENDING | SHIPPED | DELIVERED"
+    }
+    ORDER_ITEM {
+        string id PK
+        string orderId FK
+        string productId FK
+        int quantity
+    }
 ```
-*(Other tables include: Categories, Reports, Stocks, Reviews, WishlistItems, AIMemory, Notifications)*
+*(Note: Schema visually simplified for clarity. Includes supplementary tables for Categories, Reports, Stocks, Reviews, Wishlists, AIMemory, and Notifications)*
 
 ---
 
@@ -183,7 +215,7 @@ The robust backend is defined using **Prisma ORM**, ensuring referential integri
 
 ## 📸 Application Interfaces (Screenshots)
 
-> **Note to Judges:** Since the Admin Dashboard is protected by strict authentication, screenshots of the internal management tools are provided below.
+> **Note to Judges:** Since the Admin Dashboard is protected by strict authentication, screenshots of the internal management tools are provided alongside the customer experience to showcase the complete ecosystem.
 
 ### Customer Experience
 | Feature | Interface |
@@ -203,11 +235,17 @@ The robust backend is defined using **Prisma ORM**, ensuring referential integri
 | **Product Management** | <img src="./public/docx/Admin%20Product%20add.png" width="800"> |
 | **Category Management** | <img src="./public/docx/Admin%20Category.png" width="800"> |
 
-### 🎥 AI Chat Demonstration
+---
 
-Watch our Conversational Commerce Agent in action:
+## 🎥 AI Chat Demonstration
 
-https://github.com/maryamtahir7/skinglow-finalproject/raw/main/public/docx/Add%20Video%20in%20Readme.mp4
+Watch our **Conversational Commerce Agent** seamlessly interact, recommend products, and handle customer queries in real-time.
+
+<div align="center">
+  <img src="./public/docx/AI-Chatbot-Demo.gif" alt="SkinGlow AI Chatbot Demonstration GIF" width="800" style="border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);" />
+</div>
+
+*(Demonstrates natural language understanding, context retention, and product database querying.)*
 
 ---
 
@@ -265,7 +303,7 @@ The application is architected for Edge-ready cloud deployment.
 **Future Enhancements:**
 1. **Dermatological API Integration**: Upgrading the heuristic Computer Vision model to a medical-grade API (like Google Cloud Vision) for precise acne grading.
 2. **Augmented Reality (AR)**: Implementing WebGL-based face mapping to show the visual effects of products on the user's skin over time.
-3. **Automated Supply Chain**: Deepening the n8n webhook integration to automatically re-order inventory from suppliers when stock dips below critical thresholds.
+3. **Automated Supply Chain**: Deepening webhook integrations to automatically re-order inventory from suppliers when stock dips below critical thresholds.
 
 ---
 
