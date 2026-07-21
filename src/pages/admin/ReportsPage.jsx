@@ -3,6 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart3, TrendingUp, TrendingDown, RefreshCcw, Loader2, FilePlus, Pencil, Trash2 } from "lucide-react";
 import { getReports, addReport, getOrders, updateReport, deleteReport } from "../../backend/database";
+import { getCurrentUser } from "../../backend/auth";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -104,7 +105,6 @@ export default function ReportsPage() {
         // Try to get current user ID to helper user
         let userId = "unknown";
         try {
-          const { getCurrentUser } = await import("../../backend/auth");
           const user = await getCurrentUser();
           userId = user ? user.$id : 'unknown';
         } catch (uErr) { console.error(uErr); }
@@ -182,7 +182,6 @@ export default function ReportsPage() {
       if (error.message && error.message.includes('Missing "create" permission')) {
         let userId = "unknown";
         try {
-          const { getCurrentUser } = await import("../../backend/auth");
           const user = await getCurrentUser();
           userId = user ? user.$id : 'unknown';
         } catch (uErr) { console.error(uErr); }
