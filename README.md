@@ -25,7 +25,7 @@
 
 ---
 
-## Comprehensive Table of Contents
+## Table of Contents
 
 1. [Project Abstract](#-project-abstract)
 2. [Problem Domain & Motivation](#-problem-domain--motivation)
