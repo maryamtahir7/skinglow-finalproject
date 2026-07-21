@@ -203,6 +203,7 @@ export default function VoiceInterface({
     const listeningRef = useRef(false);
     const finalTranscriptRef = useRef('');
     const interimRef = useRef('');
+    const lastProcessedIndexRef = useRef(0);
     const silenceTimerRef = useRef(null);
     const pausedRef = useRef(paused);
     const agentModeRef = useRef(agentMode);
@@ -305,6 +306,7 @@ export default function VoiceInterface({
 
         finalTranscriptRef.current = '';
         interimRef.current = '';
+        lastProcessedIndexRef.current = 0;
         setInterimText('');
         clearSilenceTimer();
 
@@ -317,23 +319,29 @@ export default function VoiceInterface({
         recognition.onresult = (event) => {
             if (pausedRef.current) return;
 
-            let finalStr = '';
             let interimStr = '';
+            let newFinalStr = '';
             let hasNewFinal = false;
 
-            for (let i = 0; i < event.results.length; i++) {
+            for (let i = event.resultIndex; i < event.results.length; i++) {
                 const result = event.results[i];
                 const transcript = getBestAlternative(result);
 
                 if (result.isFinal) {
-                    finalStr += `${transcript} `;
-                    if (i >= event.resultIndex) hasNewFinal = true;
+                    // Only process if we haven't seen this final index yet
+                    if (i >= lastProcessedIndexRef.current) {
+                        newFinalStr += `${transcript} `;
+                        lastProcessedIndexRef.current = i + 1;
+                        hasNewFinal = true;
+                    }
                 } else {
                     interimStr += transcript;
                 }
             }
 
-            finalTranscriptRef.current = finalStr;
+            if (newFinalStr) {
+                finalTranscriptRef.current += newFinalStr;
+            }
             interimRef.current = interimStr;
 
             if (hasNewFinal) {
@@ -343,7 +351,7 @@ export default function VoiceInterface({
                 clearSilenceTimer();
             }
 
-            const liveText = `${finalStr}${interimStr}`.trim();
+            const liveText = `${finalTranscriptRef.current}${interimStr}`.trim();
             setInterimText(liveText);
             onInterim?.(liveText);
         };

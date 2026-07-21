@@ -205,9 +205,9 @@ The robust backend is defined using **Prisma ORM**, ensuring referential integri
 
 ### 🎥 AI Chat Demonstration
 
-Watch our Conversational Commerce Agent in action (Please view on GitHub to play video):
+Watch our Conversational Commerce Agent in action:
 
-<video src="https://github.com/maryamtahir7/skinglow-finalproject/raw/main/public/docx/Add%20Video%20in%20Readme.mp4" controls="controls" muted="muted" style="max-width: 100%;"></video>
+https://github.com/maryamtahir7/skinglow-finalproject/raw/main/public/docx/Add%20Video%20in%20Readme.mp4
 
 ---
 
@@ -271,5 +271,5 @@ The application is architected for Edge-ready cloud deployment.
 
 <p align="center">
   <strong>Developed with engineering precision and a passion for technology.</strong><br>
-  By Maryam Tahir — Final Year Project
+  By Maryam Tahir 
 </p>
