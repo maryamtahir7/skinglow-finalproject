@@ -288,49 +288,125 @@ export default function SignupForm() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 20 }}
                 onSubmit={handleVerifyOtp}
-                className="space-y-6 pt-4"
+                className="space-y-6 pt-2"
               >
 
-                <div className="space-y-2">
-                  <div className="flex justify-center mb-6">
-                    <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center animate-pulse">
-                      <Mail className="w-10 h-10 text-white" />
-                    </div>
-                  </div>
+                {/* Animated Icon */}
+                <div className="flex justify-center mb-2">
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", bounce: 0.5, delay: 0.2 }}
+                    className="w-20 h-20 bg-gradient-to-br from-rose-500/20 to-pink-500/20 rounded-full flex items-center justify-center border border-white/10"
+                  >
+                    <motion.div
+                      animate={{ y: [0, -4, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      <Mail className="w-9 h-9 text-rose-300" />
+                    </motion.div>
+                  </motion.div>
+                </div>
 
-                  <label className="text-xs font-bold uppercase tracking-widest text-white/50 block text-center mb-2">Verification Code</label>
-                  <div className="relative group max-w-[300px] mx-auto">
-                    <Hash className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40 group-focus-within:text-white transition-colors" />
-                    <input
-                      type="text"
-                      required
-                      value={otpCode}
-                      onChange={(e) => setOtpCode(e.target.value)}
-                      placeholder="• • • • • •"
-                      className="w-full bg-black/20 border border-white/10 rounded-xl py-4 pl-14 pr-4 text-white placeholder:text-white/20 outline-none focus:bg-black/30 focus:border-white/30 transition-all font-mono text-2xl tracking-[0.2em] text-center"
-                    />
+                <div className="text-center mb-2">
+                  <p className="text-white/40 text-xs">We sent a 6-digit code to</p>
+                  <p className="text-white font-medium text-sm mt-1">{formData.email}</p>
+                </div>
+
+                {/* 6 Individual Digit Boxes */}
+                <div className="space-y-3">
+                  <label className="text-xs font-bold uppercase tracking-widest text-white/50 block text-center">Verification Code</label>
+                  <div className="flex justify-center gap-2.5">
+                    {[0, 1, 2, 3, 4, 5].map((index) => (
+                      <input
+                        key={index}
+                        id={`otp-${index}`}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={1}
+                        value={otpCode[index] || ''}
+                        autoFocus={index === 0}
+                        className="w-12 h-14 bg-black/20 border border-white/10 rounded-xl text-center text-white text-xl font-bold outline-none focus:bg-black/30 focus:border-rose-400/50 focus:ring-1 focus:ring-rose-400/30 transition-all caret-transparent"
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '');
+                          if (!val) return;
+                          const newOtp = otpCode.split('');
+                          newOtp[index] = val[0];
+                          setOtpCode(newOtp.join(''));
+                          // Auto-focus next
+                          if (val && index < 5) {
+                            document.getElementById(`otp-${index + 1}`)?.focus();
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          // Backspace: clear current and jump back
+                          if (e.key === 'Backspace') {
+                            e.preventDefault();
+                            const newOtp = otpCode.split('');
+                            if (newOtp[index]) {
+                              newOtp[index] = '';
+                              setOtpCode(newOtp.join(''));
+                            } else if (index > 0) {
+                              newOtp[index - 1] = '';
+                              setOtpCode(newOtp.join(''));
+                              document.getElementById(`otp-${index - 1}`)?.focus();
+                            }
+                          }
+                        }}
+                        onPaste={(e) => {
+                          e.preventDefault();
+                          const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+                          if (pasted) {
+                            setOtpCode(pasted);
+                            const focusIdx = Math.min(pasted.length, 5);
+                            document.getElementById(`otp-${focusIdx}`)?.focus();
+                          }
+                        }}
+                      />
+                    ))}
                   </div>
                 </div>
 
                 <Button
                   type="submit"
-                  disabled={loading}
-                  className="w-full h-14 bg-white text-stone-900 border-0 rounded-xl hover:bg-stone-100 font-bold text-lg tracking-wide hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-black/10 flex items-center justify-center gap-2 group/btn"
+                  disabled={loading || otpCode.length < 6}
+                  className="w-full h-14 bg-gradient-to-r from-rose-500 to-pink-500 text-white border-0 rounded-xl hover:from-rose-600 hover:to-pink-600 font-bold text-lg tracking-wide hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-rose-500/20 flex items-center justify-center gap-2 group/btn disabled:opacity-40 disabled:hover:scale-100"
                 >
                   {loading ? (
-                    <div className="w-5 h-5 border-2 border-stone-900/30 border-t-stone-900 rounded-full animate-spin" />
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
-                    <>Verify & Join <Check className="w-5 h-5" /></>
+                    <><Sparkles className="w-5 h-5" /> Verify & Join</>
                   )}
                 </Button>
 
-                <div className="text-center">
+                {/* Resend + Back */}
+                <div className="flex items-center justify-between">
                   <button
                     type="button"
                     onClick={() => setSignupStep('form')}
-                    className="text-white/50 text-sm hover:text-white flex items-center justify-center gap-2 mx-auto transition-colors"
+                    className="text-white/50 text-sm hover:text-white flex items-center gap-1.5 transition-colors"
                   >
-                    <ArrowLeft className="w-3 h-3" /> Back to Email
+                    <ArrowLeft className="w-3 h-3" /> Back
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        setLoading(true);
+                        const otpResponse = await sendOtp(userId, formData.email);
+                        setOtpToken(otpResponse.token);
+                        setOtpCode('');
+                        setError('');
+                      } catch (err) {
+                        setError('Failed to resend OTP.');
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                    className="text-rose-300/70 text-sm hover:text-rose-200 transition-colors disabled:opacity-40"
+                  >
+                    Resend Code
                   </button>
                 </div>
               </motion.form>

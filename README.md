@@ -1,411 +1,649 @@
-# 🌟 SkinGlow - AI-Powered Skincare E-Commerce Platform
+<p align="center">
+  <img src="https://img.shields.io/badge/SkinGlow-Premium%20Skincare-be123c?style=for-the-badge&logo=sparkles&logoColor=white" alt="SkinGlow Badge" />
+</p>
 
-A comprehensive, intelligent skincare e-commerce platform that combines advanced AI technology with modern web development to deliver personalized skincare recommendations and seamless shopping experiences.
+<h1 align="center">✨ SkinGlow — AI-Powered Skincare E-Commerce Platform</h1>
 
-![SkinGlow](https://img.shields.io/badge/SkinGlow-AI%20Skincare-teal) ![React](https://img.shields.io/badge/React-19.0-blue) ![Node.js](https://img.shields.io/badge/Node.js-Latest-green) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon-blue)
+<p align="center">
+  <strong>An intelligent, full-stack skincare e-commerce web application with AI-driven diagnostics, conversational commerce, real-time face scanning, and a comprehensive admin dashboard.</strong>
+</p>
 
----
-
-## 🎯 Project Overview
-
-SkinGlow is a feature-rich e-commerce platform specifically designed for skincare products. It leverages cutting-edge AI technologies including Google Gemini, TensorFlow.js for face scanning, and advanced recommendation algorithms to provide users with personalized skincare solutions. The platform includes comprehensive admin management, secure authentication, and modern UI/UX design.
-
----
-
-## ✨ Key Features
-
-### 🤖 AI-Powered Features
-- **AI Chat Assistant**: Intelligent conversational AI using Google Gemini API for personalized skincare advice
-- **Face Analysis**: TensorFlow.js-powered face scanning for skin type detection and concern identification
-- **Smart Recommendations**: AI-driven product recommendations based on skin concerns, preferences, and purchase history
-- **Skin Quiz**: Interactive assessment to understand user skin types and concerns
-- **Routine Generator**: Automated skincare routine suggestions based on AI analysis
-
-### 🛒 E-Commerce Functionality
-- **Product Catalog**: Comprehensive skincare product management with categories, ingredients, and benefits
-- **Shopping Cart**: Persistent cart functionality with quantity management
-- **Wishlist**: Save favorite products for later purchase
-- **Checkout Process**: Secure checkout with multiple payment options (Stripe integration)
-- **Order Management**: Complete order tracking and history
-- **Product Reviews**: Customer review and rating system
-
-### 👤 User Features
-- **Secure Authentication**: Email/password signup with OTP verification
-- **Google OAuth**: Seamless Google account integration
-- **User Profiles**: Comprehensive profile management with skin preferences
-- **Order History**: Track past orders and current order status
-- **Personalized Recommendations**: AI-powered suggestions based on user data
-- **Concern-Based Navigation**: Browse products by specific skin concerns
-
-### 🔧 Admin Dashboard
-- **Product Management**: Add, edit, and delete products with image uploads
-- **Order Management**: View, update, and manage customer orders
-- **Stock Management**: Real-time inventory tracking and alerts
-- **Category Management**: Organize products into categories
-- **Review Management**: Moderate and manage customer reviews
-- **AI Employee**: Admin-specific AI tools for business insights
-- **Reports & Analytics**: Sales reports, profit tracking, and business analytics
-- **User Management**: View and manage customer accounts
-
-### 🎨 Modern UI/UX
-- **Responsive Design**: Mobile-first approach with beautiful desktop experience
-- **Glassmorphism UI**: Modern glass-effect design with smooth animations
-- **Dark Theme**: Elegant dark color scheme with excellent contrast
-- **Smooth Animations**: Framer Motion-powered transitions and interactions
-- **Voice Interface**: Voice commands for hands-free navigation
-- **Floating AI Assistant**: Always-accessible AI chat interface
-- **Progressive Web App**: PWA capabilities for mobile installation
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react" />
+  <img src="https://img.shields.io/badge/Vite-6.4-646CFF?style=flat-square&logo=vite" />
+  <img src="https://img.shields.io/badge/TailwindCSS-4.0-06B6D4?style=flat-square&logo=tailwindcss" />
+  <img src="https://img.shields.io/badge/Prisma-5.22-2D3748?style=flat-square&logo=prisma" />
+  <img src="https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=flat-square&logo=postgresql" />
+  <img src="https://img.shields.io/badge/TensorFlow.js-BlazeFace-FF6F00?style=flat-square&logo=tensorflow" />
+  <img src="https://img.shields.io/badge/Groq-LLaMA%203.3-000000?style=flat-square" />
+  <img src="https://img.shields.io/badge/Stripe-Payments-635BFF?style=flat-square&logo=stripe" />
+  <img src="https://img.shields.io/badge/Deployed-Vercel-000000?style=flat-square&logo=vercel" />
+</p>
 
 ---
 
-## 🏗️ Technical Architecture
+## 📋 Table of Contents
 
-### Frontend Stack
-- **Framework**: React 19.0 with Vite 6.1.0
-- **Routing**: React Router DOM 7.8.2
-- **Styling**: Tailwind CSS 4.0.14 with custom animations
-- **UI Components**: Radix UI primitives with shadcn/ui
-- **Icons**: Lucide React, React Icons
-- **Animations**: Framer Motion 12.23.12
-- **Forms**: React Hook Form with Zod validation
-- **State Management**: React Context API
-- **AI Integration**: Google Generative AI, Groq SDK
-
-### Backend Stack
-- **Runtime**: Node.js with Express.js
-- **Database**: PostgreSQL via Neon (serverless Postgres)
-- **ORM**: Prisma 5.22.0
-- **Authentication**: JWT tokens with email verification
-- **Email Service**: Nodemailer with Gmail SMTP
-- **Payment**: Stripe integration
-- **AI Services**: Google Gemini API, TensorFlow.js
-
-### Database Schema
-- **Users**: Customer profiles with skin preferences and concerns
-- **Products**: Comprehensive product data with ingredients and benefits
-- **Orders**: Complete order management with status tracking
-- **Cart & Wishlist**: User-specific shopping data
-- **Reviews**: Customer feedback system
-- **AI Memory**: Conversation history and recommendation data
-- **Notifications**: User notification system
+1. [Project Overview](#-project-overview)
+2. [Problem Statement](#-problem-statement)
+3. [Proposed Solution](#-proposed-solution)
+4. [Key Features](#-key-features)
+5. [System Architecture](#-system-architecture)
+6. [Technology Stack](#-technology-stack)
+7. [Database Schema (ER Model)](#-database-schema-er-model)
+8. [AI & Machine Learning Modules](#-ai--machine-learning-modules)
+9. [User Roles & Access Control](#-user-roles--access-control)
+10. [Application Pages & Routes](#-application-pages--routes)
+11. [API Endpoints](#-api-endpoints)
+12. [Screenshots](#-screenshots)
+13. [Installation & Setup](#-installation--setup)
+14. [Environment Variables](#-environment-variables)
+15. [Deployment](#-deployment)
+16. [Testing](#-testing)
+17. [Future Enhancements](#-future-enhancements)
+18. [Contributors](#-contributors)
+19. [License](#-license)
 
 ---
 
-## 📁 Project Structure
+## 🌟 Project Overview
+
+**SkinGlow** is a comprehensive, production-grade AI-powered skincare e-commerce platform built as a **Final Year Project**. It combines modern web technologies with artificial intelligence to deliver a personalized, intelligent shopping experience for skincare enthusiasts.
+
+Unlike traditional e-commerce platforms, SkinGlow integrates **conversational AI**, **real-time face scanning using TensorFlow.js**, **voice-enabled interaction**, **personalized skincare quiz recommendations**, and **an AI-powered business intelligence system for administrators** — making it a truly next-generation skincare platform.
+
+### 🎯 Project Objectives
+
+| # | Objective | Status |
+|---|-----------|--------|
+| 1 | Build a fully functional skincare e-commerce platform with product management, cart, wishlist, and checkout | ✅ Complete |
+| 2 | Integrate AI chatbot for personalized skincare consultation and conversational commerce | ✅ Complete |
+| 3 | Implement real-time face scanning using TensorFlow.js (BlazeFace) for skin analysis | ✅ Complete |
+| 4 | Create an intelligent skincare quiz that recommends products based on user responses | ✅ Complete |
+| 5 | Develop a comprehensive admin dashboard with AI-powered business analytics | ✅ Complete |
+| 6 | Implement secure authentication with OTP verification via email | ✅ Complete |
+| 7 | Deploy to production on Vercel with a cloud-hosted PostgreSQL database | ✅ Complete |
+
+---
+
+## 🔍 Problem Statement
+
+The skincare industry faces a significant **personalization gap**. Consumers often struggle with:
+
+- **Information Overload**: Thousands of products with complex ingredient lists make it difficult for average consumers to choose the right products for their skin type.
+- **Lack of Expert Access**: Professional dermatological consultations are expensive and inaccessible to many.
+- **Generic Recommendations**: Traditional e-commerce platforms provide one-size-fits-all product listings without considering individual skin types, concerns, or preferences.
+- **Trial-and-Error Purchasing**: Without proper guidance, consumers waste money on products that don't suit their skin, leading to frustration and potential skin damage.
+
+---
+
+## 💡 Proposed Solution
+
+SkinGlow addresses these challenges by providing:
+
+1. **AI Virtual Esthetician** — A conversational AI chatbot (powered by Groq LLaMA 3.3 70B) that acts as a personal skincare consultant, answering questions, recommending products from the real catalog, and even placing orders through natural conversation.
+
+2. **Real-Time Face Scanning** — Using TensorFlow.js BlazeFace model, users can scan their face via webcam/camera to receive AI-generated skin analysis and personalized product recommendations.
+
+3. **Intelligent Skin Quiz** — A multi-step interactive quiz that assesses skin type, concerns, environment, and lifestyle to generate a tailored product recommendation list.
+
+4. **Conversational Commerce** — Users can add products to cart, search the catalog, and place complete orders entirely through the AI chatbot — with structured confirmation flows and real-time inventory checks.
+
+5. **Admin AI Employee** — Store administrators have access to an AI-powered business analyst that queries live database analytics to report on revenue, top-selling products, and inventory alerts.
+
+---
+
+## 🚀 Key Features
+
+### 🛒 E-Commerce Core
+| Feature | Description |
+|---------|-------------|
+| **Product Catalog** | Browse, search, and filter products by category, skin type, concern, and price range |
+| **Product Detail Pages** | High-quality multi-image galleries, ingredient lists, benefits, reviews, and related products |
+| **Shopping Cart** | Real-time cart management with quantity adjustments and persistent storage |
+| **Wishlist** | Save favorite products for future purchase |
+| **Checkout System** | Multi-step checkout with Cash on Delivery (COD) and Stripe payment integration |
+| **Order Tracking** | Full order history with status updates (Pending → Shipped → Delivered) |
+| **Product Reviews** | Authenticated users can rate and review products with star ratings |
+| **Product Search** | Real-time search across product names, categories, and descriptions |
+
+### 🤖 AI & Intelligence
+| Feature | Description |
+|---------|-------------|
+| **AI Virtual Esthetician** | Groq LLaMA 3.3 70B conversational AI for skincare advice and shopping assistance |
+| **Voice Interface** | Speech-to-text input and text-to-speech responses with professional female voice synthesis |
+| **Face Scan Analysis** | TensorFlow.js BlazeFace real-time face detection with AI skin condition assessment |
+| **Skin Quiz Engine** | Multi-step diagnostic quiz with algorithmic product matching based on skin profile |
+| **Conversational Commerce** | Add-to-cart, product search, and complete order placement through natural language |
+| **AI Business Analyst** | Admin-facing AI employee with live database tool-calling for business intelligence |
+| **Smart Recommendations** | Concern-based and skin-type-based product ranking with weighted scoring algorithm |
+
+### 👤 User Experience
+| Feature | Description |
+|---------|-------------|
+| **Google OAuth Login** | One-click sign-in with Google Account |
+| **Email OTP Verification** | Secure 6-digit OTP sent via branded SkinGlow email with JWT-based verification |
+| **User Profiles** | Personal profile management with order history |
+| **Skincare Routine Builder** | AM/PM routine tracker with progress persistence and product recommendations |
+| **Skin Concern Explorer** | Browse products by specific skin concerns (acne, aging, dryness, pigmentation, sensitivity, pores) |
+| **Blog & Education** | Skincare education articles with detailed content pages |
+| **Real-time Notifications** | In-app notification system with read/unread management |
+| **Responsive Design** | Fully responsive across desktop, tablet, and mobile devices |
+| **PWA Support** | Installable as a Progressive Web App on mobile devices |
+
+### 🛡️ Admin Dashboard
+| Feature | Description |
+|---------|-------------|
+| **Product Management** | Full CRUD operations with multi-image upload and category tagging |
+| **Category Management** | Create, edit, and delete product categories with image support |
+| **Order Management** | View all orders, update status (Pending/Shipped/Delivered/Cancelled), delete orders |
+| **Inventory & Stock** | Track stock levels with low-stock alerts via n8n webhook automation |
+| **Financial Reports** | Monthly sales and profit reports with auto-generation from order data |
+| **Review Moderation** | View, manage, and remove customer reviews |
+| **AI Business Analyst** | Ask natural-language questions about revenue, trends, and inventory |
+| **Role-Based Access** | Admin routes protected with role verification middleware |
+
+---
+
+## 🏗️ System Architecture
 
 ```
-SkinGlow-Final-Project/
-├── api/                          # Backend API endpoints
-│   ├── ai/                      # AI-related endpoints
-│   │   ├── chat.js             # AI chat functionality
-│   │   ├── vision-scan.js      # Face scanning API
-│   │   ├── order-flow.js       # AI order processing
-│   │   └── tools.js            # AI utility functions
-│   ├── db-proxy.js             # Database proxy with Prisma
-│   ├── send-otp.js             # OTP email sending
-│   ├── verify-otp.js           # OTP verification
-│   ├── contact.js              # Contact form handling
-│   └── newsletter.js           # Newsletter subscription
-├── prisma/
-│   └── schema.prisma           # Database schema definition
-├── src/
-│   ├── components/             # Reusable React components
-│   │   ├── ui/                # UI component library
-│   │   ├── navbar.jsx         # Navigation bar
-│   │   ├── footer.jsx         # Footer component
-│   │   ├── FloatingAI.jsx     # AI chat interface
-│   │   └── VoiceInterface.jsx # Voice command system
-│   ├── pages/                 # Page components
-│   │   ├── homepage.jsx       # Landing page
-│   │   ├── products.jsx       # Product catalog
-│   │   ├── productdetail.jsx  # Product details
-│   │   ├── CartPage.jsx       # Shopping cart
-│   │   ├── CheckoutPage.jsx   # Checkout process
-│   │   ├── signup.jsx         # User registration
-│   │   ├── login.jsx          # User login
-│   │   ├── FaceScanPage.jsx   # Face analysis
-│   │   ├── SkinQuiz.jsx       # Skin assessment
-│   │   ├── AIChat/            # AI chat interface
-│   │   └── admin/             # Admin dashboard pages
-│   ├── backend/               # Backend client functions
-│   │   └── auth.js            # Authentication logic
-│   ├── context/               # React context providers
-│   └── lib/                   # Utility functions
-├── public/                     # Static assets
-└── package.json               # Dependencies and scripts
+┌──────────────────────────────────────────────────────────────────┐
+│                        CLIENT (Browser)                         │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │                    React 19 + Vite 6                       │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐  │  │
+│  │  │ Homepage │ │ Products │ │ AI Chat  │ │  Face Scan   │  │  │
+│  │  │          │ │ & Detail │ │ & Voice  │ │ (TF.js)      │  │  │
+│  │  └──────────┘ └──────────┘ └──────────┘ └──────────────┘  │  │
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────────┐  │  │
+│  │  │   Cart   │ │ Checkout │ │SkinQuiz  │ │Admin Dashboard│  │  │
+│  │  │& Wishlist│ │& Payment │ │& Routine │ │ & AI Employee│  │  │
+│  │  └──────────┘ └──────────┘ └──────────┘ └──────────────┘  │  │
+│  └────────────────────────────────────────────────────────────┘  │
+│         │ Axios / Fetch API                                      │
+└─────────┼────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                  VERCEL SERVERLESS FUNCTIONS                      │
+│  ┌─────────────────────────────────────────────────────────┐     │
+│  │                    API Layer (/api/)                     │     │
+│  │  ┌──────────┐ ┌──────────┐ ┌───────────┐ ┌──────────┐  │     │
+│  │  │ db-proxy │ │ send-otp │ │ verify-otp│ │ contact  │  │     │
+│  │  │(All CRUD)│ │(Nodemailer│ │  (JWT)   │ │newsletter│  │     │
+│  │  └──────────┘ └──────────┘ └───────────┘ └──────────┘  │     │
+│  │  ┌──────────────────────────────────────────────────┐   │     │
+│  │  │              AI Module (/api/ai/)                 │   │     │
+│  │  │  ┌────────┐ ┌────────────┐ ┌──────────────────┐  │   │     │
+│  │  │  │  chat  │ │ admin-chat │ │   vision-scan    │  │   │     │
+│  │  │  │(Groq)  │ │(Tool-Call) │ │  (Skin Analysis) │  │   │     │
+│  │  │  └────────┘ └────────────┘ └──────────────────┘  │   │     │
+│  │  │  ┌─────────────┐ ┌───────────┐ ┌──────────────┐  │   │     │
+│  │  │  │ order-flow  │ │ shopping  │ │  recommend   │  │   │     │
+│  │  │  │ (28KB logic)│ │  intent   │ │   intent     │  │   │     │
+│  │  │  └─────────────┘ └───────────┘ └──────────────┘  │   │     │
+│  │  └──────────────────────────────────────────────────┘   │     │
+│  └─────────────────────────────────────────────────────────┘     │
+│         │ Prisma ORM                                             │
+└─────────┼────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌──────────────────────────────────────────────────────────────────┐
+│              NEON PostgreSQL (Cloud Database)                     │
+│  ┌────────┐ ┌─────────┐ ┌───────┐ ┌──────┐ ┌────────────────┐  │
+│  │  User  │ │ Product │ │ Order │ │Review│ │  Notification  │  │
+│  │Profile │ │Category │ │ Item  │ │Stock │ │CartItem/Wishlist│  │
+│  └────────┘ └─────────┘ └───────┘ └──────┘ └────────────────┘  │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🛠️ Technology Stack
 
-### Prerequisites
-- Node.js 18+ and npm
-- PostgreSQL database (Neon recommended)
-- Google Cloud Project with Gemini API key
-- Gmail account for email services
-- Stripe account for payments
+### Frontend
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **React** | 19.0 | UI component library with hooks-based architecture |
+| **Vite** | 6.4 | Next-generation build tool with HMR (Hot Module Replacement) |
+| **TailwindCSS** | 4.0 | Utility-first CSS framework for responsive design |
+| **Framer Motion** | 12.x | Production-ready animation library for React |
+| **React Router DOM** | 7.8 | Client-side routing with nested layouts |
+| **Lucide React** | 0.542 | Beautiful, consistent icon library |
+| **React Hook Form** | 7.62 | Performant form handling with validation |
+| **Zod** | 4.1 | TypeScript-first schema validation |
+| **React Markdown** | 10.1 | Render markdown content (AI responses, blog posts) |
+| **Radix UI** | Latest | Accessible, unstyled UI primitives (Dialog, Select, Tabs, etc.) |
 
-### Installation
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/maryamtahir7/skinglow-finalproject.git
-cd skinglow-finalproject
-```
-
-2. **Install dependencies**
-```bash
-npm install
-```
-
-3. **Set up environment variables**
-Create a `.env` file in the root directory:
-```env
-# Database
-DATABASE_URL="postgresql://user:password@host:port/database?sslmode=require"
-
-# JWT Secret
-JWT_SECRET="your-super-secret-jwt-key"
-
-# Email Configuration
-GMAIL_USER="your-email@gmail.com"
-GMAIL_PASS="your-app-specific-password"
-
-# Google AI
-GOOGLE_AI_API_KEY="your-google-gemini-api-key"
-
-# Stripe
-STRIPE_SECRET_KEY="your-stripe-secret-key"
-STRIPE_PUBLISHABLE_KEY="your-stripe-publishable-key"
-
-# Admin Email
-ADMIN_EMAIL="skin.glow.skincare.pk@gmail.com"
-```
-
-4. **Set up the database**
-```bash
-npx prisma generate
-npx prisma db push
-```
-
-5. **Start the development server**
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:5173`
-
----
-
-## 🎯 Usage Guide
-
-### For Users
-
-1. **Sign Up**: Create an account with email verification
-2. **Skin Analysis**: Take the skin quiz or use face scanning for personalized recommendations
-3. **Browse Products**: Explore products by category or concern
-4. **AI Assistant**: Use the floating AI chat for skincare advice
-5. **Shop**: Add products to cart and checkout securely
-6. **Track Orders**: View order history and status in profile
-
-### For Admins
-
-1. **Access Admin Panel**: Login with admin credentials
-2. **Manage Products**: Add new products with images and details
-3. **Process Orders**: View and update order statuses
-4. **Monitor Stock**: Track inventory levels
-5. **View Analytics**: Check sales reports and business insights
-6. **AI Tools**: Use AI employee for business recommendations
-
----
-
-## 🔧 API Endpoints
-
-### Authentication
-- `POST /api/db-proxy` - Signup, login, and user management
-- `POST /api/send-otp` - Send OTP verification email
-- `POST /api/verify-otp` - Verify OTP code
-
-### Products
-- `POST /api/db-proxy` - Get products, add products, update products
-- `GET /api/products/*` - Product-specific endpoints
-
-### AI Services
-- `POST /api/ai/chat` - AI chat conversation
-- `POST /api/ai/vision-scan` - Face analysis
-- `POST /api/ai/order-flow` - AI-powered order processing
-
-### Orders
-- `POST /api/orders/create` - Create new order
-- `POST /api/db-proxy` - Order management
-
----
-
-## 🎨 Key Technologies Explained
-
-### AI Integration
-- **Google Gemini API**: Advanced natural language processing for conversational AI
-- **TensorFlow.js**: Client-side machine learning for face scanning and analysis
-- **Groq SDK**: High-performance AI inference for real-time recommendations
-
-### Modern Frontend
-- **React 19**: Latest React features with improved performance
-- **Vite**: Lightning-fast build tool and dev server
-- **Tailwind CSS 4**: Latest utility-first CSS framework
-- **Framer Motion**: Production-ready motion library for React
+### AI & Machine Learning
+| Technology | Purpose |
+|------------|---------|
+| **Groq SDK** (LLaMA 3.3 70B Versatile) | High-speed LLM inference for conversational AI |
+| **TensorFlow.js** | Client-side machine learning runtime |
+| **BlazeFace Model** | Real-time face detection in the browser |
+| **Web Speech API** | Browser-native speech recognition and synthesis |
 
 ### Backend & Database
-- **Prisma ORM**: Type-safe database access with excellent DX
-- **PostgreSQL (Neon)**: Serverless PostgreSQL with automatic scaling
-- **JWT Authentication**: Secure token-based authentication
-- **Nodemailer**: Email sending with SMTP support
+| Technology | Purpose |
+|------------|---------|
+| **Node.js** (Vercel Serverless Functions) | API endpoints as serverless functions |
+| **Prisma ORM** (v5.22) | Type-safe database client with migrations |
+| **PostgreSQL** (Neon Cloud) | Production-grade relational database |
+| **JWT** (jsonwebtoken) | Stateless authentication tokens |
+| **Nodemailer** | Transactional email delivery for OTP verification |
+
+### Payments & Third-Party
+| Technology | Purpose |
+|------------|---------|
+| **Stripe** | Secure payment processing (card payments) |
+| **Google OAuth 2.0** | Social authentication via Google accounts |
+| **n8n Webhooks** | Workflow automation for order confirmations and stock alerts |
+
+### DevOps & Deployment
+| Technology | Purpose |
+|------------|---------|
+| **Vercel** | Production deployment with serverless functions and edge CDN |
+| **GitHub** | Version control and CI/CD pipeline trigger |
+| **ESLint** | Code quality and linting enforcement |
+| **Vitest** | Unit testing framework compatible with Vite |
+| **Playwright** | End-to-end browser testing |
 
 ---
 
-## 📊 Database Models
+## 📊 Database Schema (ER Model)
 
-### Core Models
-- **User**: Customer accounts with authentication and profiles
-- **Product**: Skincare products with comprehensive details
-- **Order**: Customer orders with items and status tracking
-- **CartItem**: User shopping cart data
-- **WishlistItem**: User saved products
-- **Review**: Product reviews and ratings
-- **AIMemory**: AI conversation history and preferences
-- **Notification**: User notifications and alerts
+The database is managed through **Prisma ORM** with **13 interconnected models** in a PostgreSQL database:
 
-### Relationships
-- Users have many orders, cart items, wishlist items, and reviews
-- Products belong to many orders, cart items, and wishlist items
-- Orders contain many order items
-- AI memory is tied to user conversations
-
----
-
-## 🔐 Security Features
-
-- **JWT Authentication**: Secure token-based authentication
-- **Email Verification**: OTP verification for signup
-- **Password Hashing**: Secure password storage
-- **Admin Role Protection**: Protected admin routes
-- **Environment Variables**: Sensitive data in environment files
-- **SQL Injection Prevention**: Prisma ORM protection
-- **CORS Configuration**: Controlled cross-origin requests
-
----
-
-## 🌐 Deployment
-
-### Vercel Deployment (Recommended)
-
-1. **Push code to GitHub**
-2. **Import project in Vercel**
-3. **Configure environment variables**
-4. **Deploy**
-
-The project includes Vercel configuration in `vercel.json`.
-
-### Manual Deployment
-
-1. **Build the project**
-```bash
-npm run build
+```
+┌───────────────┐       ┌─────────────────┐       ┌──────────────┐
+│     User      │       │     Product     │       │   Category   │
+├───────────────┤       ├─────────────────┤       ├──────────────┤
+│ id (PK)       │──┐    │ id (PK)         │       │ id (PK)      │
+│ email (UNIQUE)│  │    │ name            │       │ name         │
+│ password      │  │    │ description     │       │ description  │
+│ name          │  │    │ category        │       │ image        │
+│ role (ENUM)   │  │    │ ingredients[]   │       │ createdAt    │
+│ createdAt     │  │    │ skinTypes[]     │       └──────────────┘
+│ updatedAt     │  │    │ benefits[]      │
+└───────────────┘  │    │ price           │       ┌──────────────┐
+                   │    │ stock           │       │    Report    │
+┌───────────────┐  │    │ imageUrl (x3)   │       ├──────────────┤
+│CustomerProfile│  │    │ concerns        │       │ id (PK)      │
+├───────────────┤  │    └─────────────────┘       │ type         │
+│ id (PK)       │  │           │                  │ month        │
+│ userId (FK)───┤──┘           │                  │ year         │
+│ skinType      │              │                  │ totalSales   │
+│ concerns[]    │    ┌─────────┼───────┐          │ profit       │
+│ allergies[]   │    │         │       │          └──────────────┘
+└───────────────┘    ▼         ▼       ▼
+               ┌─────────┐ ┌──────┐ ┌──────────┐
+               │CartItem │ │Review│ │WishlistItem│
+               ├─────────┤ ├──────┤ ├──────────┤
+               │userId(FK)│ │userId│ │userId(FK)│
+               │productId │ │prodId│ │productId │
+               │quantity  │ │rating│ │createdAt │
+               └─────────┘ │comment│ └──────────┘
+                            └──────┘
+┌───────────────┐     ┌──────────────┐     ┌──────────────┐
+│     Order     │     │  OrderItem   │     │    Stock     │
+├───────────────┤     ├──────────────┤     ├──────────────┤
+│ id (PK)       │◄────│ orderId (FK) │     │ id (PK)      │
+│ userId (FK)   │     │ productId(FK)│     │ productId(FK)│
+│ name, phone   │     │ quantity     │     │ quantity     │
+│ address, city │     │ price        │     │ status       │
+│ total         │     └──────────────┘     └──────────────┘
+│ status (ENUM) │
+│ paymentMethod │     ┌──────────────┐
+└───────────────┘     │ Notification │
+                      ├──────────────┤
+┌───────────────┐     │ id (PK)      │
+│   AIMemory    │     │ userId (FK)  │
+├───────────────┤     │ message      │
+│ id (PK)       │     │ type         │
+│ userId (FK)   │     │ read         │
+│ conversation  │     └──────────────┘
+│ recommendations│
+│ preferences   │
+└───────────────┘
 ```
 
-2. **Start production server**
-```bash
-npm start
+### Enums
+- **Role**: `ADMIN` | `CUSTOMER`
+- **OrderStatus**: `PENDING` | `PAID` | `SHIPPED` | `DELIVERED` | `CANCELLED`
+
+---
+
+## 🧠 AI & Machine Learning Modules
+
+### 1. AI Virtual Esthetician (Conversational AI)
+
+The core AI system is powered by **Groq's LLaMA 3.3 70B Versatile** model and consists of multiple specialized intent handlers:
+
+| Module | File | Responsibility |
+|--------|------|---------------|
+| **Chat Controller** | `api/ai/chat.js` | Main orchestrator — routes user messages through intent detection pipeline |
+| **Order Flow Engine** | `api/ai/_order-flow.js` | Multi-step order placement with shipping detail collection (28KB of logic) |
+| **Shopping Intent** | `api/ai/_shopping-intent.js` | Add-to-cart detection, product search, and confirmation card generation |
+| **Recommend Intent** | `api/ai/_recommend-intent.js` | Concern-based and skin-type-based product recommendations with scoring |
+| **Response Utils** | `api/ai/_response-utils.js` | Sanitization of AI responses to prevent leaking tool calls or code blocks |
+| **Tool Functions** | `api/ai/_tools.js` | Database query tools — searchProducts, getCartItems, placeOrder, etc. |
+
+**Conversational Commerce Flow:**
+```
+User Message → Intent Detection → Route to Handler
+  ├── "place my order" → Order Flow Engine → Collect Details → Confirm → Place
+  ├── "add X to cart"  → Shopping Intent → Search DB → Show Card → Confirm → Add
+  ├── "recommend moisturizer" → Recommend Intent → Score Products → Show Cards
+  └── General skincare Q → Groq LLaMA 3.3 → Natural Language Response
 ```
 
----
+### 2. AI Business Analyst (Admin)
 
-## 📱 PWA Features
+| Module | File | Responsibility |
+|--------|------|---------------|
+| **Admin Chat** | `api/ai/admin-chat.js` | Groq-powered chat with function-calling for live DB analytics |
+| **Admin Tools** | `api/ai/_admin-tools.js` | Tool declarations for revenue queries, top products, and stock alerts |
 
-- **Installable**: Can be installed on mobile devices
-- **Offline Support**: Basic offline functionality
-- **Push Notifications**: Future capability for user engagement
-- **App-like Experience**: Native mobile app feel
+The admin AI uses Groq's **tool-calling** capability to query the live database and return formatted reports with markdown tables.
 
----
+### 3. Face Scan (TensorFlow.js)
 
-## 🧪 Testing
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **BlazeFace Model** | `@tensorflow-models/blazeface` | Real-time face detection via webcam |
+| **TensorFlow.js** | `@tensorflow/tfjs` | ML runtime in the browser (no server needed) |
+| **Vision Scan API** | `api/ai/vision-scan.js` | Server-side skin analysis with product recommendations |
 
-### Unit Tests
-```bash
-npm run test:unit
+**Face Scan Pipeline:**
+```
+Camera Feed → TF.js BlazeFace Detection → Face Crop → Base64 Encode
+  → Send to Vision API → Skin Analysis → Product Recommendations
 ```
 
-### E2E Tests
-```bash
-npm run test:e2e
-```
+### 4. Voice Interface
+
+The platform features a **bi-directional voice interface** using the Web Speech API:
+- **Speech-to-Text**: Users speak their queries, which are transcribed and sent to the AI
+- **Text-to-Speech**: AI responses are read aloud with a professional female voice
+- **Voice Selection**: Intelligent voice matching algorithm that prefers natural female voices
 
 ---
 
-## 🤝 Contributing
+## 👥 User Roles & Access Control
 
-This is a final year project. For contributions:
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
+| Role | Access Level | Capabilities |
+|------|-------------|-------------|
+| **Guest** | Public pages only | Browse products, read blogs, take skin quiz |
+| **Customer** | Authenticated user | All guest features + cart, wishlist, checkout, orders, AI chat, face scan, profile |
+| **Admin** | Full system access | All customer features + admin dashboard, product/order/stock management, AI employee, reports |
 
----
-
-## 📝 License
-
-This project is licensed under the MIT License.
+Admin access is enforced via the `AdminRoute` component which checks `user.role === 'ADMIN'` before rendering admin pages.
 
 ---
 
-## 👥 Team
+## 📄 Application Pages & Routes
 
-**Developer**: Maryam Tahir
-**Project**: SkinGlow - AI-Powered Skincare Platform
-**Year**: 2026
+### Public Routes (No Authentication Required)
+
+| Route | Page | Description |
+|-------|------|-------------|
+| `/` | Homepage | Hero carousel, featured products, brand pillars, categories |
+| `/products` | Products Catalog | Grid view with search, category, skin type, and price filters |
+| `/products/:id` | Product Detail | Multi-image gallery, reviews, add-to-cart, related products |
+| `/about` | About Us | Brand story, mission, and values |
+| `/blog` | Blog Listing | Skincare education articles |
+| `/blog/:id` | Blog Detail | Full article with reading time and share options |
+| `/concerns` | Skin Concerns | Browse by concern (acne, aging, dryness, pigmentation, etc.) |
+| `/contact` | Contact | Contact form with email submission |
+| `/login` | Login | Email/password + Google OAuth login |
+| `/signup` | Signup | Registration with 6-digit OTP email verification |
+| `/forgot-password` | Forgot Password | OTP-based password reset flow |
+| `/privacy-policy` | Privacy Policy | Legal privacy documentation |
+| `/terms` | Terms of Service | Terms and conditions |
+| `/support` | Support | Customer support information |
+| `/shipping` | Shipping Info | Delivery and shipping policy |
+| `/returns` | Returns | Return and refund policy |
+
+### Authenticated Routes (Login Required)
+
+| Route | Page | Description |
+|-------|------|-------------|
+| `/cart` | Shopping Cart | Manage cart items, quantities, and proceed to checkout |
+| `/wishlist` | Wishlist | Saved products for future purchase |
+| `/checkout` | Checkout | Shipping details, payment method, order confirmation |
+| `/orders` | My Orders | Order history with status tracking |
+| `/profile` | User Profile | Personal information management |
+| `/ai-chat` | AI Chat (Full Page) | Dedicated AI skincare consultation page |
+| `/face-scan` | Face Scan | TensorFlow.js face detection and AI skin analysis |
+| `/skin-quiz` | Skin Quiz | Multi-step quiz with personalized recommendations |
+| `/routine` | Routine Builder | AM/PM skincare routine tracker with progress persistence |
+
+### Admin Routes (Admin Role Required)
+
+| Route | Page | Description |
+|-------|------|-------------|
+| `/admin` | Dashboard | Admin overview with navigation sidebar |
+| `/admin/products` | Manage Products | View, edit, delete all products |
+| `/admin/add-product` | Add Product | Create new product with multi-image upload |
+| `/admin/categories` | Categories | Manage product categories |
+| `/admin/orders` | Orders | View and update all customer orders |
+| `/admin/stock` | Inventory | Stock level tracking and management |
+| `/admin/reports` | Reports | Sales and profit analytics with auto-generation |
+| `/admin/reviews` | Reviews | Moderate customer reviews |
+| `/admin/ai-employee` | AI Analyst | AI-powered business intelligence chat |
 
 ---
 
-## 🙏 Acknowledgments
+## 🔌 API Endpoints
 
-- Google for Gemini AI API
-- TensorFlow.js for machine learning capabilities
-- Neon for PostgreSQL hosting
-- Vercel for deployment platform
-- Open source community for amazing libraries
+### Core Database Proxy
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/db-proxy` | Unified database proxy handling 30+ actions via `action` field |
 
----
+The `db-proxy` handles all CRUD operations for: Users, Products, Orders, Cart, Wishlist, Reviews, Categories, Reports, Stocks, and Notifications.
 
-## 📞 Support
+### AI Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/ai/chat` | Customer-facing AI chatbot with multi-intent handling |
+| `POST` | `/api/ai/admin-chat` | Admin AI business analyst with tool-calling |
+| `POST` | `/api/ai/vision-scan` | Face scan image analysis and product recommendations |
 
-For support or questions:
-- Email: skin.glow.skincare.pk@gmail.com
-- Project Repository: [GitHub](https://github.com/maryamtahir7/skinglow-finalproject)
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/send-otp` | Send 6-digit OTP to user email via Nodemailer |
+| `POST` | `/api/verify-otp` | Verify OTP using JWT token validation |
 
----
-
-## 🗺️ Roadmap
-
-### Future Enhancements
-- [ ] Advanced AR try-on features
-- [ ] Subscription box service
-- [ ] Mobile app development (React Native)
-- [ ] Multi-language support
-- [ ] Advanced analytics dashboard
-- [ ] Social sharing features
-- [ ] Loyalty program integration
-- [ ] Live chat support
-- [ ] Video consultations
-- [ ] Integration with dermatologists
+### Other
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/contact` | Submit contact form messages |
+| `POST` | `/api/newsletter` | Newsletter subscription |
+| `POST` | `/api/orders/create` | Direct order creation with n8n webhook trigger |
+| `POST` | `/api/products/update-stock` | Stock update with low-stock alert automation |
 
 ---
 
 ## 📸 Screenshots
 
-*(Add screenshots of your application here)*
+> Screenshots of the live application can be viewed by visiting the deployed URL or running the project locally.
 
 ---
 
-**Built with ❤️ for skincare enthusiasts**
+## ⚙️ Installation & Setup
+
+### Prerequisites
+
+- **Node.js** v18+ installed
+- **npm** v9+ installed
+- **PostgreSQL** database (local or cloud — we recommend [Neon](https://neon.tech))
+- **Git** installed
+
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/maryamtahir7/skinglow-finalproject.git
+cd skinglow-finalproject
+```
+
+### Step 2: Install Dependencies
+
+```bash
+npm install
+```
+
+### Step 3: Configure Environment Variables
+
+Create a `.env` file in the project root (see [Environment Variables](#-environment-variables) section below).
+
+### Step 4: Set Up the Database
+
+```bash
+# Generate Prisma Client
+npx prisma generate
+
+# Push schema to database (creates tables)
+npx prisma db push
+
+# (Optional) Open Prisma Studio to view/edit data
+npx prisma studio
+```
+
+### Step 5: Start the Development Server
+
+```bash
+npm run dev
+```
+
+This runs both the **Vite frontend** (port 5173) and the **API server** (port 8085) concurrently.
+
+### Step 6: Access the Application
+
+- **Frontend**: `http://localhost:5173`
+- **API Server**: `http://localhost:8085`
+
+---
+
+## 🔑 Environment Variables
+
+Create a `.env` file in the project root with the following variables:
+
+```env
+# 🔐 Google OAuth
+GOOGLE_CLIENT_ID=your_google_client_id
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# 🤖 AI - Groq (LLaMA 3.3)
+GROQ_API_KEY=your_groq_api_key
+VITE_GROQ_API_KEY=your_groq_api_key
+
+# 📧 Email OTP (Gmail)
+GMAIL_USER=your_email@gmail.com
+GMAIL_PASS=your_gmail_app_password
+
+# 🔒 JWT Secret
+JWT_SECRET=your_jwt_secret_key
+
+# 💳 Stripe Payments
+VITE_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
+VITE_STRIPE_SECRET_KEY=sk_test_xxxxx
+
+# 🗄️ Database (PostgreSQL)
+DATABASE_URL=postgresql://user:password@host:5432/dbname?sslmode=require
+
+# 🔄 n8n Webhooks (Optional)
+N8N_WEBHOOK_URL=http://localhost:5678
+```
+
+> **Note**: For Gmail, you need to use an [App Password](https://support.google.com/accounts/answer/185833) (not your regular password). Enable 2FA on your Google account first.
+
+---
+
+## 🚀 Deployment
+
+The application is deployed on **Vercel** with the following configuration:
+
+### Vercel Deployment Steps
+
+1. **Connect GitHub Repository** to Vercel
+2. **Set Environment Variables** in Vercel Dashboard → Settings → Environment Variables
+3. **Deploy** — Vercel auto-detects the Vite framework and builds automatically
+
+### Production Architecture on Vercel
+
+| Component | Vercel Feature |
+|-----------|---------------|
+| Frontend (React + Vite) | Static Assets + CDN |
+| API Routes (`/api/*`) | Serverless Functions |
+| Database | External (Neon PostgreSQL) |
+| AI Inference | External (Groq Cloud) |
+
+### Key Deployment Files
+
+| File | Purpose |
+|------|---------|
+| `vercel.json` | Build configuration, rewrites for SPA routing |
+| `.vercelignore` | Files excluded from deployment |
+| `.npmrc` | NPM configuration for legacy peer dependencies |
+
+---
+
+## 🧪 Testing
+
+### Testing Framework
+
+| Tool | Purpose |
+|------|---------|
+| **Vitest** | Unit testing (compatible with Vite's module system) |
+| **Testing Library** | React component testing utilities |
+| **Playwright** | End-to-end browser automation testing |
+
+### Running Tests
+
+```bash
+# Unit Tests
+npm run test:unit
+
+# End-to-End Tests
+npm run test:e2e
+```
+
+---
+
+## 🔮 Future Enhancements
+
+| Enhancement | Description | Priority |
+|------------|-------------|----------|
+| **AI Image Analysis** | Integrate Google Gemini Vision for actual dermatological-grade skin analysis from photos | High |
+| **Subscription Boxes** | Monthly curated skincare boxes based on user profile | Medium |
+| **AR Try-On** | Augmented reality product try-on using face mesh | Medium |
+| **Multi-Language** | Support for Urdu, Arabic, and other languages | Medium |
+| **Mobile App** | React Native companion app with push notifications | Low |
+| **Loyalty Program** | Points-based rewards system for repeat customers | Low |
+| **Ingredient Checker** | AI-powered ingredient safety and compatibility analysis | High |
+
+---
+
+## 👩‍💻 Contributors
+
+| Name | Role | Responsibilities |
+|------|------|-----------------|
+| **Maryam Tahir** | Full-Stack Developer & Project Lead | Frontend development, AI integration, database design, deployment |
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+---
+
+<p align="center">
+  <strong>Built with 💖 for skincare enthusiasts everywhere</strong>
+  <br/>
+  <sub>SkinGlow — Where AI Meets Beautiful Skin</sub>
+</p>
