@@ -10,16 +10,16 @@ import './homepage.css';
 /* Premium cinematic beauty imagery — your pin URLs (1200x for clarity) */
 const HERO_IMAGES = [
   {
-    src: 'https://i.pinimg.com/1200x/34/e4/5b/34e45b6b6158f541b6fa9f70c55fe41a.jpg',
-    position: 'center 20%',
+    src: '/docx/Hero Section Video 1.mp4',
+    position: 'center',
   },
   {
-    src: 'https://i.pinimg.com/736x/f4/d0/94/f4d094963e6105cf33716d47a52ab7cd.jpg',
-    position: 'center 28%',
+    src: '/docx/Hero Section Video 2.mp4',
+    position: 'center',
   },
   {
-    src: 'https://i.pinimg.com/736x/3e/a0/2c/3ea02cc6668815589bc0a6df2c86145d.jpg',
-    position: 'center 24%',
+    src: '/docx/Hero Section Video 3.mp4',
+    position: 'center',
   },
 ];
 
@@ -29,26 +29,29 @@ const FLOAT_LAYERS = [
     className: 'sg-float sg-float--1',
     depth: 55,
     delay: 0,
+    label: 'Hydra Glow',
   },
   {
     src: 'https://i.pinimg.com/1200x/98/f9/88/98f9889c8d63fbf1f73f0959bc38dd68.jpg',
     className: 'sg-float sg-float--2',
     depth: 90,
     delay: 0.4,
+    label: 'Rose Serum',
   },
   {
     src: 'https://i.pinimg.com/1200x/68/c8/5a/68c85a578825f1aaf47f461455bbb8ee.jpg',
     className: 'sg-float sg-float--3',
     depth: 70,
     delay: 0.8,
+    label: 'Petal Mist',
   },
 ];
 
 const PILLARS = [
-  { title: 'Botanical purity', desc: 'Plant-led formulas, free from harsh fillers and empty promises.', img: 'https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=700&q=85' },
-  { title: 'Cruelty free', desc: 'Ethically crafted — never tested on animals, always kind by design.', img: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?auto=format&fit=crop&w=700&q=85' },
-  { title: 'Clean science', desc: 'No parabens, sulfates, or toxins. Only what your skin needs.', img: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5fcccd?auto=format&fit=crop&w=700&q=85' },
-  { title: 'Clinic trusted', desc: 'Dermatologist-tested for sensitive, reactive, and radiant skin alike.', img: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&w=700&q=85' },
+  { title: 'Botanical purity', desc: 'Plant-led formulas, free from harsh fillers and empty promises.', video: '/docx/Homepage%20video%201.mp4' },
+  { title: 'Cruelty free', desc: 'Ethically crafted — never tested on animals, always kind by design.', video: '/docx/Homepage%20video%202.mp4' },
+  { title: 'Clean science', desc: 'No parabens, sulfates, or toxins. Only what your skin needs.', video: '/docx/Homepage%20video%203.mp4' },
+  { title: 'Clinic trusted', desc: 'Dermatologist-tested for sensitive, reactive, and radiant skin alike.', video: '/docx/Homepage%20video%204.mp4' },
 ];
 
 const CONCERNS = [
@@ -125,7 +128,7 @@ function usePrefersReducedMotion() {
 }
 
 /** Floating 3D plane — mouse parallax on outer, continuous motion on inner */
-function FloatLayer({ src, className, depth, smoothX, smoothY, delay = 0 }) {
+function FloatLayer({ src, className, depth, smoothX, smoothY, delay = 0, label }) {
   const x = useTransform(smoothX, (v) => v * depth);
   const y = useTransform(smoothY, (v) => v * (depth * 0.75));
   const rotateY = useTransform(smoothX, (v) => v * 14);
@@ -143,6 +146,7 @@ function FloatLayer({ src, className, depth, smoothX, smoothY, delay = 0 }) {
         <div className="sg-float__card">
           <PremiumImg src={src} alt="" />
           <span className="sg-float__rim" aria-hidden="true" />
+          {label && <span className="sg-float__label">{label}</span>}
         </div>
       </div>
     </motion.div>
@@ -221,9 +225,9 @@ function Homepage() {
 
   // Window scroll — avoid useScroll({ target: ref }) while hero may be unmounted during loading
   const { scrollY } = useScroll();
-  const heroY = useTransform(scrollY, [0, 900], [0, reduced ? 0 : 180]);
-  const heroScale = useTransform(scrollY, [0, 900], [1, reduced ? 1 : 1.12]);
-  const textY = useTransform(scrollY, [0, 900], [0, reduced ? 0 : -80]);
+  const heroY = useTransform(scrollY, [0, 900], [0, reduced ? 0 : 60]);
+  const heroScale = useTransform(scrollY, [0, 900], [1, reduced ? 1 : 1.03]);
+  const textY = useTransform(scrollY, [0, 900], [0, reduced ? 0 : -40]);
 
   useEffect(() => {
     async function checkOAuthUser() {
@@ -289,12 +293,15 @@ function Homepage() {
       >
         <motion.div className="sg-hero__media" style={{ y: heroY, scale: heroScale }} aria-hidden="true">
           {HERO_IMAGES.map((slide, i) => (
-            <PremiumImg
+            <video
               key={slide.src}
               src={slide.src}
-              alt=""
               className={`sg-hero__img${i === heroIndex ? ' is-active' : ''}`}
-              style={{ objectPosition: slide.position }}
+              autoPlay
+              muted
+              loop
+              playsInline
+              style={{ objectPosition: slide.position, objectFit: 'cover' }}
             />
           ))}
           <div className="sg-hero__veil" />
@@ -302,21 +309,6 @@ function Homepage() {
           <div className="sg-hero__orb sg-hero__orb--a" />
           <div className="sg-hero__orb sg-hero__orb--b" />
         </motion.div>
-
-        {/* Floating 3D product planes */}
-        <div className="sg-hero__stage" aria-hidden="true">
-          {FLOAT_LAYERS.map((layer) => (
-            <FloatLayer
-              key={layer.className}
-              src={layer.src}
-              className={layer.className}
-              depth={layer.depth}
-              delay={layer.delay}
-              smoothX={smoothX}
-              smoothY={smoothY}
-            />
-          ))}
-        </div>
 
         <motion.div className="sg-hero__content" style={{ y: textY }}>
           <motion.h1
@@ -387,6 +379,45 @@ function Homepage() {
         </motion.div>
       </section>
 
+      {/* ═══════════ EDITORIAL LOOKBOOK ═══════════ */}
+      <section className="sg-lookbook">
+        <div className="sg-lookbook__inner">
+          <motion.div
+            className="sg-section__head"
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.5 }}
+            variants={fadeUp}
+            style={{ textAlign: 'center', marginBottom: 'clamp(2.5rem, 5vw, 4rem)' }}
+          >
+            <span className="sg-section__eyebrow">The edit</span>
+            <h2 className="sg-section__title">Curated Botanicals</h2>
+            <p className="sg-section__sub">
+              A visual journal of textures, rituals, and the ingredients that define radiant skin.
+            </p>
+          </motion.div>
+
+          <div className="sg-lookbook__grid">
+            {FLOAT_LAYERS.map((layer, i) => (
+              <motion.div
+                key={layer.className}
+                className={`sg-lookbook__card sg-lookbook__card--${i + 1}`}
+                initial={{ opacity: 0, y: 60 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.9, delay: i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <div className="sg-lookbook__img-wrap">
+                  <PremiumImg src={layer.src} alt={layer.label || ''} loading="lazy" />
+                  <div className="sg-lookbook__overlay" />
+                </div>
+                <span className="sg-lookbook__tag">{layer.label}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ═══════════ PILLARS 3D ═══════════ */}
       <section className="sg-section sg-pillars">
         <div className="sg-section__inner">
@@ -417,7 +448,18 @@ function Homepage() {
                 <Tilt3D className="sg-pillar-tilt" max={12}>
                   <article className="sg-pillar sg-pillar--3d">
                     <div className="sg-pillar__media">
-                      <img src={p.img} alt="" loading="lazy" />
+                      {p.video ? (
+                        <video 
+                          src={p.video} 
+                          autoPlay 
+                          loop 
+                          muted 
+                          playsInline 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <img src={p.img} alt="" loading="lazy" />
+                      )}
                     </div>
                     <div className="sg-pillar__index">0{i + 1}</div>
                     <h3 className="sg-pillar__title">{p.title}</h3>
@@ -447,39 +489,36 @@ function Homepage() {
                 From first cleanse to final glow — build a routine that feels like ceremony.
               </p>
             </motion.div>
-            <div className="sg-cats__grid sg-scene-3d">
-              {categories.map((cat, i) => (
-                <motion.div
-                  key={cat.$id || cat.id || i}
-                  custom={i}
-                  initial="hidden"
-                  whileInView="show"
-                  viewport={{ once: true, amount: 0.2 }}
-                  variants={fadeUp}
-                  className="sg-cats__cell"
-                >
-                  <Tilt3D
-                    className="sg-cat-tilt"
-                    max={10}
-                    onClick={() =>
-                      navigate(`/products?category=${encodeURIComponent(cat.name)}`)
-                    }
+            <div className="sg-cats__marquee-wrapper">
+              <div className="sg-cats__marquee-track sg-scene-3d">
+                {[...categories, ...categories, ...categories, ...categories, ...categories, ...categories].map((cat, i) => (
+                  <div
+                    key={`cat-${i}`}
+                    className="sg-cats__cell"
                   >
-                    <span className="sg-cat">
-                      <PremiumImg
-                        src={cat.imageUrl || CAT_FALLBACKS[i % CAT_FALLBACKS.length]}
-                        alt={cat.name || ''}
-                        loading="lazy"
-                      />
-                      <span className="sg-cat__veil" />
-                      <span className="sg-cat__label">
-                        <span className="sg-cat__name">{cat.name}</span>
-                        <span className="sg-cat__hint">Explore</span>
+                    <Tilt3D
+                      className="sg-cat-tilt"
+                      max={10}
+                      onClick={() =>
+                        navigate(`/products?category=${encodeURIComponent(cat.name)}`)
+                      }
+                    >
+                      <span className="sg-cat">
+                        <PremiumImg
+                          src={cat.imageUrl || CAT_FALLBACKS[i % CAT_FALLBACKS.length]}
+                          alt={cat.name || ''}
+                          loading="lazy"
+                        />
+                        <span className="sg-cat__veil" />
+                        <span className="sg-cat__label">
+                          <span className="sg-cat__name">{cat.name}</span>
+                          <span className="sg-cat__hint">Explore</span>
+                        </span>
                       </span>
-                    </span>
-                  </Tilt3D>
-                </motion.div>
-              ))}
+                    </Tilt3D>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>

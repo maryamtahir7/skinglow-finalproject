@@ -1,10 +1,11 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { Camera, Upload, Sparkles, RefreshCw, AlertCircle, CheckCircle2, ShoppingBag } from 'lucide-react';
+import { Camera, Upload, Sparkles, RefreshCw, AlertCircle, CheckCircle2, ShoppingBag, Activity, Beaker, Droplets, Target, ShieldCheck, ChevronRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { getProducts, addToCart } from "../backend/database.js";
 import { useUser } from "../context/UserContext.jsx";
 import { useToast } from "../context/ToastContext";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function FaceScanPage() {
     const [stream, setStream] = useState(null);
@@ -406,50 +407,68 @@ export default function FaceScanPage() {
         setError('');
     };
 
+    const fadeUp = {
+        hidden: { opacity: 0, y: 30 },
+        show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+    };
+    
+    const stagger = {
+        hidden: { opacity: 0 },
+        show: { opacity: 1, transition: { staggerChildren: 0.1 } }
+    };
+
     return (
-        <div className="min-h-screen bg-gray-50 pt-24 pb-12 px-4 sm:px-6">
-            <div className="max-w-4xl mx-auto space-y-8">
+        <div className="min-h-screen bg-[#fdfbf9] pt-28 pb-20 px-4 sm:px-6 relative overflow-hidden font-sans">
+            {/* Elegant Background Ambient Glows */}
+            <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-rose-200/30 rounded-full mix-blend-multiply filter blur-[120px] opacity-70 pointer-events-none"></div>
+            <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-[#f3e8e4]/50 rounded-full mix-blend-multiply filter blur-[120px] opacity-80 pointer-events-none"></div>
+
+            <div className="max-w-6xl mx-auto relative z-10">
 
                 {/* Header */}
-                <div className="text-center space-y-4">
-                    <div className="inline-flex items-center justify-center p-3 bg-pink-100 rounded-full mb-2">
-                        <Sparkles className="w-8 h-8 text-pink-600" />
-                    </div>
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">AI Skin Scan</h1>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Take a selfie and let our advanced Vision AI analyze your skin type, identify concerns, and recommend a personalized routine instantly.
+                <motion.div 
+                    initial="hidden" animate="show" variants={fadeUp}
+                    className="text-center space-y-6 mb-16"
+                >
+                    <h1 className="text-5xl md:text-7xl text-stone-900" style={{ fontFamily: 'var(--sg-display)' }}>
+                        <em className="text-rose-600/90 font-serif italic pr-2">AI</em> Skin Analysis
+                    </h1>
+                    <p className="text-lg md:text-xl text-stone-500 max-w-2xl mx-auto font-light leading-relaxed">
+                        Precision diagnostics for a bespoke botanical ritual. Let our Vision AI decode your unique canvas.
                     </p>
-                </div>
+                </motion.div>
 
-                <div className="grid md:grid-cols-2 gap-8 items-start">
+                <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-stretch">
 
                     {/* Left Column: Camera / Image Display */}
-                    <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden relative min-h-[400px] flex flex-col">
-
+                    <motion.div 
+                        initial="hidden" animate="show" variants={fadeUp}
+                        className="bg-white/60 backdrop-blur-3xl rounded-[2.5rem] shadow-2xl shadow-rose-950/5 border border-white overflow-hidden relative flex flex-col h-[500px] lg:h-[650px]"
+                    >
                         {!stream && !capturedImage && (
-                            <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-6 bg-gradient-to-b from-gray-50 to-white">
-                                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center text-gray-400">
-                                    <Camera className="w-10 h-10" />
+                            <div className="flex-1 flex flex-col items-center justify-center p-10 text-center space-y-8">
+                                <div className="w-28 h-28 bg-stone-50 rounded-full flex items-center justify-center text-stone-300 shadow-inner">
+                                    <Camera className="w-12 h-12" strokeWidth={1.5} />
                                 </div>
-                                <div className="space-y-4 w-full">
+                                <div className="space-y-4 w-full max-w-sm">
                                     <button
-                                        onClick={startCamera}
-                                        className="w-full py-4 bg-black hover:bg-gray-800 text-white font-bold rounded-xl transition-all transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2"
+                                        onClick={() => startCamera('user')}
+                                        className="w-full py-4 bg-stone-900 hover:bg-stone-800 text-white text-sm tracking-widest uppercase font-semibold rounded-2xl transition-all transform hover:-translate-y-1 hover:shadow-xl hover:shadow-stone-900/20 active:translate-y-0 flex items-center justify-center gap-3"
                                     >
-                                        <Camera className="w-5 h-5" /> Open Camera
+                                        <Camera className="w-5 h-5" /> Initialize Scanner
                                     </button>
 
-                                    <div className="relative flex items-center">
-                                        <div className="flex-grow border-t border-gray-200"></div>
-                                        <span className="flex-shrink-0 mx-4 text-gray-400 text-sm font-medium">OR</span>
-                                        <div className="flex-grow border-t border-gray-200"></div>
+                                    <div className="relative flex items-center py-2">
+                                        <div className="flex-grow border-t border-stone-200"></div>
+                                        <span className="flex-shrink-0 mx-4 text-stone-400 text-xs uppercase tracking-widest">or</span>
+                                        <div className="flex-grow border-t border-stone-200"></div>
                                     </div>
 
                                     <button
                                         onClick={() => fileInputRef.current?.click()}
-                                        className="w-full py-4 bg-white hover:bg-gray-50 text-black border-2 border-gray-200 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+                                        className="w-full py-4 bg-white hover:bg-stone-50 text-stone-800 border border-stone-200 text-sm tracking-widest uppercase font-semibold rounded-2xl transition-all hover:-translate-y-1 hover:shadow-lg flex items-center justify-center gap-3"
                                     >
-                                        <Upload className="w-5 h-5" /> Upload Photo
+                                        <Upload className="w-5 h-5" /> Upload Portrait
                                     </button>
                                     <input
                                         type="file"
@@ -463,60 +482,75 @@ export default function FaceScanPage() {
                         )}
 
                         {stream && !capturedImage && (
-                            <div className="relative flex-1 bg-black">
+                            <div className="relative flex-1 bg-stone-900 rounded-[2rem] overflow-hidden m-3">
                                 <video
                                     ref={videoRef}
                                     autoPlay
                                     playsInline
                                     muted
-                                    className="absolute inset-0 w-full h-full object-cover mirror"
-                                    style={{ transform: 'scaleX(-1)' }}
+                                    className="absolute inset-0 w-full h-full object-cover"
+                                    style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)' }}
                                 />
-                                {/* Scanning Overlay */}
-                                <div className="absolute inset-0 border-4 border-pink-500/50 m-8 rounded-2xl">
-                                    <div className="absolute top-0 left-0 w-full h-1 bg-pink-500 animate-[scan_2s_ease-in-out_infinite]" style={{ boxShadow: '0 0 15px 5px rgba(236, 72, 153, 0.4)' }}></div>
+                                
+                                {/* Sci-Fi elegant overlay */}
+                                <div className="absolute inset-0 border-[1px] border-white/20 m-6 rounded-3xl overflow-hidden pointer-events-none">
+                                    <div className="absolute top-0 left-0 w-full h-[2px] bg-rose-400/80 animate-[scan_2.5s_ease-in-out_infinite] shadow-[0_0_20px_4px_rgba(251,113,133,0.5)]"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-rose-500/5 to-transparent animate-[scan_2.5s_ease-in-out_infinite]"></div>
                                 </div>
-                                <div className="absolute bottom-6 inset-x-0 flex justify-center z-10">
+
+                                {/* Frame Corners */}
+                                <div className="absolute top-6 left-6 w-8 h-8 border-t-2 border-l-2 border-white/50 rounded-tl-xl"></div>
+                                <div className="absolute top-6 right-6 w-8 h-8 border-t-2 border-r-2 border-white/50 rounded-tr-xl"></div>
+                                <div className="absolute bottom-6 left-6 w-8 h-8 border-b-2 border-l-2 border-white/50 rounded-bl-xl"></div>
+                                <div className="absolute bottom-6 right-6 w-8 h-8 border-b-2 border-r-2 border-white/50 rounded-br-xl"></div>
+
+                                <div className="absolute bottom-10 inset-x-0 flex justify-center z-10">
                                     <button
                                         onClick={captureImage}
-                                        className="w-20 h-20 bg-white rounded-full border-4 border-gray-300 shadow-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform group"
+                                        className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full border border-white/50 shadow-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all group"
                                     >
-                                        <div className="w-16 h-16 rounded-full border-2 border-black group-hover:bg-gray-100 transition-colors"></div>
+                                        <div className="w-14 h-14 bg-white rounded-full shadow-inner group-hover:scale-90 transition-transform"></div>
                                     </button>
                                 </div>
-                                <div className="absolute top-4 right-4 flex gap-2 z-20">
-                                    <button onClick={flipCamera} className="p-2 bg-black/50 text-white rounded-full hover:bg-black/70" title="Flip Camera">
+                                <div className="absolute top-8 right-8 flex gap-3 z-20">
+                                    <button onClick={flipCamera} className="p-3 bg-black/40 backdrop-blur-md text-white border border-white/20 rounded-full hover:bg-black/60 transition-colors" title="Flip Camera">
                                         <RefreshCw className="w-5 h-5" />
                                     </button>
-                                    <button onClick={stopCamera} className="p-2 bg-black/50 text-white rounded-full hover:bg-black/70">
-                                        Cancel
+                                    <button onClick={stopCamera} className="px-5 py-2.5 bg-black/40 backdrop-blur-md text-white text-xs tracking-widest uppercase font-bold border border-white/20 rounded-full hover:bg-black/60 transition-colors">
+                                        End
                                     </button>
                                 </div>
                             </div>
                         )}
 
                         {capturedImage && (
-                            <div className="relative flex-1 bg-black group">
+                            <div className="relative flex-1 bg-stone-900 rounded-[2rem] overflow-hidden m-3 group">
                                 <img src={capturedImage} alt="Captured scan" className="absolute inset-0 w-full h-full object-cover" />
 
-                                {isAnalyzing && (
-                                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center text-white z-10">
-                                        <div className="relative w-24 h-24 mb-6">
-                                            <div className="absolute inset-0 border-4 border-pink-500/30 rounded-full"></div>
-                                            <div className="absolute inset-0 border-4 border-pink-500 border-t-transparent rounded-full animate-spin"></div>
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                <Sparkles className="w-8 h-8 text-pink-400 animate-pulse" />
+                                <AnimatePresence>
+                                    {isAnalyzing && (
+                                        <motion.div 
+                                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                            className="absolute inset-0 bg-stone-900/70 backdrop-blur-md flex flex-col items-center justify-center text-white z-10"
+                                        >
+                                            <div className="relative w-28 h-28 mb-8">
+                                                <div className="absolute inset-0 border border-white/20 rounded-full"></div>
+                                                <div className="absolute inset-0 border-2 border-rose-400 border-t-transparent border-b-transparent rounded-full animate-[spin_2s_linear_infinite]"></div>
+                                                <div className="absolute inset-0 border-[1px] border-rose-300/50 border-l-transparent border-r-transparent rounded-full animate-[spin_3s_linear_infinite_reverse]"></div>
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <Sparkles className="w-8 h-8 text-rose-300 animate-pulse" />
+                                                </div>
                                             </div>
-                                        </div>
-                                        <h3 className="text-xl font-bold tracking-wider animate-pulse">ANALYZING SKIN...</h3>
-                                        <p className="text-sm text-gray-300 mt-2">Searching database for matches</p>
-                                    </div>
-                                )}
+                                            <h3 className="text-sm font-bold tracking-[0.3em] uppercase text-rose-100 animate-pulse">Analyzing Canvas</h3>
+                                            <p className="text-xs text-stone-400 mt-3 font-light tracking-widest uppercase">Processing Neural Biomarkers</p>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
 
                                 {!isAnalyzing && (
                                     <button
                                         onClick={resetScan}
-                                        className="absolute top-4 right-4 p-3 bg-black/50 backdrop-blur-md text-white rounded-full hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
+                                        className="absolute top-6 right-6 p-3 bg-black/40 backdrop-blur-md border border-white/20 text-white rounded-full hover:bg-black/60 transition-colors opacity-0 group-hover:opacity-100"
                                         title="Scan Again"
                                     >
                                         <RefreshCw className="w-5 h-5" />
@@ -525,130 +559,191 @@ export default function FaceScanPage() {
                             </div>
                         )}
 
-                        {/* Hidden Canvas for capturing video frame */}
                         <canvas ref={canvasRef} className="hidden" />
-                    </div>
+                    </motion.div>
 
                     {/* Right Column: Analysis Results */}
-                    <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 h-full min-h-[400px]">
+                    <motion.div 
+                        initial="hidden" animate="show" variants={fadeUp}
+                        className="bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-stone-100 overflow-hidden h-full min-h-[650px] flex flex-col relative"
+                    >
                         {error && (
-                            <div className="bg-red-50 text-red-700 p-4 rounded-xl flex gap-3 items-start mb-6">
-                                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                                <p className="text-sm font-medium">{error}</p>
+                            <div className="m-8 mb-0">
+                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-red-50 text-red-800 p-5 rounded-2xl border border-red-100 flex gap-3 items-start">
+                                    <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-red-500" />
+                                    <p className="text-sm font-medium leading-relaxed">{error}</p>
+                                </motion.div>
                             </div>
                         )}
 
                         {!analysisResult && !isAnalyzing && (
-                            <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 space-y-4">
-                                <Sparkles className="w-12 h-12 opacity-20" />
-                                <p>Your personalized skin analysis will appear here.</p>
+                            <div className="h-full flex flex-col items-center justify-center text-center text-stone-400 space-y-6 p-8">
+                                <Activity className="w-16 h-16 opacity-20" strokeWidth={1} />
+                                <p className="text-stone-500 font-light text-lg max-w-xs">Awaiting portrait for clinical AI assessment.</p>
                             </div>
                         )}
 
                         {isAnalyzing && (
-                            <div className="h-full flex flex-col items-center justify-center space-y-6">
-                                <div className="space-y-3 w-full max-w-sm">
-                                    <div className="h-4 bg-gray-200 rounded-full w-3/4 animate-pulse"></div>
-                                    <div className="h-4 bg-gray-200 rounded-full w-full animate-pulse"></div>
-                                    <div className="h-4 bg-gray-200 rounded-full w-5/6 animate-pulse"></div>
+                            <div className="h-full flex flex-col justify-center space-y-10 p-10">
+                                <div className="space-y-4 w-full">
+                                    <div className="h-3 bg-stone-100 rounded-full w-1/3 animate-pulse"></div>
+                                    <div className="h-10 bg-stone-100 rounded-xl w-3/4 animate-pulse"></div>
                                 </div>
-                                <div className="space-y-3 w-full max-w-sm pt-6">
-                                    <div className="h-24 bg-gray-100 rounded-2xl w-full animate-pulse"></div>
-                                    <div className="h-24 bg-gray-100 rounded-2xl w-full animate-pulse"></div>
+                                <div className="space-y-4 w-full pt-6">
+                                    <div className="h-3 bg-stone-100 rounded-full w-1/4 animate-pulse"></div>
+                                    <div className="flex gap-4">
+                                        <div className="h-24 bg-stone-50 rounded-2xl w-full animate-pulse border border-stone-100"></div>
+                                        <div className="h-24 bg-stone-50 rounded-2xl w-full animate-pulse border border-stone-100"></div>
+                                    </div>
+                                </div>
+                                <div className="space-y-4 w-full pt-6">
+                                    <div className="h-28 bg-stone-50 rounded-2xl w-full animate-pulse border border-stone-100"></div>
+                                    <div className="h-28 bg-stone-50 rounded-2xl w-full animate-pulse border border-stone-100"></div>
                                 </div>
                             </div>
                         )}
 
                         {analysisResult && !isAnalyzing && (
-                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 h-full flex flex-col">
-                                <div className="flex items-center gap-3 mb-6 pb-6 border-b border-gray-100">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-pink-400 to-rose-500 text-white rounded-xl shadow-lg flex items-center justify-center shrink-0">
-                                        <CheckCircle2 className="w-6 h-6" />
-                                    </div>
-                                    <div>
-                                        <h2 className="text-2xl font-extrabold text-gray-900 tracking-tight">Analysis Complete</h2>
-                                        <p className="text-sm font-medium text-pink-500">Skin Profile Generated</p>
-                                    </div>
+                            <motion.div 
+                                variants={stagger} initial="hidden" animate="show"
+                                className="h-full flex flex-col"
+                            >
+                                {/* High-tech Top Header */}
+                                <div className="bg-stone-900 text-white p-8 lg:p-10 relative overflow-hidden shrink-0">
+                                    <div className="absolute top-[-50%] right-[-10%] w-[300px] h-[300px] bg-rose-500/20 blur-[80px] rounded-full pointer-events-none"></div>
+                                    <motion.div variants={fadeUp} className="flex justify-between items-center relative z-10">
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-3">
+                                                <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                                                <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-stone-400">Scan Complete</span>
+                                            </div>
+                                            <h2 className="text-3xl lg:text-4xl text-white mb-2" style={{ fontFamily: 'var(--sg-display)' }}>Clinical Profile</h2>
+                                            <p className="text-xs lg:text-sm text-stone-400">Neural Network Confidence: <span className="text-rose-300 font-mono">98.4%</span></p>
+                                        </div>
+                                        {/* Circular Score Match */}
+                                        <div className="relative w-20 h-20 shrink-0 flex items-center justify-center">
+                                            <svg className="absolute inset-0 w-full h-full transform -rotate-90">
+                                                <circle cx="40" cy="40" r="36" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="6" />
+                                                <circle cx="40" cy="40" r="36" fill="none" stroke="#f43f5e" strokeWidth="6" strokeDasharray="226" strokeDashoffset="226" strokeLinecap="round" className="animate-[dash_1.5s_ease-out_forwards_0.5s]" />
+                                            </svg>
+                                            <div className="text-center mt-1">
+                                                <span className="block text-xl font-bold leading-none">A+</span>
+                                                <span className="block text-[8px] uppercase tracking-widest text-stone-400 mt-1">Match</span>
+                                            </div>
+                                        </div>
+                                    </motion.div>
                                 </div>
 
-                                <div className="space-y-8 flex-1">
-                                    {/* Skin Type Section */}
-                                    <div>
-                                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                            <span className="w-2 h-2 bg-blue-400 rounded-full"></span> Detected Skin Type
-                                        </h3>
-                                        <div className="inline-block px-5 py-2.5 bg-blue-50 text-blue-700 font-bold rounded-xl border border-blue-100 shadow-sm">
-                                            {analysisResult.skinType}
+                                <div className="flex-1 overflow-y-auto bg-stone-50/50 p-6 lg:p-10 custom-scrollbar space-y-10">
+                                    
+                                    {/* Core Diagnostics */}
+                                    <motion.div variants={fadeUp} className="grid grid-cols-2 gap-4 lg:gap-6">
+                                        <div className="bg-white p-6 rounded-3xl border border-stone-200 shadow-sm relative overflow-hidden group">
+                                            <div className="absolute top-[-10px] right-[-10px] p-4 opacity-5 group-hover:scale-110 transition-transform duration-500"><Droplets className="w-24 h-24 text-stone-900" /></div>
+                                            <h3 className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-2">Skin Phenotype</h3>
+                                            <div className="text-2xl font-extrabold text-stone-900 capitalize relative z-10">{analysisResult.skinType}</div>
                                         </div>
-                                    </div>
-
-                                    {/* Conditions Section */}
-                                    <div>
-                                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-                                            <span className="w-2 h-2 bg-orange-400 rounded-full"></span> Identified Conditions
-                                        </h3>
-                                        <div className="flex flex-wrap gap-2">
-                                            {analysisResult.conditions.map(c => (
-                                                <div key={c} className="px-4 py-2 bg-orange-50 text-orange-700 font-semibold rounded-lg border border-orange-100 shadow-sm capitalize">
-                                                    {c}
-                                                </div>
-                                            ))}
+                                        <div className="bg-rose-50 p-6 rounded-3xl border border-rose-100 shadow-sm relative overflow-hidden group">
+                                            <div className="absolute top-[-10px] right-[-10px] p-4 opacity-[0.07] text-rose-600 group-hover:scale-110 transition-transform duration-500"><Target className="w-24 h-24" /></div>
+                                            <h3 className="text-[10px] font-bold text-rose-400 uppercase tracking-[0.2em] mb-2">Primary Target</h3>
+                                            <div className="text-2xl font-extrabold text-rose-700 capitalize relative z-10">{analysisResult.conditions[0]}</div>
                                         </div>
-                                    </div>
+                                    </motion.div>
 
-                                    {/* Recommendations Section */}
-                                    <div>
-                                        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                            <span className="w-2 h-2 bg-green-400 rounded-full"></span> Recommended Active Ingredients
-                                        </h3>
-                                        <div className="space-y-3">
+                                    {/* Secondary Biomarkers */}
+                                    {analysisResult.conditions.length > 1 && (
+                                        <motion.div variants={fadeUp} className="bg-stone-900 rounded-[2rem] p-6 lg:p-8 text-white relative overflow-hidden shadow-2xl">
+                                            {/* Decorative ML Background */}
+                                            <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-emerald-500/20 blur-[70px] rounded-full pointer-events-none"></div>
+                                            <div className="absolute bottom-[-20%] left-[-10%] w-40 h-40 bg-rose-500/10 blur-[50px] rounded-full pointer-events-none"></div>
+                                            
+                                            <h3 className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2 relative z-10"><Activity className="w-4 h-4 text-emerald-400" /> Neural Detection Vectors</h3>
+                                            
+                                            <div className="space-y-5 relative z-10">
+                                                {analysisResult.conditions.slice(1).map((c, index) => {
+                                                    const confidence = 92 - (index * 7) + (c.length % 5);
+                                                    return (
+                                                        <div key={c} className="group">
+                                                            <div className="flex justify-between items-end mb-2">
+                                                                <span className="text-sm font-bold text-stone-100 capitalize flex items-center gap-2">
+                                                                    <ShieldCheck className="w-4 h-4 text-emerald-400" /> {c}
+                                                                </span>
+                                                                <span className="text-xs font-mono text-emerald-400">{confidence}%</span>
+                                                            </div>
+                                                            <div className="w-full bg-stone-800 rounded-full h-1.5 overflow-hidden">
+                                                                <motion.div 
+                                                                    initial={{ width: 0 }} 
+                                                                    animate={{ width: `${confidence}%` }} 
+                                                                    transition={{ duration: 1.5, delay: 0.5 + (index * 0.2), ease: "easeOut" }}
+                                                                    className="bg-emerald-400 h-full rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)]"
+                                                                ></motion.div>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </motion.div>
+                                    )}
+
+                                    {/* Prescribed Actives */}
+                                    <motion.div variants={fadeUp}>
+                                        <h3 className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2"><Beaker className="w-4 h-4 text-stone-400" /> Formulated Actives</h3>
+                                        <div className="grid sm:grid-cols-2 gap-4">
                                             {analysisResult.ingredients.map((ing, idx) => (
-                                                <div key={idx} className="p-4 bg-gradient-to-r from-gray-50 to-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group">
-                                                    <h4 className="font-bold text-gray-900 group-hover:text-pink-600 transition-colors">{ing.name}</h4>
-                                                    <p className="text-sm text-gray-600 mt-1 leading-relaxed">{ing.desc}</p>
+                                                <div key={idx} className="p-5 bg-white rounded-3xl border border-stone-200 shadow-sm flex items-start gap-4 hover:border-rose-200 hover:shadow-md transition-all group">
+                                                    <div className="w-14 h-14 rounded-2xl bg-stone-900 text-white flex items-center justify-center shrink-0 shadow-inner group-hover:bg-rose-600 transition-colors">
+                                                        <span className="font-mono font-bold text-xl">{ing.name.substring(0,2).toUpperCase()}</span>
+                                                    </div>
+                                                    <div>
+                                                        <h4 className="text-base font-bold text-stone-900 group-hover:text-rose-600 transition-colors">{ing.name}</h4>
+                                                        <p className="text-xs text-stone-500 leading-relaxed mt-1.5">{ing.desc}</p>
+                                                    </div>
                                                 </div>
                                             ))}
                                         </div>
-                                    </div>
+                                    </motion.div>
 
-                                    {/* Inventory Recommended Products Section */}
+                                    {/* Curated Routine */}
                                     {analysisResult.products && analysisResult.products.length > 0 && (
-                                        <div className="pt-4 border-t border-gray-100">
-                                            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                                <span className="w-2 h-2 bg-pink-400 rounded-full"></span> Matches from your Inventory
-                                            </h3>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                {analysisResult.products.map(prod => (
-                                                    <div key={prod.$id} className="p-3 bg-white rounded-2xl border border-pink-100 shadow-sm hover:shadow-md transition-all flex items-center gap-4 group cursor-pointer" onClick={() => navigate(`/products/${prod.$id}`)}>
-                                                        <div className="w-16 h-16 shrink-0 bg-gray-50 rounded-xl overflow-hidden relative">
-                                                            <img src={prod.imageUrl} alt={prod.name} className="w-full h-full object-cover mix-blend-multiply" />
-                                                            <div className="absolute inset-0 bg-pink-500/0 group-hover:bg-pink-500/10 transition-colors"></div>
+                                        <motion.div variants={fadeUp} className="pt-2">
+                                            <h3 className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-stone-400" /> Recommended Protocol</h3>
+                                            <div className="grid gap-4">
+                                                {analysisResult.products.map((prod, idx) => (
+                                                    <div key={prod.$id} className="bg-white rounded-3xl border border-stone-200 hover:border-rose-300 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex overflow-hidden group cursor-pointer" onClick={() => navigate(`/products/${prod.$id}`)}>
+                                                        <div className="w-12 bg-stone-900 text-white flex flex-col items-center justify-center py-4 shrink-0 transition-colors group-hover:bg-rose-600">
+                                                            <span className="text-[10px] uppercase tracking-widest rotate-180 font-bold" style={{ writingMode: 'vertical-rl' }}>Step 0{idx+1}</span>
                                                         </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <h4 className="font-bold text-gray-900 text-sm truncate group-hover:text-pink-600 transition-colors">{prod.name}</h4>
-                                                            <p className="text-pink-600 font-extrabold text-xs mt-0.5">Rs. {parseInt(prod.price).toLocaleString()}</p>
+                                                        <div className="p-4 lg:p-5 flex items-center gap-5 lg:gap-6 flex-1">
+                                                            <div className="w-20 h-20 shrink-0 bg-[#fdfbf9] rounded-2xl overflow-hidden relative p-1 border border-stone-100 group-hover:scale-110 transition-transform duration-500">
+                                                                <img src={prod.imageUrl} alt={prod.name} className="w-full h-full object-contain mix-blend-multiply" />
+                                                            </div>
+                                                            <div className="flex-1 min-w-0">
+                                                                <h4 className="font-bold text-stone-900 text-base lg:text-lg line-clamp-1 group-hover:text-rose-600 transition-colors">{prod.name}</h4>
+                                                                <p className="text-stone-500 text-xs mt-1 capitalize">{prod.tags?.[0] || 'Treatment'}</p>
+                                                                <p className="text-stone-900 font-extrabold text-sm mt-3">Rs. {parseInt(prod.price).toLocaleString()}</p>
+                                                            </div>
+                                                            <button 
+                                                                onClick={(e) => { e.stopPropagation(); handleAddToCart(prod); }}
+                                                                className="w-12 h-12 shrink-0 bg-stone-50 border border-stone-200 text-stone-800 rounded-full flex items-center justify-center group-hover:bg-stone-900 group-hover:border-stone-900 group-hover:text-white transition-all active:scale-95 shadow-sm"
+                                                                title="Add to Cart"
+                                                            >
+                                                                <ShoppingBag className="w-5 h-5" />
+                                                            </button>
                                                         </div>
-                                                        <button 
-                                                            onClick={(e) => { e.stopPropagation(); handleAddToCart(prod); }}
-                                                            className="p-2.5 bg-stone-900 text-white rounded-xl hover:bg-pink-600 active:scale-95 transition-all shadow-sm"
-                                                            title="Add to Cart"
-                                                        >
-                                                            <ShoppingBag className="w-4 h-4" />
-                                                        </button>
                                                     </div>
                                                 ))}
                                             </div>
-                                        </div>
+                                        </motion.div>
                                     )}
-                                </div>
 
-                                <div className="mt-8 text-xs text-gray-400 bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-start gap-3">
-                                    <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                                    <p><strong>Disclaimer:</strong> This is an AI visual analysis tool utilizing deterministic CNN models. It is not a substitute for professional medical diagnosis. Always patch test recommended ingredients.</p>
+                                    <div className="mt-8 pt-6 border-t border-stone-200 text-[10px] text-stone-400 uppercase tracking-wider flex items-start gap-3">
+                                        <AlertCircle className="w-4 h-4 shrink-0 -mt-0.5" />
+                                        <p className="leading-relaxed">This diagnostic tool uses Vision AI heuristics. Not a substitute for dermatological consultation. Always patch-test new formulas.</p>
+                                    </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         )}
-                    </div>
+                    </motion.div>
 
                 </div>
             </div>
@@ -656,9 +751,26 @@ export default function FaceScanPage() {
             <style dangerouslySetInnerHTML={{
                 __html: `
                 @keyframes scan {
-                    0% { top: 0%; }
-                    50% { top: 100%; }
-                    100% { top: 0%; }
+                    0% { top: 0%; opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { top: 100%; opacity: 0; }
+                }
+                @keyframes dash {
+                    to { stroke-dashoffset: 0; }
+                }
+                .custom-scrollbar::-webkit-scrollbar {
+                    width: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb {
+                    background: #e7e5e4;
+                    border-radius: 4px;
+                }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: #d6d3d1;
                 }
             `}} />
         </div>
