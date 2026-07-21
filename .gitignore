@@ -29,16 +29,4 @@ dist-ssr
 .env*.local
 
 
-# ML Model files (sensitive/large files)
-public/tokenizer.json
-public/vocab.txt
-public/ingredients_data.json
-public/config.json
-public/config_sentence_transformers.json
-public/condition.json
-public/skintype.json
-public/modules.json
-public/special_tokens_map.json
-public/sentence_bert_config.json
-public/tokenizer_config.json
-public/ingredients_config.json
+
