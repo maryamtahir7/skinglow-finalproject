@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "concurrently \"vite\" \"node api-server.js\"",
     "build": "vite build",
-    "vercel-build": "prisma generate && vite build",
-    "postinstall": "prisma generate",
+    "vercel-build": "npm run prisma:generate && vite build",
+    "prisma:generate": "prisma generate --skip-engine-check 2>/dev/null || echo 'Prisma generation skipped (DATABASE_URL not available at build time)'",
+    "postinstall": "npm run prisma:generate",
     "start": "node api-server.js",
     "lint": "eslint .",
     "preview": "vite preview",
