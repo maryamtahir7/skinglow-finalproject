@@ -1,5 +1,5 @@
 async function loadTools() {
-  const mod = await import('./tools.js');
+  const mod = await import('./_tools.js');
   return mod.tools;
 }
 
@@ -125,7 +125,7 @@ export async function previewShoppingAction(message, context = {}) {
       };
     }
 
-    const { resolveShippingDetails } = await import('./tools.js');
+    const { resolveShippingDetails } = await import('./_tools.js');
     const { shipping, missing } = await resolveShippingDetails(userId, userName, userPrefs || {});
 
     if (missing.length > 0) {

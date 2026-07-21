@@ -1,4 +1,4 @@
-import prisma from '../db.js';
+import prisma from '../_db.js';
 
 // --- Admin Tool Implementations ---
 

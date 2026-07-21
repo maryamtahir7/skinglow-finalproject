@@ -1,5 +1,5 @@
-import prisma from '../../db.js';
-import { triggerLowStockAlert } from '../workflows/n8n.js';
+import prisma from '../../_db.js';
+import { triggerLowStockAlert } from '../workflows/_n8n.js';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {

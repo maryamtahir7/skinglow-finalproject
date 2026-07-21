@@ -1,9 +1,9 @@
 import Groq from 'groq-sdk';
-import { sanitizeAIResponse, buildUserContext } from './response-utils.js';
-import { previewShoppingAction, executeConfirmedAction } from './shopping-intent.js';
+import { sanitizeAIResponse, buildUserContext } from './_response-utils.js';
+import { previewShoppingAction, executeConfirmedAction } from './_shopping-intent.js';
 
 async function loadOrderFlow() {
-    return import(`./order-flow.js?t=${Date.now()}`);
+    return import(`./_order-flow.js?t=${Date.now()}`);
 }
 
 const apiKey = process.env.GROQ_API_KEY;
@@ -138,7 +138,7 @@ export default async function handler(req, res) {
 
         // ── Product recommendations (real catalog + clickable cards) ──
         // Reload recommend module so edits apply in dev
-        const { previewProductRecommendations: previewRecs } = await import(`./recommend-intent.js?t=${Date.now()}`);
+        const { previewProductRecommendations: previewRecs } = await import(`./_recommend-intent.js?t=${Date.now()}`);
         const recommendOutcome = await previewRecs(message);
         if (recommendOutcome?.handled && recommendOutcome.productPicker?.products?.length) {
             return res.status(200).json(buildFlowResponse({

@@ -1,5 +1,5 @@
-import prisma from '../../db.js';
-import { triggerOrderConfirmation } from '../workflows/n8n.js';
+import prisma from '../../_db.js';
+import { triggerOrderConfirmation } from '../workflows/_n8n.js';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {

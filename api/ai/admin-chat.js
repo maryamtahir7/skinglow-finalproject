@@ -1,5 +1,5 @@
 import Groq from 'groq-sdk';
-import { adminTools, adminToolDeclarations } from './admin-tools.js';
+import { adminTools, adminToolDeclarations } from './_admin-tools.js';
 
 const apiKey = process.env.GROQ_API_KEY;
 if (!apiKey) {
