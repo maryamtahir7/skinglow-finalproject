@@ -7,153 +7,116 @@
   <h1>✨ SkinGlow — Next-Generation AI Skincare Ecosystem</h1>
 
   <p>
-    <strong>An intelligent, full-stack e-commerce ecosystem integrating Computer Vision, Generative AI, and Conversational Commerce to revolutionize personalized skincare.</strong>
+    <strong>A production-ready e-commerce platform that harnesses the power of Generative AI and Computer Vision to deliver hyper-personalized skincare experiences.</strong>
   </p>
 
   <p>
-    <a href="#-tech-stack"><img src="https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react" alt="React" /></a>
-    <a href="#-tech-stack"><img src="https://img.shields.io/badge/Vite-6.4-646CFF?style=flat-square&logo=vite" alt="Vite" /></a>
-    <a href="#-tech-stack"><img src="https://img.shields.io/badge/TailwindCSS-4.0-06B6D4?style=flat-square&logo=tailwindcss" alt="TailwindCSS" /></a>
-    <a href="#-tech-stack"><img src="https://img.shields.io/badge/Prisma-5.22-2D3748?style=flat-square&logo=prisma" alt="Prisma" /></a>
-    <a href="#-tech-stack"><img src="https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=flat-square&logo=postgresql" alt="Neon Postgres" /></a>
-    <a href="#-artificial-intelligence-integration"><img src="https://img.shields.io/badge/TensorFlow.js-BlazeFace-FF6F00?style=flat-square&logo=tensorflow" alt="Tensorflow" /></a>
-    <a href="#-artificial-intelligence-integration"><img src="https://img.shields.io/badge/Groq-LLaMA%203.3-000000?style=flat-square" alt="Groq LLaMA" /></a>
-    <a href="#-payment-gateway-integration"><img src="https://img.shields.io/badge/Stripe-Payments-6772E5?style=flat-square&logo=stripe" alt="Stripe" /></a>
-    <a href="#-cloud-deployment-strategy"><img src="https://img.shields.io/badge/Deployed-Vercel-000000?style=flat-square&logo=vercel" alt="Vercel" /></a>
+    <a href="#-technology-stack"><img src="https://img.shields.io/badge/React-19.0-61DAFB?style=flat-square&logo=react" alt="React" /></a>
+    <a href="#-technology-stack"><img src="https://img.shields.io/badge/Vite-6.4-646CFF?style=flat-square&logo=vite" alt="Vite" /></a>
+    <a href="#-technology-stack"><img src="https://img.shields.io/badge/TailwindCSS-4.0-06B6D4?style=flat-square&logo=tailwindcss" alt="TailwindCSS" /></a>
+    <a href="#-technology-stack"><img src="https://img.shields.io/badge/Prisma-5.22-2D3748?style=flat-square&logo=prisma" alt="Prisma" /></a>
+    <a href="#-technology-stack"><img src="https://img.shields.io/badge/PostgreSQL-Neon-4169E1?style=flat-square&logo=postgresql" alt="Neon Postgres" /></a>
+    <a href="#-core-ai-innovations"><img src="https://img.shields.io/badge/TensorFlow.js-BlazeFace-FF6F00?style=flat-square&logo=tensorflow" alt="Tensorflow" /></a>
+    <a href="#-core-ai-innovations"><img src="https://img.shields.io/badge/Groq-LLaMA%203.3-000000?style=flat-square" alt="Groq LLaMA" /></a>
+    <a href="#-payment-processing"><img src="https://img.shields.io/badge/Stripe-Payments-6772E5?style=flat-square&logo=stripe" alt="Stripe" /></a>
+    <a href="#-installation--deployment"><img src="https://img.shields.io/badge/Deployed-Vercel-000000?style=flat-square&logo=vercel" alt="Vercel" /></a>
   </p>
 </div>
 
 ---
 
-## Table of Contents
+## 📑 Table of Contents
 
-1. [Project Abstract](#-project-abstract)
-2. [Problem Domain & Motivation](#-problem-domain--motivation)
-3. [Core Features Matrix](#-core-features-matrix)
-4. [Deep Dive: Artificial Intelligence Architecture](#-deep-dive-artificial-intelligence-architecture)
-5. [System Architecture & Engineering](#-system-architecture--engineering)
-6. [Detailed Technology Stack](#-detailed-technology-stack)
-7. [Database Schema (ER Model)](#-database-schema-er-model)
-8. [Security & Authentication Protocols](#-security--authentication-protocols)
-9. [Payment Gateway Integration](#-payment-gateway-integration)
-10. [Application Interfaces (Screenshots)](#-application-interfaces-screenshots)
-11. [AI Chat Demonstration](#-ai-chat-demonstration)
-12. [Installation & Local Deployment](#-installation--local-deployment)
-13. [Quality Assurance & Testing Strategy](#-quality-assurance--testing-strategy)
-14. [Technical Challenges & Solutions](#-technical-challenges--solutions)
-15. [Conclusion & Future Scope](#-conclusion--future-scope)
+1. [🎓 Executive Summary](#-executive-summary)
+2. [🤖 Core AI Innovations](#-core-ai-innovations)
+3. [🚀 Key Features](#-key-features)
+4. [🏗️ System Architecture](#-system-architecture)
+5. [🛠️ Technology Stack](#-technology-stack)
+6. [📊 Database Schema](#-database-schema)
+7. [🔒 Enterprise-Grade Security](#-enterprise-grade-security)
+8. [💳 Payment Processing](#-payment-processing)
+9. [📸 UI Showcase](#-ui-showcase)
+10. [🎥 AI Demonstration](#-ai-demonstration)
+11. [⚙️ Installation & Deployment](#-installation--deployment)
+12. [🔮 Future Roadmap](#-future-roadmap)
 
 ---
 
-##  Project Abstract
+## 🎓 Executive Summary
 
-**SkinGlow** is a comprehensive, production-grade AI-powered skincare e-commerce platform designed and developed as a **Final Project**. The platform addresses the "personalization deficit" in modern e-commerce by bridging the gap between generic online shopping and personalized dermatological consultation. 
+**SkinGlow** is a comprehensive, production-grade AI-powered skincare e-commerce platform engineered for the modern retail landscape. Traditional e-commerce relies on rigid search filters and generic product descriptions, leaving customers overwhelmed by choices and complex scientific formulations.
 
-By leveraging a micro-services-inspired monolithic architecture, the system employs a sophisticated multi-agent AI framework. It features a **Conversational Virtual Esthetician** for natural language shopping, **Computer Vision (TensorFlow.js)** for real-time facial skin analysis, and an **Autonomous Business Intelligence Analyst** for platform administrators. The project serves as a blueprint for the next generation of conversational and visually-aware e-commerce platforms.
-
----
-
-## Problem Domain & Motivation
-
-The modern skincare industry is vast, yet consumers face several critical barriers:
-
-1. **The Paradox of Choice**: Consumers are overwhelmed by thousands of complex chemical formulations (e.g., Niacinamide, Retinol, AHA/BHA), leading to decision paralysis.
-2. **Inaccessible Expertise**: Professional dermatological advice is costly and not readily accessible for daily consumer queries or routine building.
-3. **Static User Experiences**: Traditional e-commerce relies on rigid category filtering, completely ignoring the nuanced, multi-variable, and dynamic nature of human skin profiles.
-
-**SkinGlow's Solution:** By engineering a system that intelligently extracts user context—via conversational intent detection, visual face scanning, and structured quizzes—and dynamically maps it against a relational product database using custom scoring algorithms, SkinGlow delivers hyper-personalized, expert-level recommendations instantly.
+SkinGlow solves this "personalization deficit" by functioning as a **virtual dermatologist and intelligent storefront**. By fusing cutting-edge Large Language Models (LLMs) with real-time Computer Vision, SkinGlow analyzes individual skin profiles, understands conversational context, and autonomously recommends highly tailored skincare routines. It is built as a highly scalable, real-world solution ready for modern business demands.
 
 ---
 
-##  Core Features Matrix
+## 🤖 Core AI Innovations
 
-###  Customer-Facing Application
-- **Interactive Skin Quiz**: A dynamic, state-driven multi-step form built with `react-hook-form` and `zod` that constructs a persistent user profile to alter global store recommendations.
-- **Routine Builder**: An intelligent AM/PM tracking system utilizing `localStorage` and date-diffing to monitor daily skincare adherence and progress.
-- **Smart Catalog & Search**: Advanced filtering by specific concerns (Hyperpigmentation, Acne, Aging) with real-time stock validation and client-side pagination.
-- **Checkout Pipeline**: Seamless cart-to-order flow supporting both **Stripe Credit Card Processing** and **Cash on Delivery (COD)**.
+SkinGlow is not just a storefront; it is an intelligent ecosystem where AI is deeply integrated into every user interaction.
 
-###  Administrator Operations Portal
-- **Financial Analytics**: Auto-generated dashboard calculating monthly revenue, profit margins, and platform growth metrics.
-- **Inventory Orchestration**: Real-time stock tracking with visual low-stock indicators, category mapping, and full CRUD capabilities.
-- **Order Fulfillment Engine**: Strict state management for the complete order lifecycle (`PENDING` → `SHIPPED` → `DELIVERED`).
-- **Community Moderation**: Centralized hub for monitoring, approving, and managing user-generated product reviews and ratings.
+### 1. Conversational Commerce (Powered by Groq & LLaMA 3.3)
+Instead of manually searching through catalogs, users chat with a **Virtual Esthetician**.
+- **Context-Aware Intent Detection:** The AI understands whether a user is asking for advice (e.g., *"My skin feels dry today"*), looking for a specific product, or needing customer support.
+- **Autonomous Database Querying:** The AI engine translates natural language into secure, contextual database queries to retrieve exact products that match the user's skin concerns and ingredient preferences.
+- **Lightning-Fast Responses:** Utilizing Groq's LPU infrastructure, the system delivers complex, personalized responses in under 400ms, ensuring a fluid, natural conversation.
 
----
+### 2. Real-Time Computer Vision Analysis (TensorFlow.js)
+SkinGlow brings clinical-level skin analysis to any device with a camera, prioritizing privacy and speed.
+- **On-Device Inference:** Using **BlazeFace**, the platform processes facial visual data entirely within the browser. No images are sent to external servers, guaranteeing 100% user privacy.
+- **Dynamic Recommendations:** The system instantly detects facial mapping points and correlates visual cues (like redness or texture) to specific product categories, instantly updating the user's recommended skincare regimen.
 
-##  Deep Dive: Artificial Intelligence Architecture
-
-SkinGlow implements AI not as an afterthought, but as core infrastructure utilizing state-of-the-art LLMs and Machine Learning models.
-
-### 1. Conversational Commerce (NLP)
-Powered by **Groq LLaMA 3.3 70B Versatile**, the chatbot acts as a smart state machine utilizing custom **Intent Detection**.
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Frontend
-    participant IntentEngine as Intent Engine (API)
-    participant GroqLLM as Groq LLaMA 3.3
-    participant DB as Prisma PostgreSQL
-
-    User->>Frontend: "I have dry skin and need a moisturizer"
-    Frontend->>IntentEngine: POST /api/chat { message }
-    IntentEngine->>GroqLLM: Analyze Intent (Recommendation vs Support vs Order)
-    GroqLLM-->>IntentEngine: Intent: RECOMMENDATION, Entities: [Dry Skin, Moisturizer]
-    IntentEngine->>DB: Query Products WHERE category="Moisturizer" AND tags="Dry"
-    DB-->>IntentEngine: Return [Product A, Product B]
-    IntentEngine->>GroqLLM: Generate conversational response with Products
-    GroqLLM-->>Frontend: "I highly recommend Product A for your dry skin..."
-    Frontend-->>User: Display Message + Add to Cart UI Cards
-```
-
-### 2. Computer Vision Engine (TensorFlow.js)
-The platform performs lightning-fast on-device ML inference using **BlazeFace**.
-- **Privacy-First**: Captures real-time webcam feeds securely within the browser; image data never leaves the client unnecessarily.
-- **Facial Mapping**: Detects facial boundaries and extracts localized image crops (cheeks, forehead, chin).
-- **Heuristic Analysis**: Passes extracted visual data to a backend AI algorithm to visually detect redness, texture issues, or oiliness, immediately recommending corrective products.
-
-### 3. Voice Accessibility (Web Speech API)
-- **Voice-to-Text**: Real-time command interpretation for hands-free shopping and accessibility compliance.
-- **Text-to-Speech**: Dynamic response generation utilizing a custom voice-filtering algorithm to select professional female AI voices natively supported by the operating system.
-
-### 4. Autonomous Admin Analyst
-The Admin portal features an AI employee with **Tool Calling Capabilities**. Administrators can ask, *"What were our top-selling products last week?"* The LLM autonomously decides to execute predefined database queries (e.g., `getRevenueReport()`), translating complex business intelligence requests into instant conversational insights.
+### 3. Autonomous Business Intelligence for Admins
+The administrator dashboard features an embedded AI analyst. Admins can prompt the system with natural language questions like, *"What are the top selling acne products this month?"* The LLM autonomously constructs and executes internal database queries, delivering real-time business insights and data visualizations on demand.
 
 ---
 
-##  System Architecture & Engineering
+## 🚀 Key Features
 
-The application follows a modern **Serverless Monorepo** architectural pattern, ensuring high scalability and clean separation of concerns.
+### 🛍️ Customer Experience
+- **Interactive Skin Assessment:** A dynamic, multi-step profile builder that tailors the entire storefront to the individual's specific skin type, concerns, and goals.
+- **Smart Routine Tracker:** An intelligent AM/PM dashboard that helps users track their daily skincare regimen and adherence over time.
+- **Frictionless Checkout:** A seamless, localized cart experience supporting secure **Stripe Credit Card Processing** alongside traditional **Cash on Delivery (COD)**.
+- **Voice-Enabled Accessibility:** Native integration of the Web Speech API allows for hands-free shopping and fluid vocal interactions with the AI assistant.
+
+### 🛡️ Administrative Portal
+- **Real-Time Financial Dashboard:** Automated calculation of revenue, profit margins, and inventory turn-over metrics.
+- **Inventory & Order Lifecycle Management:** Complete control over product catalogs, stock levels, and a strict state-machine for order tracking (`PENDING` → `SHIPPED` → `DELIVERED`).
+- **Community Moderation System:** Centralized controls for reviewing, approving, and managing user-generated feedback and product ratings.
+
+---
+
+## 🏗️ System Architecture
+
+SkinGlow is built upon a **Serverless Monorepo** pattern, optimizing for extreme scalability, rapid deployment, and minimal operational overhead.
 
 ```mermaid
 graph TD
   subgraph Client [Client Tier - React 19 & Tailwind 4]
-    UI[Radix UI Components]
-    State[Context API & React Hooks]
-    CV[TF.js BlazeFace Inference]
+    UI[Interactive UI Components]
+    State[State Management]
+    CV[TF.js On-Device Vision]
   end
 
-  subgraph Gateway [API Gateway - Node.js Serverless]
-    Auth[Next-Auth / JWT Middleware]
-    REST[Express-style REST API]
+  subgraph Gateway [API Gateway - Serverless Node.js]
+    Auth[Secure JWT Auth]
+    REST[RESTful Endpoints]
   end
 
-  subgraph AI_Engine [AI Core Orchestrator]
-    LLM[Groq LLaMA 3.3 70B]
-    Intent[Intent & State Manager]
+  subgraph AI_Engine [AI Orchestration Layer]
+    LLM[Groq LLaMA 3.3]
+    Intent[Intent Classification]
   end
 
-  subgraph DB [Data Tier - Neon Serverless Postgres]
-    Prisma[Prisma ORM Layer]
-    Postgres[(Relational Database)]
+  subgraph DB [Data Tier - Serverless Postgres]
+    Prisma[Prisma ORM]
+    Postgres[(Neon Tech DB)]
   end
 
-  UI <-->|HTTPS / JSON| REST
+  UI <-->|JSON over HTTPS| REST
   UI <--> Auth
   State <--> UI
-  CV -->|Visual Data| REST
-  REST <-->|Contextual Queries| LLM
+  CV -->|Analyzed Vectors| REST
+  REST <-->|Context Queries| LLM
   REST <--> Intent
   REST <--> Prisma
   Prisma <--> Postgres
@@ -166,38 +129,23 @@ graph TD
 
 ---
 
-##  Detailed Technology Stack
+## 🛠️ Technology Stack
 
-### Frontend Architecture
-- **Framework**: React 19 (Hooks-first approach)
-- **Build Tool**: Vite 6.4 (HMR, aggressive chunking, fast builds)
-- **Styling**: Tailwind CSS 4.0, Tailwind Merge, Framer Motion (for fluid micro-animations)
-- **Component Library**: Radix UI (Headless, accessible UI primitives), Lucide React (Icons)
-- **Form Management**: React Hook Form paired with Zod for strict schema validation.
-- **Routing**: React Router DOM v7
+Every technology choice was purposefully selected to ensure enterprise reliability, robust performance, and an exceptional developer experience.
 
-### Backend & API
-- **Runtime environment**: Node.js (Vercel Serverless Functions)
-- **Authentication**: Next-Auth, Google OAuth, JSON Web Tokens (JWT), Nodemailer (OTP delivery)
-
-### Data Layer
-- **Database**: PostgreSQL (Hosted on Neon Tech for serverless pooling)
-- **ORM**: Prisma 5.22 (Type-safe database interactions and migrations)
-
-### Machine Learning & AI
-- **LLM Provider**: Groq SDK (Ultra-fast LPU inference), Google GenAI
-- **Vision Model**: `@tensorflow/tfjs`, `@tensorflow-models/blazeface`
-
-### Quality Assurance
-- **Unit/Component Testing**: Vitest, React Testing Library
-- **End-to-End Testing**: Playwright
-- **Linting & Formatting**: ESLint 9, Prettier
+* **Frontend:** React 19, Vite 6.4, Tailwind CSS 4.0, Framer Motion, Radix UI.
+* **Backend:** Node.js, Express-style Serverless Functions.
+* **Database:** PostgreSQL (Neon Serverless), Prisma ORM 5.22.
+* **AI & Machine Learning:** Groq SDK (LLaMA 3.3 70B Versatile), TensorFlow.js (`@tensorflow-models/blazeface`).
+* **Authentication & Security:** Next-Auth, JSON Web Tokens (JWT), Zod Schema Validation, Nodemailer (OTP).
+* **Payments:** Stripe API & Stripe React Elements.
+* **Quality Assurance:** Vitest, React Testing Library, Playwright (E2E).
 
 ---
 
-##  Database Schema (ER Model)
+## 📊 Database Schema
 
-The database utilizes strict referential integrity across multiple relational tables.
+A highly normalized relational database structure guarantees strict data integrity across orders, user profiles, and dynamic product catalogs.
 
 ```mermaid
 erDiagram
@@ -256,31 +204,28 @@ erDiagram
 
 ---
 
-##  Security & Authentication Protocols
+## 🔒 Enterprise-Grade Security
 
-Enterprise-grade security measures were implemented to protect user data and financial transactions:
-1. **Multi-Factor OTP Registration**: Nodemailer generates cryptographically random 6-digit OTPs sent via branded email.
-2. **Stateless JWT Authorization**: The API uses HttpOnly JSON Web Tokens with strict expiration windows.
-3. **Role-Based Access Control (RBAC)**: Custom Higher-Order Components (`<AdminRoute>`) intercept routing attempts, verifying server-side session roles before rendering the dashboard.
-4. **Input Sanitization**: Zod schemas validate every single API request payload to prevent SQL Injection and XSS attacks.
-5. **Environment Segregation**: Strict separation of `.env.local` and production variables ensuring Stripe Secret Keys and Database URIs are never exposed to the client bundle.
+- **Zero-Trust Input Validation:** Every incoming API request payload is strictly validated against robust Zod schemas, mitigating SQL injection and XSS vulnerabilities.
+- **Stateless Authentication:** Secure, HttpOnly JSON Web Tokens manage active user sessions without the need for redundant database lookups on every request.
+- **Secure Secret Management:** Complete isolation of Stripe keys and database connection strings using environment variables and secure serverless deployment contexts.
+- **Role-Based Access Control (RBAC):** Cryptographically enforced permissions and custom Higher-Order Components completely separate Customer interactions from Administrative operations.
 
 ---
 
-##  Payment Gateway Integration
+## 💳 Payment Processing
 
-SkinGlow features a fully operational, PCI-compliant payment pipeline utilizing **Stripe**.
-- Uses Stripe Elements (`@stripe/react-stripe-js`) for secure card tokenization.
-- Backend securely handles PaymentIntents to confirm funds before generating an `ORDER` record in the database.
-- Fallback support for traditional **Cash on Delivery (COD)**.
+Fully integrated with **Stripe** to provide a seamless, reliable, and PCI-compliant checkout pipeline.
+- Utilizes **Stripe Elements** to safely tokenize sensitive payment details directly within the browser ecosystem.
+- Employs strict server-side verification using `PaymentIntents` to securely confirm transactions before altering database state or depleting inventory levels.
 
 ---
 
-##  Application Interfaces (Screenshots)
+## 📸 UI Showcase
 
-> **Note to Evaluators:** The platform features a responsive, mobile-first design language prioritizing aesthetic micro-animations and accessibility.
+A polished, mobile-first design language focused on aesthetic micro-interactions, responsive grids, and seamless user journeys.
 
-### Customer Experience Interfaces
+### Customer Journey
 | Feature Overview | High-Fidelity Interface |
 |---------|------------|
 | **Homepage & Hero Banner** | <img src="./public/docx/SkinGlow%20Homepage%20Hero.png" width="800"> |
@@ -290,7 +235,7 @@ SkinGlow features a fully operational, PCI-compliant payment pipeline utilizing 
 | **Curated Shop By Concern** | <img src="./public/docx/Shop%20By%20Concern.png" width="800"> |
 | **Routine & Shop By Ritual** | <img src="./public/docx/Shop%20by%20Ritual.png" width="800"> |
 
-### Administrator Management Portal
+### Administrator Portal
 | Operational Feature | Administrative Interface |
 |---------|------------|
 | **Autonomous Admin AI Analyst** | <img src="./public/docx/Admin%20Ai%20Chat.png" width="800"> |
@@ -300,27 +245,26 @@ SkinGlow features a fully operational, PCI-compliant payment pipeline utilizing 
 
 ---
 
-##  AI Chat Demonstration
+## 🎥 AI Demonstration
 
-Watch our **Conversational Commerce Agent** seamlessly interact, understand natural language context, and recommend hyper-specific products in real-time.
+Watch the **Conversational Commerce Agent** seamlessly interact, understand natural language context, and recommend hyper-specific products in real-time.
 
 <div align="center">
   <img src="./public/docx/AI-Chatbot-Demo.gif" alt="SkinGlow AI Chatbot Demonstration GIF" width="850" style="border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);" />
 </div>
 
-*(Demonstrates natural language understanding, entity extraction, context retention, and autonomous product database querying.)*
+> *Demonstrates robust natural language understanding, real-time entity extraction, context retention, and autonomous product database querying.*
 
 ---
 
-##  Installation & Local Deployment
+## ⚙️ Installation & Deployment
 
 ### Prerequisites
 - **Node.js** v18.x or higher
-- **npm** v9.x or higher
-- **PostgreSQL** Local instance or Cloud URI (e.g., Neon/Supabase)
-- **Stripe & Groq API Keys**
+- **PostgreSQL** (Local instance or Cloud Provider e.g., Neon/Supabase)
+- **Stripe API Keys** & **Groq API Keys**
 
-### Developer Setup Instructions
+### Quick Start Guide
 
 1. **Clone the Repository**
    ```bash
@@ -328,63 +272,45 @@ Watch our **Conversational Commerce Agent** seamlessly interact, understand natu
    cd skinglow-finalproject
    ```
 
-2. **Install Package Dependencies**
+2. **Install Dependencies**
    ```bash
    npm install
    ```
 
 3. **Configure Environment Variables**
-   Create a `.env` file in the root directory using the template provided in `.env.example`. You will need to supply your DB string, JWT Secret, Stripe Keys, and Groq API Key.
+   Rename `.env.example` to `.env` and populate your secure credentials:
+   ```env
+   DATABASE_URL="postgresql://..."
+   JWT_SECRET="your_secure_secret"
+   STRIPE_SECRET_KEY="sk_test_..."
+   GROQ_API_KEY="gsk_..."
+   ```
 
-4. **Initialize Prisma & Database Schema**
+4. **Initialize Database Schema**
    ```bash
    npm run prisma:generate
    npx prisma db push
    ```
 
-5. **Start the Concurrent Development Environment**
+5. **Launch Development Server**
    ```bash
    npm run dev
    ```
-   *Note: This utilizes `concurrently` to spin up Vite (Port 5173) and the Node API (Port 8085) simultaneously.*
+   *The application will utilize `concurrently` to launch both the Vite frontend and the Node.js API simultaneously.*
 
 ---
 
-##  Quality Assurance & Testing Strategy
+## 🔮 Future Roadmap
 
-To ensure enterprise-level stability, SkinGlow incorporates a rigorous testing framework:
-- **Unit Testing (Vitest)**: Validates utility functions, custom hooks, and AI string parsing algorithms.
-- **Component Testing (React Testing Library)**: Ensures Radix UI components render correctly and handle user interactions (e.g., checkout button states).
-- **End-to-End Testing (Playwright)**: Automates and verifies the complete user journey from account creation to successful checkout and Stripe payment validation.
-
----
-
-##  Technical Challenges & Solutions
-
-During development, several complex engineering challenges were resolved:
-
-1. **Challenge:** High latency during AI product recommendations.
-   **Solution:** Migrated from standard OpenAI endpoints to **Groq's LPU (Language Processing Unit)** infrastructure, reducing token generation latency from ~3 seconds to under 400ms.
-2. **Challenge:** Serverless cold starts impacting database connections.
-   **Solution:** Implemented **Neon Serverless PostgreSQL**, which utilizes connection pooling at the edge, drastically reducing connection timeout errors during high traffic.
-3. **Challenge:** Running Machine Learning (BlazeFace) on low-end mobile devices.
-   **Solution:** Transitioned the ML inference entirely to the client-side browser using **TensorFlow.js WebGL backend**, bypassing the need to send heavy image payloads to the server, ensuring privacy and rapid execution.
-
----
-
-##  Conclusion & Future Scope
-
-**SkinGlow** successfully demonstrates that the integration of complex Artificial Intelligence into a modern web ecosystem is not only feasible but entirely redefines the standard for consumer e-commerce. It transforms a static catalog into an interactive, empathetic, and intelligent dermatological assistant.
-
-**Future Enhancements Roadmap:**
-1. **Dermatological API Integration**: Upgrading the heuristic Computer Vision model to a certified medical-grade API (e.g., Google Cloud Vision) for precise acne grading and melanoma detection.
-2. **Augmented Reality (AR)**: Implementing WebGL-based face mapping to simulate the visual effects of products on the user's skin over a 30-day projected timeline.
-3. **Automated Supply Chain**: Deepening webhook integrations (via n8n) to automatically re-order inventory from external suppliers when stock dips below calculated critical thresholds.
+SkinGlow is engineered as a continuously evolving intelligent platform. Our next strategic milestones include:
+1. **Medical-Grade API Integration:** Transitioning our heuristic computer vision models to certified medical-grade APIs (e.g., Google Cloud Vision) for precise acne severity mapping and condition grading.
+2. **Augmented Reality (AR) Previews:** Implementing robust WebGL overlays to visually simulate projected skin improvements over a 30-60 day product regimen directly on the user's face.
+3. **Automated Supply Chain Orchestration:** Deepening integrations with tools like n8n to autonomously trigger vendor purchase orders when warehouse stock hits predefined critical minimum thresholds.
 
 ---
 
 <p align="center">
   <br>
-  <strong>Architected and Engineered with precision</strong><br>
+  <strong>Architected and Engineered for the Future of E-Commerce.</strong><br>
   Developed by Maryam Tahir 
 </p>
