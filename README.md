@@ -179,7 +179,6 @@ graph TD
 ### Backend & API
 - **Runtime environment**: Node.js (Vercel Serverless Functions)
 - **Authentication**: Next-Auth, Google OAuth, JSON Web Tokens (JWT), Nodemailer (OTP delivery)
-- **Payments**: Stripe Node SDK & `@stripe/react-stripe-js`
 
 ### Data Layer
 - **Database**: PostgreSQL (Hosted on Neon Tech for serverless pooling)
