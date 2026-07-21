@@ -47,7 +47,7 @@
 
 ##  Project Abstract
 
-**SkinGlow** is a comprehensive, production-grade AI-powered skincare e-commerce platform designed and developed as a **Final Year Project**. The platform addresses the "personalization deficit" in modern e-commerce by bridging the gap between generic online shopping and personalized dermatological consultation. 
+**SkinGlow** is a comprehensive, production-grade AI-powered skincare e-commerce platform designed and developed as a **Final Project**. The platform addresses the "personalization deficit" in modern e-commerce by bridging the gap between generic online shopping and personalized dermatological consultation. 
 
 By leveraging a micro-services-inspired monolithic architecture, the system employs a sophisticated multi-agent AI framework. It features a **Conversational Virtual Esthetician** for natural language shopping, **Computer Vision (TensorFlow.js)** for real-time facial skin analysis, and an **Autonomous Business Intelligence Analyst** for platform administrators. The project serves as a blueprint for the next generation of conversational and visually-aware e-commerce platforms.
 
