@@ -1,6 +1,7 @@
 // src/pages/admin/AdminPage.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { getDashboardStats } from "../../backend/database";
 import {
   LayoutDashboard,
   Package,
@@ -35,6 +36,7 @@ export default function AdminPage() {
     { icon: Star, label: "Reviews", path: "/admin/reviews" },
     { icon: Layers, label: "Categories", path: "/admin/categories" },
     { icon: Boxes, label: "Inventory", path: "/admin/stock" },
+    { icon: Users, label: "Users", path: "/admin/users" },
     { icon: BarChart3, label: "Reports", path: "/admin/reports" },
     { icon: Bot, label: "AI Employee", path: "/admin/ai-employee" },
   ];
@@ -47,6 +49,24 @@ export default function AdminPage() {
 
   // If we are at the root admin path, show the dashboard widgets
   const isDashboardRoot = location.pathname === "/admin";
+
+  const [stats, setStats] = useState({
+    totalProducts: 0,
+    lowStockCount: 0,
+    pendingOrdersCount: 0,
+    totalRevenue: 0,
+    totalCustomers: 0,
+  });
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  useEffect(() => {
+    if (isDashboardRoot) {
+      getDashboardStats()
+        .then(setStats)
+        .catch(console.error)
+        .finally(() => setLoadingStats(false));
+    }
+  }, [isDashboardRoot]);
 
   return (
     <div className="min-h-screen flex bg-background font-sans text-foreground">
@@ -170,7 +190,9 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <h3 className="text-muted-foreground text-sm font-medium">Total Products</h3>
-                    <p className="text-3xl font-bold text-foreground mt-1">124</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">
+                      {loadingStats ? "..." : stats.totalProducts}
+                    </p>
                   </div>
                   <div className="bg-secondary/50 px-6 py-2 border-t border-border">
                     <Link to="/admin/products" className="text-xs font-bold text-primary hover:underline">View Inventory &rarr;</Link>
@@ -183,10 +205,14 @@ export default function AdminPage() {
                       <div className="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-lg text-orange-600">
                         <AlertCircle className="w-6 h-6" />
                       </div>
-                      <span className="text-xs font-bold text-orange-700 bg-orange-100 px-2 py-1 rounded-full">3 Alert</span>
+                      {stats.lowStockCount > 0 && (
+                        <span className="text-xs font-bold text-orange-700 bg-orange-100 px-2 py-1 rounded-full">{stats.lowStockCount} Alert</span>
+                      )}
                     </div>
                     <h3 className="text-muted-foreground text-sm font-medium">Low Stock</h3>
-                    <p className="text-3xl font-bold text-foreground mt-1">3</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">
+                      {loadingStats ? "..." : stats.lowStockCount}
+                    </p>
                   </div>
                   <div className="bg-secondary/50 px-6 py-2 border-t border-border">
                     <Link to="/admin/stock" className="text-xs font-bold text-primary hover:underline">Restock Now &rarr;</Link>
@@ -199,10 +225,14 @@ export default function AdminPage() {
                       <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg text-blue-600">
                         <ShoppingBag className="w-6 h-6" />
                       </div>
-                      <span className="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-1 rounded-full text-nowrap">+5 New</span>
+                      {stats.pendingOrdersCount > 0 && (
+                        <span className="text-xs font-bold text-blue-700 bg-blue-100 px-2 py-1 rounded-full text-nowrap">+{stats.pendingOrdersCount} New</span>
+                      )}
                     </div>
                     <h3 className="text-muted-foreground text-sm font-medium">Pending Orders</h3>
-                    <p className="text-3xl font-bold text-foreground mt-1">12</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">
+                      {loadingStats ? "..." : stats.pendingOrdersCount}
+                    </p>
                   </div>
                   <div className="bg-secondary/50 px-6 py-2 border-t border-border">
                     <Link to="/admin/orders" className="text-xs font-bold text-primary hover:underline">Process Orders &rarr;</Link>
@@ -217,10 +247,12 @@ export default function AdminPage() {
                       </div>
                     </div>
                     <h3 className="text-muted-foreground text-sm font-medium">Total Revenue</h3>
-                    <p className="text-3xl font-bold text-foreground mt-1">$4,250</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">
+                      {loadingStats ? "..." : `Rs. ${stats.totalRevenue.toLocaleString()}`}
+                    </p>
                   </div>
                   <div className="bg-secondary/50 px-6 py-2 border-t border-border">
-                    <span className="text-xs font-bold text-emerald-600">+18% this month</span>
+                    <Link to="/admin/reports" className="text-xs font-bold text-primary hover:underline">View Reports &rarr;</Link>
                   </div>
                 </Card>
               </div>
@@ -233,7 +265,7 @@ export default function AdminPage() {
                     <Button onClick={() => window.location.href = '/admin/add-product'} className="bg-primary hover:bg-primary/90 text-primary-foreground w-full">
                       <PlusCircle className="mr-2 h-4 w-4" /> Add Product
                     </Button>
-                    <Button variant="outline" className="border-border text-foreground w-full hover:bg-secondary">
+                    <Button onClick={() => window.location.href = '/admin/stock'} variant="outline" className="border-border text-foreground w-full hover:bg-secondary">
                       <Boxes className="mr-2 h-4 w-4" /> Check Stock
                     </Button>
                   </div>
@@ -242,7 +274,9 @@ export default function AdminPage() {
                 <div className="bg-primary/5 rounded-xl p-6 relative overflow-hidden flex flex-col justify-center border border-primary/10">
                   <Users className="absolute right-4 bottom-4 w-24 h-24 text-primary opacity-10" />
                   <h3 className="font-bold text-lg mb-2 text-foreground">Customers</h3>
-                  <div className="text-4xl font-bold mb-4 text-primary">1,204</div>
+                  <div className="text-4xl font-bold mb-4 text-primary">
+                    {loadingStats ? "..." : stats.totalCustomers.toLocaleString()}
+                  </div>
                   <div className="text-sm text-muted-foreground">Total registered users.</div>
                 </div>
               </div>

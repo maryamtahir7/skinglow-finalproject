@@ -14,6 +14,19 @@ async function dbCall(action, payload = {}) {
   return res.json();
 }
 
+/* --------------------- DASHBOARD & USERS --------------------- */
+export async function getDashboardStats() {
+  return dbCall('getDashboardStats');
+}
+
+export async function getUsers() {
+  return dbCall('getUsers');
+}
+
+export async function deleteUser(userId) {
+  return dbCall('deleteUser', { userId });
+}
+
 /* --------------------- PRODUCTS --------------------- */
 export async function addProduct(product) {
   return dbCall('addProduct', product);

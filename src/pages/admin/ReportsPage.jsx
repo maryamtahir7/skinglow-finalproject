@@ -64,9 +64,10 @@ export default function ReportsPage() {
       const currentYear = now.getFullYear();
 
       // 3. Filter orders for this month & Calculate totals
+      const validStatuses = ["PAID", "SHIPPED", "DELIVERED"];
       const thisMonthOrders = orders.filter(o => {
-        const d = new Date(o.$createdAt);
-        return d.getMonth() === now.getMonth() && d.getFullYear() === currentYear;
+        const d = new Date(o.createdAt || o.$createdAt);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === currentYear && validStatuses.includes(o.status);
       });
 
       const totalSales = thisMonthOrders.reduce((sum, o) => sum + (o.total || 0), 0);

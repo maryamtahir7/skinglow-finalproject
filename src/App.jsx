@@ -10,6 +10,7 @@ import OrdersPage from "./pages/admin/OrdersPage";
 import ReportsPage from "./pages/admin/ReportsPage";
 import StocksPage from "./pages/admin/StocksPage";
 import AIEmployee from "./pages/admin/AIEmployee";
+import UsersPage from "./pages/admin/UsersPage";
 import Homepage from "./pages/homepage";
 import ProductsPage from "./pages/products";
 import ProductDetailPage from "./pages/productdetail";
@@ -103,6 +104,7 @@ function App() {
               <Route path="orders" element={<OrdersPage />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="stock" element={<StocksPage />} />
+              <Route path="users" element={<UsersPage />} />
               <Route path="ai-employee" element={<AIEmployee />} />
             </Route>
           </Route>

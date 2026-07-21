@@ -29,6 +29,38 @@ export default async function handler(req, res) {
                 
                 return res.status(200).json(user);
             }
+            case 'getUsers': {
+                const users = await prisma.user.findMany({
+                    select: { id: true, name: true, email: true, role: true, createdAt: true },
+                    orderBy: { createdAt: 'desc' }
+                });
+                const mapped = users.map(u => ({ ...u, $id: u.id }));
+                return res.status(200).json({ documents: mapped, total: mapped.length });
+            }
+            case 'deleteUser': {
+                await prisma.user.delete({ where: { id: payload.userId } });
+                return res.status(200).json({ success: true });
+            }
+            case 'getDashboardStats': {
+                const totalProducts = await prisma.product.count();
+                const lowStockCount = await prisma.product.count({ where: { stock: { lt: 10 } } });
+                const pendingOrdersCount = await prisma.order.count({ where: { status: 'PENDING' } });
+                const totalCustomers = await prisma.user.count({ where: { role: 'CUSTOMER' } });
+                
+                const deliveredOrders = await prisma.order.findMany({
+                    where: { status: { in: ['PAID', 'SHIPPED', 'DELIVERED'] } }
+                });
+                const totalRevenue = deliveredOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+
+                return res.status(200).json({
+                    totalProducts,
+                    lowStockCount,
+                    pendingOrdersCount,
+                    totalRevenue,
+                    totalCustomers
+                });
+            }
+
 
             // PRODUCTS
             case 'getProducts': {

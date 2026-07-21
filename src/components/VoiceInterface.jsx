@@ -317,23 +317,33 @@ export default function VoiceInterface({
         recognition.onresult = (event) => {
             if (pausedRef.current) return;
 
-            let interim = '';
+            let finalStr = '';
+            let interimStr = '';
+            let hasNewFinal = false;
 
-            for (let i = event.resultIndex; i < event.results.length; i++) {
+            for (let i = 0; i < event.results.length; i++) {
                 const result = event.results[i];
                 const transcript = getBestAlternative(result);
 
                 if (result.isFinal) {
-                    finalTranscriptRef.current += `${transcript} `;
-                    scheduleSilenceCommit();
+                    finalStr += `${transcript} `;
+                    if (i >= event.resultIndex) hasNewFinal = true;
                 } else {
-                    interim += transcript;
-                    clearSilenceTimer();
+                    interimStr += transcript;
                 }
             }
 
-            interimRef.current = interim;
-            const liveText = `${finalTranscriptRef.current}${interim}`.trim();
+            finalTranscriptRef.current = finalStr;
+            interimRef.current = interimStr;
+
+            if (hasNewFinal) {
+                scheduleSilenceCommit();
+            }
+            if (interimStr) {
+                clearSilenceTimer();
+            }
+
+            const liveText = `${finalStr}${interimStr}`.trim();
             setInterimText(liveText);
             onInterim?.(liveText);
         };
