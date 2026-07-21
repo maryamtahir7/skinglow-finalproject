@@ -4,9 +4,6 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
-  "env": {
-    "DATABASE_URL": "@database_url"
-  },
   "headers": [
     {
       "source": "/api/:path*",
