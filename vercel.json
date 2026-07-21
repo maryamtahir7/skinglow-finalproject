@@ -1,9 +1,13 @@
 {
-  "framework": "vite",
-  "buildCommand": "npm run vercel-build",
+  "buildCommand": "vite build",
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "headers": [
     {
       "source": "/api/:path*",
@@ -15,10 +19,6 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
     {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
