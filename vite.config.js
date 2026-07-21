@@ -28,6 +28,9 @@ export default defineConfig({
           'ui-vendor': ['framer-motion', 'lucide-react', 'clsx', 'tailwind-merge']
         }
       }
-    }
-  }
+    },
+    outDir: 'dist',
+    emptyOutDir: true
+  },
+  publicDir: 'public'
 })

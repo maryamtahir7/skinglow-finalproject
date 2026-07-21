@@ -262,13 +262,25 @@ export default function FaceScanPage() {
             const configRes = await fetch('/ingredients_config.json');
             
             if (!skinTypeRes.ok || !conditionRes.ok || !ingredientsRes.ok || !configRes.ok) {
-                throw new Error("Failed to load model metadata or ingredients data from public folder.");
+                console.error('File load errors:', {
+                    skintype: skinTypeRes.status,
+                    condition: conditionRes.status,
+                    ingredients: ingredientsRes.status,
+                    config: configRes.status
+                });
+                throw new Error("Failed to load model metadata or ingredients data. Please ensure all JSON files are in the public folder and try again.");
             }
 
-            const skinTypeData = await skinTypeRes.json();
-            const conditionData = await conditionRes.json();
-            const ingredientsData = await ingredientsRes.json();
-            const configData = await configRes.json();
+            let skinTypeData, conditionData, ingredientsData, configData;
+            try {
+                skinTypeData = await skinTypeRes.json();
+                conditionData = await conditionRes.json();
+                ingredientsData = await ingredientsRes.json();
+                configData = await configRes.json();
+            } catch (parseErr) {
+                console.error('JSON parse error:', parseErr);
+                throw new Error("Failed to parse configuration files. Files may be corrupted.");
+            }
 
             // Extract classes
             const skinTypes = Object.keys(skinTypeData.class_indices);
