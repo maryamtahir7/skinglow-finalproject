@@ -386,6 +386,6 @@ During development, several complex engineering challenges were resolved:
 
 <p align="center">
   <br>
-  <strong>Architected and Engineered with precision for the Final Year Project.</strong><br>
+  <strong>Architected and Engineered with precision</strong><br>
   Developed by Maryam Tahir 
 </p>
