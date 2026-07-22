@@ -319,39 +319,46 @@ export default function VoiceInterface({
         recognition.onresult = (event) => {
             if (pausedRef.current) return;
 
-            let interimStr = '';
-            let newFinalStr = '';
+            let sessionStr = '';
             let hasNewFinal = false;
+            let hasInterim = false;
 
-            for (let i = event.resultIndex; i < event.results.length; i++) {
+            for (let i = 0; i < event.results.length; i++) {
                 const result = event.results[i];
                 const transcript = getBestAlternative(result);
 
                 if (result.isFinal) {
-                    // Only process if we haven't seen this final index yet
                     if (i >= lastProcessedIndexRef.current) {
-                        newFinalStr += `${transcript} `;
                         lastProcessedIndexRef.current = i + 1;
                         hasNewFinal = true;
                     }
                 } else {
-                    interimStr += transcript;
+                    hasInterim = true;
+                }
+
+                const trimmed = transcript.trimStart();
+                if (!trimmed) continue;
+
+                const sessionTrimmed = sessionStr.trim();
+                
+                // Handle Android duplication bug: if the new transcript contains the existing session text
+                if (sessionTrimmed && trimmed.toLowerCase().startsWith(sessionTrimmed.toLowerCase())) {
+                    sessionStr = transcript + ' ';
+                } else {
+                    sessionStr += transcript + ' ';
                 }
             }
 
-            if (newFinalStr) {
-                finalTranscriptRef.current += newFinalStr;
-            }
-            interimRef.current = interimStr;
+            interimRef.current = sessionStr;
 
             if (hasNewFinal) {
                 scheduleSilenceCommit();
             }
-            if (interimStr) {
+            if (hasInterim) {
                 clearSilenceTimer();
             }
 
-            const liveText = `${finalTranscriptRef.current}${interimStr}`.trim();
+            const liveText = `${finalTranscriptRef.current}${sessionStr}`.trim();
             setInterimText(liveText);
             onInterim?.(liveText);
         };
@@ -382,6 +389,16 @@ export default function VoiceInterface({
                 return;
             }
             if (pausedRef.current) return;
+
+            // Commit the session string to finalTranscript before restarting
+            if (interimRef.current) {
+                finalTranscriptRef.current += interimRef.current;
+                if (!finalTranscriptRef.current.endsWith(' ')) {
+                    finalTranscriptRef.current += ' ';
+                }
+                interimRef.current = '';
+            }
+            lastProcessedIndexRef.current = 0;
 
             try {
                 recognition.start();
