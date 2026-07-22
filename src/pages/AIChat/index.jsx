@@ -506,7 +506,7 @@ export default function AIChat() {
         </aside>
 
         {/* Main Chat Area */}
-        <main className="flex-1 flex flex-col relative z-10 h-full">
+        <main className="flex-1 flex flex-col relative z-10 h-full min-w-0 w-full">
           {/* Header */}
           <header className="h-[72px] shrink-0 bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-4 md:px-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -543,7 +543,7 @@ export default function AIChat() {
           </header>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-8 space-y-6 w-full">
             {messages.length === 1 && messages[0].id === 'welcome' && (
               <div className="flex flex-col items-center justify-center text-center mt-10 mb-16 max-w-md mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <div className="w-20 h-20 rounded-[2rem] bg-gradient-to-br from-white to-rose-50 border border-rose-100 shadow-xl shadow-rose-100/50 flex items-center justify-center mb-6">
@@ -621,7 +621,7 @@ export default function AIChat() {
           </div>
 
           {/* Input Area */}
-          <div className="shrink-0 bg-white/80 backdrop-blur-xl border-t border-slate-200/60 p-4 relative z-20 pb-safe">
+          <div className="shrink-0 bg-white/80 backdrop-blur-xl border-t border-slate-200/60 p-4 relative z-20 pb-safe w-full min-w-0">
             {voiceAgentOn && (
               <div className="flex items-center justify-between bg-primary/5 border border-primary/20 rounded-2xl p-4 mb-4">
                 <div className="flex items-center gap-3">
