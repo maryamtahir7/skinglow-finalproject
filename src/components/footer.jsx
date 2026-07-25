@@ -111,9 +111,9 @@ export default function Footer() {
                 <MapPin />
                 Punjab, Pakistan
               </span>
-              <a href="mailto:glow@skinglow.com" className="sg-footer__contact-item">
+              <a href="mailto:skin.glow.skincare.pk@gmail.com" className="sg-footer__contact-item">
                 <Mail />
-                glow@skinglow.com
+                skin.glow.skincare.pk@gmail.com
               </a>
             </div>
           </div>
@@ -201,10 +201,17 @@ export default function Footer() {
           </form>
         </motion.div>
 
-        <div className="sg-footer__bottom">
-          <p className="sg-footer__copy">
-            © {new Date().getFullYear()} SkinGlow. All rights reserved.
-          </p>
+        <div className="sg-footer__bottom flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex flex-col gap-1">
+            <p className="sg-footer__copy">
+              © {new Date().getFullYear()} SkinGlow. All rights reserved.
+            </p>
+            <p className="text-xs text-slate-500 font-medium">
+              Developed by <a href="https://maryamtahir.tech" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-bold transition-all">Maryam Tahir</a>
+              <span className="mx-2 text-slate-300">|</span>
+              <a href="https://www.linkedin.com/in/maryam-tahir-developer/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-bold transition-all">LinkedIn</a>
+            </p>
+          </div>
 
           <div className="sg-footer__legal">
             {legal.map((l) => (
