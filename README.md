@@ -80,6 +80,9 @@ The modern skincare industry is vast, yet consumers face several critical barrie
 - **Community Moderation**: Centralized hub for monitoring, approving, and managing user-generated product reviews and ratings.
 
 ---
+## Live App
+- **Link**: https://www.skin-glow.me
+---
 
 ##  Deep Dive: Artificial Intelligence Architecture
 
