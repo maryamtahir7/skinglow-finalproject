@@ -32,17 +32,18 @@
 3. [Core Features Matrix](#-core-features-matrix)
 4. [Deep Dive: Artificial Intelligence Architecture](#-deep-dive-artificial-intelligence-architecture)
 5. [AI Chat Capabilities (Complete Guide)](#-ai-chat-capabilities-complete-guide)
-6. [System Architecture & Engineering](#-system-architecture--engineering)
-7. [Detailed Technology Stack](#-detailed-technology-stack)
-8. [Database Schema (ER Model)](#-database-schema-er-model)
-9. [Security & Authentication Protocols](#-security--authentication-protocols)
-10. [Payment Gateway Integration](#-payment-gateway-integration)
-11. [Application Interfaces (Screenshots)](#-application-interfaces-screenshots)
-12. [AI Chat Demonstration](#-ai-chat-demonstration)
-13. [Installation & Local Deployment](#-installation--local-deployment)
-14. [Quality Assurance & Testing Strategy](#-quality-assurance--testing-strategy)
-15. [Technical Challenges & Solutions](#-technical-challenges--solutions)
-16. [Conclusion & Future Scope](#-conclusion--future-scope)
+6. [Admin Portal AI Chat (Operations Copilot)](#-admin-portal-ai-chat-operations-copilot)
+7. [System Architecture & Engineering](#-system-architecture--engineering)
+8. [Detailed Technology Stack](#-detailed-technology-stack)
+9. [Database Schema (ER Model)](#-database-schema-er-model)
+10. [Security & Authentication Protocols](#-security--authentication-protocols)
+11. [Payment Gateway Integration](#-payment-gateway-integration)
+12. [Application Interfaces (Screenshots)](#-application-interfaces-screenshots)
+13. [AI Chat Demonstration](#-ai-chat-demonstration)
+14. [Installation & Local Deployment](#-installation--local-deployment)
+15. [Quality Assurance & Testing Strategy](#-quality-assurance--testing-strategy)
+16. [Technical Challenges & Solutions](#-technical-challenges--solutions)
+17. [Conclusion & Future Scope](#-conclusion--future-scope)
 
 ---
 
@@ -212,6 +213,80 @@ The AI can assist in general support direction including:
 ### Responsible Use Note
 
 SkinGlow AI provides skincare and shopping guidance for cosmetic use cases. It is not a substitute for medical diagnosis. For severe or persistent skin conditions, users should consult a licensed dermatologist.
+
+---
+
+## 🧠 Admin Portal AI Chat (Operations Copilot)
+
+The Admin AI Chat is an **operations-focused assistant** designed for managers and administrators. Unlike customer chat, this assistant supports internal workflows, data interpretation, and admin decision-making.
+
+### What the Admin AI Chat Does
+
+#### 1) Sales & Revenue Insights
+Admins can ask natural language questions to retrieve business insights such as:
+- Daily/weekly/monthly sales trends
+- Revenue snapshots
+- Top-selling products
+- Low-performing categories
+- Order volume comparisons
+
+#### 2) Product & Inventory Intelligence
+The assistant helps monitor catalog health:
+- Low-stock alerts and restock suggestions
+- Product-level sales performance checks
+- Category-wise inventory overview
+- Fast discovery of products requiring operational action
+
+#### 3) Order Management Support
+It can assist with order lifecycle analysis:
+- Count orders by status (`PENDING`, `SHIPPED`, `DELIVERED`)
+- Detect fulfillment bottlenecks
+- Highlight pending backlogs
+- Guide admins on where action is needed first
+
+#### 4) Conversational Analytics
+Instead of manual dashboard filtering, admins can ask:
+- “What happened in sales this week?”
+- “Which products are declining?”
+- “How many pending orders do we have today?”
+
+The assistant translates natural language into meaningful operational responses.
+
+#### 5) Admin Decision Support
+The assistant acts as a productivity layer for:
+- Prioritizing urgent operational tasks
+- Identifying trends before they become issues
+- Supporting quicker management decisions with contextual summaries
+
+#### 6) Role-Aware Administrative Experience
+Admin AI Chat is intended for authenticated admin users and aligns with role-based access in the portal, keeping operational insights within authorized workflows.
+
+---
+
+### Admin AI Functional Summary
+
+- ✅ Answers business and operational questions in plain language
+- ✅ Surfaces revenue and order insights
+- ✅ Helps monitor inventory and product performance
+- ✅ Supports fulfillment-focused decision-making
+- ✅ Reduces dashboard-navigation overhead for admins
+
+---
+
+### Example Admin Prompts
+
+- “What were the top-selling products this week?”
+- “Show me low-stock products that need restocking.”
+- “How many pending orders are still unshipped?”
+- “Give me today’s revenue summary.”
+- “Which category performed best this month?”
+- “Compare this week’s sales with last week.”
+
+---
+
+### Admin AI Scope Note
+
+The Admin AI Chat is designed to assist decision-making and operational analysis. Final business actions (such as stock updates, policy changes, or manual status edits) remain under explicit admin control.
 
 ---
 
