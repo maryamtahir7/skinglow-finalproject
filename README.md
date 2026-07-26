@@ -127,7 +127,7 @@ The Admin portal features an AI employee with **Tool Calling Capabilities**. Adm
 
 ---
 
-## 🤖 AI Chat Capabilities (Complete Guide)
+## 🤖 AI Chat Capabilities 
 
 SkinGlow AI Chat is not a basic chatbot—it is an **actionable conversational shopping and support assistant** integrated with product data, cart logic, and ordering workflows.
 
@@ -216,7 +216,7 @@ SkinGlow AI provides skincare and shopping guidance for cosmetic use cases. It i
 
 ---
 
-## 🧠 Admin Portal AI Chat (Operations Copilot)
+##  Admin Portal AI Chat
 
 The Admin AI Chat is an **operations-focused assistant** designed for managers and administrators. Unlike customer chat, this assistant supports internal workflows, data interpretation, and admin decision-making.
 
