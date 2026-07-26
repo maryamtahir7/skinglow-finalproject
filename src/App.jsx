@@ -59,13 +59,12 @@ function FloatingAITrigger() {
       type="button"
       onClick={() => navigate("/ai-chat")}
       aria-label="Open SkinGlow AI chat"
-      className="fixed bottom-6 right-6 z-[10000] group flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-3 shadow-2xl ring-1 ring-white/30 hover:scale-105 active:scale-95 transition-all duration-300"
+      className="fixed bottom-6 right-6 z-[10000] group inline-flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-2xl ring-1 ring-white/30 hover:scale-105 active:scale-95 transition-all duration-300"
     >
       <span className="absolute inset-0 rounded-full animate-ping bg-pink-400/25 pointer-events-none" />
       <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
         <Sparkles className="h-4 w-4" />
       </span>
-      <span className="relative text-sm font-semibold tracking-wide">SkinGlow AI</span>
       <span className="absolute -top-11 right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[11px] px-2.5 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
         Ask your AI Esthetician ✨
       </span>
