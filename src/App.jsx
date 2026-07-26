@@ -1,7 +1,6 @@
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Sparkles, X } from "lucide-react";
-import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { Sparkles } from "lucide-react";
 
 import LoginForm from "./pages/login";
 import SignupForm from "./pages/signup";
@@ -28,7 +27,6 @@ import UserOrdersPage from "./pages/UserOrdersPage"; // ✅ user orders page
 import UserProfilePage from "./pages/UserProfilePage";
 import AIChat from "./pages/AIChat";
 import ContactPage from "./pages/Contact";
-import FloatingAI from "./components/FloatingAI";
 
 import BlogPage from "./pages/BlogPage";
 import BlogDetailPage from "./pages/BlogDetailPage";
@@ -53,9 +51,29 @@ import ScrollToTop from "./components/ScrollToTop";
 
 import { ToastProvider } from "./context/ToastContext";
 
-function App() {
-  const [isFloatingAiOpen, setIsFloatingAiOpen] = useState(false);
+function FloatingAITrigger() {
+  const navigate = useNavigate();
 
+  return (
+    <button
+      type="button"
+      onClick={() => navigate("/ai-chat")}
+      aria-label="Open SkinGlow AI chat"
+      className="fixed bottom-6 right-6 z-[10000] group flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-3 shadow-2xl ring-1 ring-white/30 hover:scale-105 active:scale-95 transition-all duration-300"
+    >
+      <span className="absolute inset-0 rounded-full animate-ping bg-pink-400/25 pointer-events-none" />
+      <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+        <Sparkles className="h-4 w-4" />
+      </span>
+      <span className="relative text-sm font-semibold tracking-wide">SkinGlow AI</span>
+      <span className="absolute -top-11 right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[11px] px-2.5 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
+        Ask your AI Esthetician ✨
+      </span>
+    </button>
+  );
+}
+
+function App() {
   return (
     <ToastProvider>
       <Router>
@@ -116,41 +134,7 @@ function App() {
         </Routes>
 
         {/* Floating AI Chat Trigger */}
-        {!isFloatingAiOpen && (
-          <button
-            type="button"
-            onClick={() => setIsFloatingAiOpen(true)}
-            aria-label="Open SkinGlow AI chat"
-            className="fixed bottom-6 right-6 z-[10000] group flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-3 shadow-2xl ring-1 ring-white/30 hover:scale-105 active:scale-95 transition-all duration-300"
-          >
-            <span className="absolute inset-0 rounded-full animate-ping bg-pink-400/25 pointer-events-none" />
-            <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-              <Sparkles className="h-4 w-4" />
-            </span>
-            <span className="relative text-sm font-semibold tracking-wide">SkinGlow AI</span>
-            <span className="absolute -top-11 right-0 opacity-0 group-hover:opacity-100 transition-opacity bg-slate-900 text-white text-[11px] px-2.5 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
-              Ask your AI Esthetician ✨
-            </span>
-          </button>
-        )}
-
-        {/* Floating AI Panel */}
-        <FloatingAI
-          isOpen={isFloatingAiOpen}
-          onClose={() => setIsFloatingAiOpen(false)}
-        />
-
-        {/* Small close chip when AI is open on mobile */}
-        {isFloatingAiOpen && (
-          <button
-            type="button"
-            onClick={() => setIsFloatingAiOpen(false)}
-            className="fixed top-4 right-4 z-[10001] md:hidden inline-flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur-md px-3 py-2 text-xs font-semibold text-slate-700 shadow-lg border border-slate-200"
-            aria-label="Close SkinGlow AI chat"
-          >
-            <X className="h-3.5 w-3.5" /> Close AI
-          </button>
-        )}
+        <FloatingAITrigger />
       </Router>
     </ToastProvider>
   );
