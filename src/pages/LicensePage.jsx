@@ -45,7 +45,7 @@ function LicensePage() {
 
                 <div className="mt-16 text-center">
                     <p className="text-slate-500 text-sm">
-                        For official inquiries or to report a concern, please contact our Legal Department at <a href="mailto:legal@skinglow.com" className="text-primary hover:underline">legal@skinglow.com</a>.
+                        For official inquiries or to report a concern, please contact our Legal Department at <a href="mailto:skin.glow.skincare.pk@gmail.com" className="text-primary hover:underline">skin.glow.skincare.pk@gmail.com</a>.
                     </p>
                 </div>
             </div>

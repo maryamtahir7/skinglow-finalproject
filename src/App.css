@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400..700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @import "tw-animate-css";
@@ -388,4 +388,18 @@ body,
 
 .animate-typing-dot {
   animation: typing 1.4s infinite ease-in-out both;
+}
+
+/* Beautiful Nastaliq font styling for Urdu messages */
+.urdu-text {
+  font-family: 'Noto Nastaliq Urdu', 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif !important;
+  font-size: 1.15rem !important;
+  line-height: 2.3 !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.urdu-text p {
+  line-height: 2.3 !important;
+  margin-bottom: 0.75rem !important;
 }

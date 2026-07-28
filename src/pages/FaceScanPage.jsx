@@ -70,7 +70,7 @@ export default function FaceScanPage() {
             const mediaStream = await navigator.mediaDevices.getUserMedia({
                 video: { facingMode: mode }
             });
-            
+
             setStream(mediaStream);
             setFacingMode(mode);
             if (videoRef.current) {
@@ -140,7 +140,7 @@ export default function FaceScanPage() {
         return new Promise((resolve) => {
             const img = new Image();
             img.onload = async () => {
-                
+
                 // 1. Primary: Use Real ML Model (TensorFlow BlazeFace)
                 if (model) {
                     try {
@@ -177,33 +177,33 @@ export default function FaceScanPage() {
                 ctx.drawImage(img, 0, 0, w, h);
                 const imageData = ctx.getImageData(0, 0, w, h);
                 const data = imageData.data;
-                
+
                 let skinPixels = 0;
                 let uniqueColors = new Set();
-                
+
                 // Define tight center bounding box (middle 40% of the image)
                 const startX = Math.floor(w * 0.30);
                 const endX = Math.floor(w * 0.70);
                 const startY = Math.floor(h * 0.30);
                 const endY = Math.floor(h * 0.70);
                 const centerArea = (endX - startX) * (endY - startY);
-                
+
                 for (let y = startY; y < endY; y++) {
                     for (let x = startX; x < endX; x++) {
                         const index = (y * w + x) * 4;
                         const r = data[index];
                         const g = data[index + 1];
                         const b = data[index + 2];
-                        
+
                         // Ignore pure whites and blacks common in screenshots
                         if (r > 240 && g > 240 && b > 240) continue;
                         if (r < 20 && g < 20 && b < 20) continue;
-                        
+
                         // Track unique colors to detect screenshots/cartoons (which have flat colors)
                         uniqueColors.add(`${r},${g},${b}`);
-                        
+
                         // Convert RGB to HSV
-                        let r1 = r/255, g1 = g/255, b1 = b/255;
+                        let r1 = r / 255, g1 = g / 255, b1 = b / 255;
                         let max = Math.max(r1, g1, b1), min = Math.min(r1, g1, b1);
                         let h_val = 0, s = 0, v = max;
                         let d = max - min;
@@ -215,23 +215,23 @@ export default function FaceScanPage() {
                             h_val /= 6;
                         }
                         h_val *= 360; // Hue in degrees
-                        
+
                         // Human skin Hue is tightly bound: 0-50 (brown/tan) and 330-360 (pink/red)
                         const isSkinHue = (h_val >= 0 && h_val <= 50) || (h_val >= 330 && h_val <= 360);
                         // Saturation shouldn't be greyscale or neon
                         const isSkinSaturation = s > 0.15 && s < 0.75;
                         // Skin always has more red than blue
-                        
+
                         if (isSkinHue && isSkinSaturation && r > b) {
                             skinPixels++;
                         }
                     }
                 }
-                
+
                 const skinPercentage = (skinPixels / centerArea) * 100;
                 // Screenshots have very few unique colors. Real camera photos have noise/gradients (>50 unique colors)
-                const isRealPhoto = uniqueColors.size > 50; 
-                
+                const isRealPhoto = uniqueColors.size > 50;
+
                 // Extremely strict: Must have >30% skin in the exact center AND be a real photo
                 resolve(skinPercentage > 30 && isRealPhoto);
             };
@@ -261,7 +261,7 @@ export default function FaceScanPage() {
             const conditionRes = await fetch('/condition.json');
             const ingredientsRes = await fetch('/ingredients_data.json');
             const configRes = await fetch('/ingredients_config.json');
-            
+
             if (!skinTypeRes.ok || !conditionRes.ok || !ingredientsRes.ok || !configRes.ok) {
                 console.error('File load errors:', {
                     skintype: skinTypeRes.status,
@@ -293,21 +293,21 @@ export default function FaceScanPage() {
             const sampleStr = base64String.substring(base64String.length / 2, (base64String.length / 2) + 500);
             for (let i = 0; i < sampleStr.length; i++) {
                 hash = ((hash << 5) - hash) + sampleStr.charCodeAt(i);
-                hash |= 0; 
+                hash |= 0;
             }
             const seed = Math.abs(hash);
 
             // Select Skin Type
             const selectedSkinType = skinTypes[seed % skinTypes.length];
-            
+
             // Select Conditions (1 to 3 conditions)
-            const numConditions = (seed % 3) + 1; 
+            const numConditions = (seed % 3) + 1;
             const selectedConditions = [];
             for (let i = 0; i < numConditions; i++) {
                 const cond = conditions[(seed + i * 13) % conditions.length];
                 if (!selectedConditions.includes(cond)) selectedConditions.push(cond);
             }
-            
+
             // Map model conditions and skin type to tags using user's config
             const conditionTagMap = configData.condition_tag_map || {};
             const skinTypeTagMap = configData.skin_type_good_tag_map || {};
@@ -329,7 +329,7 @@ export default function FaceScanPage() {
             const scoredIngredients = ingredientsData.map(ing => {
                 let score = 0;
                 let hasAvoidTag = false;
-                
+
                 if (ing.avoid_tags) {
                     hasAvoidTag = ing.avoid_tags.some(t => avoidTagsArray.includes(t));
                 }
@@ -345,7 +345,7 @@ export default function FaceScanPage() {
             // Pick Top 3-4 Ingredients deterministically
             const finalIngredients = [];
             const numRecs = Math.min(4, scoredIngredients.length);
-            for(let i = 0; i < numRecs; i++) {
+            for (let i = 0; i < numRecs; i++) {
                 const ing = scoredIngredients[(seed + i) % scoredIngredients.length];
                 if (ing && !finalIngredients.find(f => f.name === ing.name)) {
                     finalIngredients.push({
@@ -367,18 +367,18 @@ export default function FaceScanPage() {
             const matchedProducts = [];
             const conditionKeywords = [...selectedConditions, ...desiredTagsArray].map(t => t.toLowerCase());
             const ingredientKeywords = finalIngredients.map(i => i.name.toLowerCase());
-            
+
             // Give each product a score based on semantic overlap
             const scoredProducts = allProducts.map(p => {
                 let score = 0;
                 const searchStr = `${p.name} ${p.description} ${p.Concerns} ${p.tags}`.toLowerCase();
-                
+
                 conditionKeywords.forEach(kw => {
                     if (searchStr.includes(kw)) score += 2;
                 });
                 ingredientKeywords.forEach(kw => {
                     // Higher score for exact ingredient match
-                    if (searchStr.includes(kw)) score += 5; 
+                    if (searchStr.includes(kw)) score += 5;
                 });
                 return { ...p, score };
             }).filter(p => p.score > 0).sort((a, b) => b.score - a.score);
@@ -411,7 +411,7 @@ export default function FaceScanPage() {
         hidden: { opacity: 0, y: 30 },
         show: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
     };
-    
+
     const stagger = {
         hidden: { opacity: 0 },
         show: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -426,7 +426,7 @@ export default function FaceScanPage() {
             <div className="max-w-6xl mx-auto relative z-10">
 
                 {/* Header */}
-                <motion.div 
+                <motion.div
                     initial="hidden" animate="show" variants={fadeUp}
                     className="text-center space-y-6 mb-16"
                 >
@@ -441,7 +441,7 @@ export default function FaceScanPage() {
                 <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-stretch">
 
                     {/* Left Column: Camera / Image Display */}
-                    <motion.div 
+                    <motion.div
                         initial="hidden" animate="show" variants={fadeUp}
                         className="bg-white/60 backdrop-blur-3xl rounded-[2.5rem] shadow-2xl shadow-rose-950/5 border border-white overflow-hidden relative flex flex-col h-[500px] lg:h-[650px]"
                     >
@@ -491,7 +491,7 @@ export default function FaceScanPage() {
                                     className="absolute inset-0 w-full h-full object-cover"
                                     style={{ transform: facingMode === 'user' ? 'scaleX(-1)' : 'scaleX(1)' }}
                                 />
-                                
+
                                 {/* Sci-Fi elegant overlay */}
                                 <div className="absolute inset-0 border-[1px] border-white/20 m-6 rounded-3xl overflow-hidden pointer-events-none">
                                     <div className="absolute top-0 left-0 w-full h-[2px] bg-rose-400/80 animate-[scan_2.5s_ease-in-out_infinite] shadow-[0_0_20px_4px_rgba(251,113,133,0.5)]"></div>
@@ -529,7 +529,7 @@ export default function FaceScanPage() {
 
                                 <AnimatePresence>
                                     {isAnalyzing && (
-                                        <motion.div 
+                                        <motion.div
                                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                                             className="absolute inset-0 bg-stone-900/70 backdrop-blur-md flex flex-col items-center justify-center text-white z-10"
                                         >
@@ -563,7 +563,7 @@ export default function FaceScanPage() {
                     </motion.div>
 
                     {/* Right Column: Analysis Results */}
-                    <motion.div 
+                    <motion.div
                         initial="hidden" animate="show" variants={fadeUp}
                         className="bg-white rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-stone-100 overflow-hidden h-full min-h-[650px] flex flex-col relative"
                     >
@@ -604,7 +604,7 @@ export default function FaceScanPage() {
                         )}
 
                         {analysisResult && !isAnalyzing && (
-                            <motion.div 
+                            <motion.div
                                 variants={stagger} initial="hidden" animate="show"
                                 className="h-full flex flex-col"
                             >
@@ -635,7 +635,7 @@ export default function FaceScanPage() {
                                 </div>
 
                                 <div className="flex-1 overflow-y-auto bg-stone-50/50 p-6 lg:p-10 custom-scrollbar space-y-10">
-                                    
+
                                     {/* Core Diagnostics */}
                                     <motion.div variants={fadeUp} className="grid grid-cols-2 gap-4 lg:gap-6">
                                         <div className="bg-white p-6 rounded-3xl border border-stone-200 shadow-sm relative overflow-hidden group">
@@ -656,9 +656,9 @@ export default function FaceScanPage() {
                                             {/* Decorative ML Background */}
                                             <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-emerald-500/20 blur-[70px] rounded-full pointer-events-none"></div>
                                             <div className="absolute bottom-[-20%] left-[-10%] w-40 h-40 bg-rose-500/10 blur-[50px] rounded-full pointer-events-none"></div>
-                                            
+
                                             <h3 className="text-[10px] font-bold text-stone-400 uppercase tracking-[0.2em] mb-6 flex items-center gap-2 relative z-10"><Activity className="w-4 h-4 text-emerald-400" /> Neural Detection Vectors</h3>
-                                            
+
                                             <div className="space-y-5 relative z-10">
                                                 {analysisResult.conditions.slice(1).map((c, index) => {
                                                     const confidence = 92 - (index * 7) + (c.length % 5);
@@ -671,9 +671,9 @@ export default function FaceScanPage() {
                                                                 <span className="text-xs font-mono text-emerald-400">{confidence}%</span>
                                                             </div>
                                                             <div className="w-full bg-stone-800 rounded-full h-1.5 overflow-hidden">
-                                                                <motion.div 
-                                                                    initial={{ width: 0 }} 
-                                                                    animate={{ width: `${confidence}%` }} 
+                                                                <motion.div
+                                                                    initial={{ width: 0 }}
+                                                                    animate={{ width: `${confidence}%` }}
                                                                     transition={{ duration: 1.5, delay: 0.5 + (index * 0.2), ease: "easeOut" }}
                                                                     className="bg-emerald-400 h-full rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)]"
                                                                 ></motion.div>
@@ -692,7 +692,7 @@ export default function FaceScanPage() {
                                             {analysisResult.ingredients.map((ing, idx) => (
                                                 <div key={idx} className="p-5 bg-white rounded-3xl border border-stone-200 shadow-sm flex items-start gap-4 hover:border-rose-200 hover:shadow-md transition-all group">
                                                     <div className="w-14 h-14 rounded-2xl bg-stone-900 text-white flex items-center justify-center shrink-0 shadow-inner group-hover:bg-rose-600 transition-colors">
-                                                        <span className="font-mono font-bold text-xl">{ing.name.substring(0,2).toUpperCase()}</span>
+                                                        <span className="font-mono font-bold text-xl">{ing.name.substring(0, 2).toUpperCase()}</span>
                                                     </div>
                                                     <div>
                                                         <h4 className="text-base font-bold text-stone-900 group-hover:text-rose-600 transition-colors">{ing.name}</h4>
@@ -711,7 +711,7 @@ export default function FaceScanPage() {
                                                 {analysisResult.products.map((prod, idx) => (
                                                     <div key={prod.$id} className="bg-white rounded-3xl border border-stone-200 hover:border-rose-300 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex overflow-hidden group cursor-pointer" onClick={() => navigate(`/products/${prod.$id}`)}>
                                                         <div className="w-12 bg-stone-900 text-white flex flex-col items-center justify-center py-4 shrink-0 transition-colors group-hover:bg-rose-600">
-                                                            <span className="text-[10px] uppercase tracking-widest rotate-180 font-bold" style={{ writingMode: 'vertical-rl' }}>Step 0{idx+1}</span>
+                                                            <span className="text-[10px] uppercase tracking-widest rotate-180 font-bold" style={{ writingMode: 'vertical-rl' }}>Step 0{idx + 1}</span>
                                                         </div>
                                                         <div className="p-4 lg:p-5 flex items-center gap-5 lg:gap-6 flex-1">
                                                             <div className="w-20 h-20 shrink-0 bg-[#fdfbf9] rounded-2xl overflow-hidden relative p-1 border border-stone-100 group-hover:scale-110 transition-transform duration-500">
@@ -722,7 +722,7 @@ export default function FaceScanPage() {
                                                                 <p className="text-stone-500 text-xs mt-1 capitalize">{prod.tags?.[0] || 'Treatment'}</p>
                                                                 <p className="text-stone-900 font-extrabold text-sm mt-3">Rs. {parseInt(prod.price).toLocaleString()}</p>
                                                             </div>
-                                                            <button 
+                                                            <button
                                                                 onClick={(e) => { e.stopPropagation(); handleAddToCart(prod); }}
                                                                 className="w-12 h-12 shrink-0 bg-stone-50 border border-stone-200 text-stone-800 rounded-full flex items-center justify-center group-hover:bg-stone-900 group-hover:border-stone-900 group-hover:text-white transition-all active:scale-95 shadow-sm"
                                                                 title="Add to Cart"

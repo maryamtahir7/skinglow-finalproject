@@ -1,7 +1,8 @@
-import { tools, resolveShippingDetails } from './_tools.js';
+import { resolveShippingDetails } from './_tools.js';
 
 async function loadTools() {
-  return tools;
+  const mod = await import('./_tools.js');
+  return mod.tools;
 }
 
 const ADD_TO_CART_PATTERNS = [

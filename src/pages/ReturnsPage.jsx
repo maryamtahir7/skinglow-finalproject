@@ -5,7 +5,7 @@ export default function ReturnsPage() {
     const steps = [
         {
             title: "Initiate Return",
-            text: "Email us at glow@skinglow.com within 30 days with your order number."
+            text: "Email us at skin.glow.skincare.pk@gmail.com within 30 days with your order number."
         },
         {
             title: "Pack It Up",

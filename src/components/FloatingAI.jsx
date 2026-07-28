@@ -5,6 +5,17 @@ import { useUser } from '@/context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import ProductConfirmCard from '../pages/AIChat/components/ProductConfirmCard';
+import OrderConfirmCard from '../pages/AIChat/components/OrderConfirmCard';
+import ProductPickerCard from '../pages/AIChat/components/ProductPickerCard';
+import OrderProgressCard from '../pages/AIChat/components/OrderProgressCard';
+import OrderSourceChoiceCard from '../pages/AIChat/components/OrderSourceChoiceCard';
+
+let msgIdCounter = 0;
+const newId = () => `msg-${++msgIdCounter}-${Date.now()}`;
+
+const YES_RE = /^(yes|yep|yeah|haan|han|ji|ok|okay|confirm|bilkul|sure|kar do|kr do)$/i;
+const NO_RE = /^(no|nope|cancel|nahi|nah|mat)$/i;
 
 export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
     // If no external props, we can fallback to internal state (for pages that use it standalone), but we prefer external.
@@ -21,6 +32,7 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
 
     const [messages, setMessages] = useState([
         {
+            id: newId(),
             text: '✨ Hello! I’m your personal SkinGlow Esthetician. I can help you build a routine, track orders, or find the perfect ingredients for your skin type. How can I help you glow today?',
             sender: 'bot',
             type: 'text'
@@ -28,8 +40,11 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
     ]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
+    const [confirmLoading, setConfirmLoading] = useState(false);
+    const [orderDraft, setOrderDraft] = useState(null);
     const [products, setProducts] = useState([]);
     const [speakingIndex, setSpeakingIndex] = useState(null);
+    const [voiceLang, setVoiceLang] = useState('en-US');
 
     // History format for Gemini
     const [chatHistory, setChatHistory] = useState([]);
@@ -65,7 +80,7 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
             return;
         }
 
-        speakText(text, 'en-US', {
+        speakText(text, voiceLang, {
             onStart: () => setSpeakingIndex(idx),
             onEnd: () => setSpeakingIndex(null),
         });
@@ -76,32 +91,62 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
         setSpeakingIndex(null);
     };
 
-    const handleSend = async (txt = input) => {
-        if (!txt.trim()) return;
+    const buildConfirmAction = (pending) => {
+        if (pending.type === 'add_to_cart') {
+            return {
+                type: 'add_to_cart',
+                productId: pending.product.id,
+                productName: pending.product.name,
+                quantity: 1,
+            };
+        }
+        if (pending.type === 'place_order') {
+            return {
+                type: 'place_order',
+                useCart: pending.useCart ?? false,
+                productId: pending.productId,
+                phone: pending.shipping?.phone,
+                address: pending.shipping?.address,
+                city: pending.shipping?.city,
+                postalCode: pending.shipping?.postalCode,
+                paymentMethod: pending.shipping?.paymentMethod || 'COD',
+            };
+        }
+        return null;
+    };
 
-        const userMsg = { text: txt, sender: 'user' };
-        setMessages(prev => [...prev, userMsg]);
-        setInput('');
-        setLoading(true);
-
-        const newHistory = [...chatHistory, { role: 'user', parts: [{ text: txt }] }];
-        setChatHistory(newHistory);
+    const handleConfirm = async (msgId, confirmAction) => {
+        if (confirmLoading) return;
+        setConfirmLoading(true);
 
         try {
             const response = await fetch('/api/ai/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    message: txt,
+                    confirmAction,
                     history: chatHistory,
                     userId: user?.$id || user?.id || 'guest',
                     userName: user?.name || null,
                     userPrefs: user?.prefs || null,
-                })
+                    orderDraft,
+                }),
             });
 
             const data = await response.json();
-            
+
+            if (data.orderDraft !== undefined) {
+                setOrderDraft(data.orderDraft);
+            }
+
+            setMessages((prev) =>
+                prev.map((m) => (m.id === msgId ? {
+                    ...m,
+                    confirmed: data.confirmed !== false,
+                    orderId: data.orderId || null,
+                } : m))
+            );
+
             if (data.reply) {
                 const cleanReply = String(data.reply)
                     .replace(/<function=\w+\s*\{[\s\S]*?\}\s*<\/function>/gi, '')
@@ -109,22 +154,196 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
                     .replace(/<\/?function[^>]*>/gi, '')
                     .replace(/\b(searchProducts|addToCart|placeOrder)\s*[({][\s\S]*?[)}]/gi, '')
                     .trim();
-                setMessages(prev => [...prev, { text: cleanReply, sender: 'bot' }]);
-                setChatHistory(data.updatedHistory || [...newHistory, { role: 'model', parts: [{ text: cleanReply }] }]);
+                setMessages(prev => [...prev, { id: newId(), text: cleanReply, sender: 'bot' }]);
+            }
 
-                if (data.actions?.length) {
-                    for (const action of data.actions) {
-                        if (action.type === 'cart_updated' || action.type === 'order_placed') {
-                            window.dispatchEvent(new Event('cart-updated'));
-                        }
+            if (data.confirmed) {
+                window.dispatchEvent(new Event('cart-updated'));
+                setOrderDraft(null);
+            }
+
+            if (data.actions?.length) {
+                for (const action of data.actions) {
+                    if (action.type === 'cart_updated' || action.type === 'order_placed') {
+                        window.dispatchEvent(new Event('cart-updated'));
                     }
                 }
-            } else {
-                setMessages(prev => [...prev, { text: 'Sorry, I encountered an error. Please try again.', sender: 'bot' }]);
             }
         } catch (error) {
             console.error(error);
-            setMessages(prev => [...prev, { text: 'Network error. Could not reach the AI server.', sender: 'bot' }]);
+            setMessages(prev => [...prev, { id: newId(), text: 'Could not complete that action. Please try again.', sender: 'bot' }]);
+        } finally {
+            setConfirmLoading(false);
+        }
+    };
+
+    const handleCancelConfirm = (msgId) => {
+        setMessages((prev) =>
+            prev.map((m) => (m.id === msgId ? { ...m, confirmed: false } : m))
+        );
+        setOrderDraft(null);
+        setMessages(prev => [...prev, { id: newId(), text: 'Order cancelled. Let me know if you\'d like to start again or need skincare advice. ✨', sender: 'bot' }]);
+    };
+
+    const handleOrderSourceChoice = async (choice) => {
+        if (confirmLoading || loading) return;
+
+        const labels = {
+            cart: 'Order from my cart',
+            dry: 'Dry skin products',
+            oily: 'Oily skin products',
+            combination: 'Combination skin products',
+            sensitive: 'Sensitive skin products',
+            hydrating: 'Hydration products',
+            browse: 'Browse products',
+        };
+
+        setMessages((prev) => [...prev, {
+            id: newId(), sender: 'user', type: 'text', text: labels[choice] || choice,
+        }]);
+        setConfirmLoading(true);
+
+        try {
+            const response = await fetch('/api/ai/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    orderSourceChoice: choice,
+                    orderDraft,
+                    history: chatHistory,
+                    userId: user?.$id || user?.id || 'guest',
+                    userName: user?.name || null,
+                    userPrefs: user?.prefs || null,
+                }),
+            });
+            const data = await response.json();
+            handleApiResponse(data, labels[choice] || choice);
+        } catch {
+            setMessages(prev => [...prev, { id: newId(), text: 'Could not process your choice. Please try again.', sender: 'bot' }]);
+        } finally {
+            setConfirmLoading(false);
+        }
+    };
+
+    const handleProductSelect = async (product) => {
+        if (confirmLoading || loading) return;
+        setMessages((prev) => [...prev, {
+            id: newId(), sender: 'user', type: 'text', text: `I'll order ${product.name}`,
+        }]);
+        setConfirmLoading(true);
+
+        try {
+            const response = await fetch('/api/ai/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    selectProductId: product.id,
+                    orderDraft,
+                    history: chatHistory,
+                    userId: user?.$id || user?.id || 'guest',
+                    userName: user?.name || null,
+                    userPrefs: user?.prefs || null,
+                }),
+            });
+            const data = await response.json();
+            handleApiResponse(data, `Selected ${product.name}`);
+        } catch {
+            setMessages(prev => [...prev, { id: newId(), text: 'Could not select that product. Please try again.', sender: 'bot' }]);
+        } finally {
+            setConfirmLoading(false);
+        }
+    };
+
+    const handleApiResponse = (data, userText) => {
+        if (data.orderDraft !== undefined) {
+            setOrderDraft(data.orderDraft);
+        }
+
+        if (data.reply) {
+            const cleanReply = String(data.reply)
+                .replace(/<function=\w+\s*\{[\s\S]*?\}\s*<\/function>/gi, '')
+                .replace(/<function=[^>\n]+>[\s\S]*?<\/function>/gi, '')
+                .replace(/<\/?function[^>]*>/gi, '')
+                .replace(/\b(searchProducts|addToCart|placeOrder)\s*[({][\s\S]*?[)}]/gi, '')
+                .trim();
+                
+            const botMsg = {
+                id: newId(),
+                sender: 'bot',
+                type: data.pendingConfirmation ? data.pendingConfirmation.type : 'text',
+                text: cleanReply,
+                pendingConfirmation: data.pendingConfirmation || null,
+                productPicker: data.productPicker || null,
+                orderProgress: data.orderProgress || null,
+                orderSourceChoice: data.orderSourceChoice || null,
+                confirmed: data.pendingConfirmation ? null : undefined,
+                orderId: null,
+            };
+            setMessages(prev => [...prev, botMsg]);
+            
+            if (userText) {
+                setChatHistory(data.updatedHistory || [...chatHistory, { role: 'user', parts: [{ text: userText }] }, { role: 'model', parts: [{ text: cleanReply }] }]);
+            }
+        }
+
+        if (data.actions?.length) {
+            for (const action of data.actions) {
+                if (action.type === 'cart_updated' || action.type === 'order_placed') {
+                    window.dispatchEvent(new Event('cart-updated'));
+                }
+            }
+        }
+    };
+
+    const handleSend = async (txt = input) => {
+        const text = (txt || '').trim();
+        if (!text || loading || confirmLoading) return;
+
+        const pendingMsg = [...messages].reverse().find(
+            (m) => m.pendingConfirmation && m.confirmed === null
+        );
+
+        if (pendingMsg && YES_RE.test(text)) {
+            setMessages((prev) => [...prev, { id: newId(), sender: 'user', type: 'text', text }]);
+            setInput('');
+            await handleConfirm(pendingMsg.id, buildConfirmAction(pendingMsg.pendingConfirmation));
+            return;
+        }
+
+        if (pendingMsg && NO_RE.test(text)) {
+            setMessages((prev) => [...prev, { id: newId(), sender: 'user', type: 'text', text }]);
+            setInput('');
+            handleCancelConfirm(pendingMsg.id);
+            return;
+        }
+
+        const userMsg = { id: newId(), text, sender: 'user' };
+        setMessages(prev => [...prev, userMsg]);
+        setInput('');
+        setLoading(true);
+
+        const newHistory = [...chatHistory, { role: 'user', parts: [{ text }] }];
+        setChatHistory(newHistory);
+
+        try {
+            const response = await fetch('/api/ai/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: text,
+                    history: chatHistory,
+                    userId: user?.$id || user?.id || 'guest',
+                    userName: user?.name || null,
+                    userPrefs: user?.prefs || null,
+                    orderDraft,
+                })
+            });
+
+            const data = await response.json();
+            handleApiResponse(data, text);
+        } catch (error) {
+            console.error(error);
+            setMessages(prev => [...prev, { id: newId(), text: 'Network error. Could not reach the AI server.', sender: 'bot' }]);
         } finally {
             setLoading(false);
         }
@@ -180,6 +399,21 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
                     </div>
 
                     <div className="flex items-center gap-2">
+                        {/* Language Selector Pill */}
+                        <div className="flex bg-white/80 backdrop-blur-md rounded-full border border-slate-200 p-0.5 shadow-sm mr-1">
+                            <button
+                                onClick={() => setVoiceLang('en-US')}
+                                className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full transition-all ${voiceLang === 'en-US' ? 'bg-primary text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+                            >
+                                EN
+                            </button>
+                            <button
+                                onClick={() => setVoiceLang('ur-PK')}
+                                className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full transition-all ${voiceLang === 'ur-PK' ? 'bg-primary text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}
+                            >
+                                اردو
+                            </button>
+                        </div>
                         {speakingIndex !== null && (
                             <button
                                 onClick={handleStopVoice}
@@ -212,31 +446,62 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
                                 </div>
                             )}
 
-                            <div className={`p-4 rounded-2xl shadow-sm text-sm leading-relaxed relative ${msg.sender === 'user'
-                                ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-br-none shadow-slate-900/10'
-                                : 'bg-white border border-primary/5 text-slate-700 rounded-bl-none shadow-sm prose prose-sm prose-slate max-w-none'
-                                }`}>
-                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                    {msg.text}
-                                </ReactMarkdown>
-                                {msg.sender === 'bot' && (
-                                    <button
-                                        onClick={() => handleSpeak(msg.text, idx)}
-                                        className={`absolute -right-8 bottom-0 p-1.5 rounded-full transition-colors ${
-                                            speakingIndex === idx
-                                                ? 'bg-red-100 text-red-500 hover:bg-red-200 animate-pulse'
-                                                : 'bg-slate-100 text-slate-400 hover:text-slate-600'
-                                        }`}
-                                        title={speakingIndex === idx ? 'Stop voice' : 'Read aloud'}
-                                    >
-                                        {speakingIndex === idx ? (
-                                            <VolumeX className="w-4 h-4" />
-                                        ) : (
-                                            <Volume2 className="w-4 h-4" />
+                            {(() => {
+                                const isMsgUrdu = /[\u0600-\u06FF]/.test(msg.text);
+                                return (
+                                    <div className="flex flex-col gap-2 min-w-0 relative">
+                                        <div className={`p-4 rounded-2xl shadow-sm text-sm leading-relaxed relative ${
+                                            isMsgUrdu ? 'urdu-text' : ''
+                                        } ${msg.sender === 'user'
+                                            ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-br-none shadow-slate-900/10'
+                                            : 'bg-white border border-primary/5 text-slate-700 rounded-bl-none shadow-sm prose prose-sm prose-slate max-w-none'
+                                        }`}>
+                                            <div className={isMsgUrdu ? 'urdu-text' : ''}>
+                                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                    {msg.text}
+                                                </ReactMarkdown>
+                                            </div>
+                                            {msg.sender === 'bot' && msg.type === 'text' && (
+                                                <button
+                                                    onClick={() => handleSpeak(msg.text, idx)}
+                                                    className={`absolute -right-8 bottom-0 p-1.5 rounded-full transition-colors ${
+                                                        speakingIndex === idx
+                                                            ? 'bg-red-100 text-red-500 hover:bg-red-200 animate-pulse'
+                                                            : 'bg-slate-100 text-slate-400 hover:text-slate-600'
+                                                    }`}
+                                                    title={speakingIndex === idx ? 'Stop voice' : 'Read aloud'}
+                                                >
+                                                    {speakingIndex === idx ? (
+                                                        <VolumeX className="w-4 h-4" />
+                                                    ) : (
+                                                        <Volume2 className="w-4 h-4" />
+                                                    )}
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {msg.orderSourceChoice && (
+                                            <OrderSourceChoiceCard choice={msg.orderSourceChoice} loading={confirmLoading} onChoose={handleOrderSourceChoice} />
                                         )}
-                                    </button>
-                                )}
-                            </div>
+
+                                        {msg.productPicker?.products?.length > 0 && (
+                                            <ProductPickerCard products={msg.productPicker.products} hint={msg.productPicker.hint} mode={msg.productPicker.mode || 'order'} loading={confirmLoading} onSelect={handleProductSelect} />
+                                        )}
+
+                                        {msg.orderProgress && (
+                                            <OrderProgressCard progress={msg.orderProgress} />
+                                        )}
+
+                                        {msg.pendingConfirmation?.type === 'add_to_cart' && (
+                                            <ProductConfirmCard product={msg.pendingConfirmation.product} confirmed={msg.confirmed ?? null} loading={confirmLoading} onConfirm={() => handleConfirm(msg.id, buildConfirmAction(msg.pendingConfirmation))} onCancel={() => handleCancelConfirm(msg.id)} />
+                                        )}
+
+                                        {msg.pendingConfirmation?.type === 'place_order' && (
+                                            <OrderConfirmCard order={msg.pendingConfirmation} confirmed={msg.confirmed ?? null} loading={confirmLoading} orderId={msg.orderId} onConfirm={() => handleConfirm(msg.id, buildConfirmAction(msg.pendingConfirmation))} onCancel={() => handleCancelConfirm(msg.id)} />
+                                        )}
+                                    </div>
+                                );
+                            })()}
                         </div>
                     ))}
 
@@ -275,7 +540,7 @@ export default function FloatingAI({ isOpen: externalIsOpen, onClose }) {
                             onResult={handleVoiceInput}
                             onInterim={handleVoiceInterim}
                             disabled={loading}
-                            lang="en-US"
+                            lang={voiceLang}
                         />
                         <input
                             ref={inputRef}

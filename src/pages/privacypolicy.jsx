@@ -54,7 +54,7 @@ const PolicyPage = () => {
         <section className="bg-secondary/20 p-8 rounded-3xl border border-primary/10">
           <h3 className="font-bold text-foreground mb-2 text-lg">Questions?</h3>
           <p className="text-muted-foreground">
-            If you have any questions about our privacy practices, please reach out to our support team at <a href="mailto:care@skinglow.com" className="text-primary font-medium hover:underline">care@skinglow.com</a>.
+            If you have any questions about our privacy practices, please reach out to our support team at <a href="mailto:skin.glow.skincare.pk@gmail.com" className="text-primary font-medium hover:underline">skin.glow.skincare.pk@gmail.com</a>.
           </p>
         </section>
 

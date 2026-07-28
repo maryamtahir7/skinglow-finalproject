@@ -1,8 +1,8 @@
-import { tools } from './_tools.js';
 import prisma from '../_db.js';
 
 async function loadTools() {
-  return tools;
+  const mod = await import('./_tools.js');
+  return mod.tools;
 }
 
 const RECOMMEND_PATTERNS = [

@@ -29,6 +29,7 @@ const MALE_VOICE_PATTERNS = [
 ];
 
 let voicesCache = null;
+let currentAudio = null;
 
 function loadVoices() {
     if (!window.speechSynthesis) return [];
@@ -536,31 +537,309 @@ export default function VoiceInterface({
 }
 
 export function stopSpeaking() {
+    if (currentAudio) {
+        try {
+            currentAudio.pause();
+            currentAudio.onended = null;
+            currentAudio.onerror = null;
+        } catch (e) {
+            console.error('Error stopping fallback audio:', e);
+        }
+        currentAudio = null;
+    }
     if (!window.speechSynthesis) return;
     window.speechSynthesis.cancel();
 }
 
 export function isSpeaking() {
-    return window.speechSynthesis?.speaking ?? false;
+    const isSynthSpeaking = window.speechSynthesis?.speaking ?? false;
+    const isAudioPlaying = currentAudio ? !currentAudio.paused : false;
+    return isSynthSpeaking || isAudioPlaying;
+}
+
+function transliterateUrduToDevanagari(text) {
+    if (!text) return '';
+
+    // Common words map for high accuracy on common skincare conversation words
+    const wordMap = {
+        'السلام': 'अस्सलाम',
+        'علیکم': 'वालेकुम',
+        'وعلیکم': 'वालेकुम',
+        'شكریہ': 'शुक्रिया',
+        'شکریہ': 'शुक्रिया',
+        'خوش': 'खुश',
+        'آمدید': 'आमदीद',
+        'اللہ': 'अल्लाह',
+        'حافظ': 'हाफ़िज़',
+        'میں': 'मैं',
+        'ہوں': 'हूँ',
+        'ہے': 'है',
+        'ہیں': 'हैं',
+        'کی': 'की',
+        'کا': 'का',
+        'کے': 'के',
+        'کو': 'को',
+        'کر': 'कर',
+        'اور': 'और',
+        'آپ': 'आप',
+        'مدد': 'मदद',
+        'سکتی': 'सकती',
+        'سکتا': 'सकता',
+        'کریں': 'करें',
+        'نہیں': 'नहीं',
+        'تو': 'तो',
+        'یہ': 'यह',
+        'وہ': 'वह',
+        'تھا': 'था',
+        'تھی': 'थी',
+        'تھے': 'थे',
+        'کرنا': 'करना',
+        'طرح': 'तरह',
+        'بات': 'बात',
+        'بولیں': 'बोलें',
+        'کیئر': 'केयर',
+        'اسکن': 'स्किन',
+        'گلو': 'ग्लो',
+        'آرڈر': 'ऑर्डर',
+        'مصنوعات': 'मसनूआत',
+        'رٹین': 'रूटीन',
+        'فیس': 'फेस',
+        'ماسک': 'मास्क',
+        'کریم': 'क्रीम',
+        'لوشن': 'लोशन',
+        'سیرم': 'सीरम',
+        'جلد': 'जिल्द',
+        'خشک': 'खुश्क',
+        'چکنی': 'चिकनी',
+        'حساس': 'हसास',
+        'معلومات': 'मालूमात',
+        'رہنمائی': 'रहनुमाई',
+        'ایسٹھیٹیشن': 'एस्थेटीशियन',
+        'وائس': 'वॉइस',
+        'ایجنٹ': 'एजेंट',
+        'سن': 'सुन',
+        'رہی': 'रही',
+        'رہا': 'रहा',
+        'پوچھیں': 'पूछें',
+        'کچھ': 'कुछ',
+        'بھی': 'भी',
+        'بارے': 'बारे'
+    };
+
+    const consonants = {
+        'ب': 'ब', 'پ': 'प', 'ت': 'त', 'ٹ': 'ट', 'ث': 'स', 'ج': 'ज', 'چ': 'च',
+        'ح': 'ह', 'خ': 'ख़', 'د': 'द', 'ڈ': 'ड', 'ذ': 'ज़', 'ر': 'र', 'ڑ': 'ड़',
+        'ز': 'ज़', 'ژ': 'ज़', 'س': 'स', 'ش': 'श', 'ص': 'स', 'ض': 'ज़', 'ط': 'त',
+        'ظ': 'ज़', 'ع': 'अ', 'غ': 'ग़', 'ف': 'फ़', 'ق': 'क़', 'ک': 'क', 'گ': 'ग',
+        'ل': 'ल', 'م': 'म', 'ن': 'न', 'ہ': 'ह', 'ھ': 'ह'
+    };
+
+    const vowelsMap = {
+        'ا': 'ा', 'ی': 'ी', 'ے': 'े', 'و': 'ो'
+    };
+
+    let words = text.split(/\s+/);
+    let mappedWords = words.map(word => {
+        if (/^[a-zA-Z0-9.,!?'-]+$/.test(word)) {
+            return word;
+        }
+
+        let cleanWord = word.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()۔؟]/g, "");
+        if (wordMap[cleanWord]) {
+            return word.replace(cleanWord, wordMap[cleanWord]);
+        }
+
+        let devanagari = '';
+        let i = 0;
+        while (i < word.length) {
+            let char = word[i];
+            let nextChar = word[i + 1] || '';
+
+            if (nextChar === 'ھ') {
+                const aspirates = {
+                    'ب': 'भ', 'پ': 'फ', 'ت': 'थ', 'ٹ': 'ठ', 'ج': 'झ', 'چ': 'छ',
+                    'د': 'ध', 'ڈ': 'ढ', 'ر': 'र्ह', 'ڑ': 'ढ़', 'ک': 'ख', 'گ': 'घ'
+                };
+                if (aspirates[char]) {
+                    devanagari += aspirates[char];
+                    i += 2;
+                    continue;
+                }
+            }
+
+            if (consonants[char]) {
+                let devCons = consonants[char];
+                if (vowelsMap[nextChar]) {
+                    devanagari += devCons + vowelsMap[nextChar];
+                    i += 2;
+                } else {
+                    devanagari += devCons;
+                    i++;
+                }
+            } else {
+                const independentVowels = {
+                    'ا': 'अ', 'آ': 'आ', 'ی': 'ई', 'ے': 'ए', 'و': 'ऊ', 'ں': 'ं', '۔': '।', '؟': '?'
+                };
+                devanagari += independentVowels[char] || char;
+                i++;
+            }
+        }
+        return devanagari;
+    });
+
+    return mappedWords.join(' ');
+}
+
+function prepareUrduPronunciation(text) {
+    if (!text) return '';
+    let processed = text;
+    
+    const pronunciationMap = [
+        [/\bSkinGlow\b/gi, 'اسکن گلو'],
+        [/\bskin\s*glow\b/gi, 'اسکن گلو'],
+        [/\bspf\b/gi, 'ایس پی ایف'],
+        [/\bvitamin\s*c\b/gi, 'وٹامن سی'],
+        [/\bvitamin\s*e\b/gi, 'وٹامن ای'],
+        [/\bvitamin\s*a\b/gi, 'وٹامن اے'],
+        [/\bvitamin\b/gi, 'وٹامن'],
+        [/\bretinol\b/gi, 'ریٹینول'],
+        [/\bhyaluronic\s*acid\b/gi, 'ہائلورونک ایسڈ'],
+        [/\bsalicylic\s*acid\b/gi, 'سیلی سیلک ایسڈ'],
+        [/\bniacinamide\b/gi, 'نیاسینامائڈ'],
+        [/\bmoisturizer\b/gi, 'مائسچرائزر'],
+        [/\bsunscreen\b/gi, 'سن اسکرین'],
+        [/\bserum\b/gi, 'سیرم'],
+        [/\bserums\b/gi, 'سیرمز'],
+        [/\broutine\b/gi, 'روٹین'],
+        [/\btoner\b/gi, 'ٹونر'],
+        [/\bcleanser\b/gi, 'کلینزر'],
+        [/\bacne\b/gi, 'ایکنی'],
+        [/\bskin\b/gi, 'اسکن'],
+        [/\bglow\b/gi, 'گلو'],
+        [/\bcream\b/gi, 'کریم'],
+        [/\bface\b/gi, 'فیس'],
+        [/\bgel\b/gi, 'جیل'],
+        [/\boily\b/gi, 'آئیلی'],
+        [/\bdry\b/gi, 'ڈرائی'],
+        [/\bpeeling\b/gi, 'پیلنگ'],
+        [/\bscrub\b/gi, 'اسکرب'],
+        [/\bmask\b/gi, 'ماسک'],
+        [/\btoners\b/gi, 'ٹونرز'],
+        [/\bcleansers\b/gi, 'کلینزرز'],
+        [/\bmoisturizers\b/gi, 'مائسچرائزرز'],
+        [/\bsunscreens\b/gi, 'سن اسکرینز']
+    ];
+
+    for (const [pattern, replacement] of pronunciationMap) {
+        processed = processed.replace(pattern, replacement);
+    }
+    return processed;
 }
 
 // Speak text aloud with a clear, professional female voice
 export async function speakText(text, lang = 'en-US', { onStart, onEnd } = {}) {
-    if (!window.speechSynthesis) return;
-
-    const cleanText = prepareTextForSpeech(text);
+    let cleanText = prepareTextForSpeech(text);
     if (!cleanText) return;
 
-    window.speechSynthesis.cancel();
+    stopSpeaking();
+
+    const isUrdu = /[\u0600-\u06FF]/.test(cleanText) || lang.startsWith('ur');
+    const targetLang = isUrdu ? 'ur-PK' : lang;
+
+    if (isUrdu) {
+        cleanText = prepareUrduPronunciation(cleanText);
+    }
+
+    // Try server-side Microsoft Edge Neural TTS (high-quality female voices)
+    let audioSrc = null;
+    let contentType = 'audio/mpeg';
+
+    onStart?.();
+
+    // 1. Try relative path (Vite proxy / production same-origin)
+    try {
+        const apiBase = import.meta.env.VITE_API_URL || '';
+        const response = await fetch(`${apiBase}/api/ai/tts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: cleanText, lang: targetLang }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.audio) {
+                audioSrc = `data:${data.contentType || 'audio/mpeg'};base64,${data.audio}`;
+                contentType = data.contentType || 'audio/mpeg';
+            }
+        }
+    } catch (err) {
+        console.warn('Relative Edge TTS fetch failed:', err.message);
+    }
+
+    // 2. Try direct localhost backend URL as fallback (in case proxy is inactive in preview/custom servers)
+    if (!audioSrc) {
+        try {
+            const response = await fetch(`http://localhost:8085/api/ai/tts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: cleanText, lang: targetLang }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.audio) {
+                    audioSrc = `data:${data.contentType || 'audio/mpeg'};base64,${data.audio}`;
+                    contentType = data.contentType || 'audio/mpeg';
+                }
+            }
+        } catch (err) {
+            console.warn('Direct local Edge TTS fetch failed:', err.message);
+        }
+    }
+
+    // 3. Play audio if loaded successfully
+    if (audioSrc) {
+        try {
+            const audio = new Audio(audioSrc);
+            currentAudio = audio;
+
+            audio.onended = () => {
+                currentAudio = null;
+                onEnd?.();
+            };
+            audio.onerror = () => {
+                currentAudio = null;
+                console.warn('Edge TTS audio playback failed, falling back to native TTS');
+                speakNative(cleanText, targetLang, { onEnd });
+            };
+
+            await audio.play();
+            return;
+        } catch (playErr) {
+            console.warn('Edge TTS audio play failed, falling back to native:', playErr.message);
+        }
+    }
+
+    // Fallback to native browser TTS if server-side TTS fails
+    await speakNative(cleanText, targetLang, { onEnd });
+}
+
+async function speakNative(cleanText, targetLang, { onStart, onEnd } = {}) {
+    if (!window.speechSynthesis) {
+        onEnd?.();
+        return;
+    }
+    
     await ensureVoicesReady();
+    const isUrdu = targetLang.startsWith('ur');
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = lang;
-    utterance.rate = 0.92;
+    utterance.lang = targetLang;
+    utterance.rate = isUrdu ? 0.85 : 0.92;
     utterance.pitch = 1.05;
     utterance.volume = 1;
 
-    const femaleVoice = getFemaleVoice(lang);
+    const femaleVoice = getFemaleVoice(targetLang);
     if (femaleVoice) utterance.voice = femaleVoice;
 
     utterance.onstart = () => onStart?.();

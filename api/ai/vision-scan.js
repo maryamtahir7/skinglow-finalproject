@@ -19,21 +19,21 @@ export default async function handler(req, res) {
             take: 20,
             select: { id: true, name: true, category: true, price: true, concerns: true }
         });
-        
+
         // Simulate a slight delay to make it feel like AI processing
         await new Promise(resolve => setTimeout(resolve, 2000));
-        
+
         // Local heuristic simulation
         const concerns = ['mild redness around the cheeks', 'dry patches along the jawline', 'uneven skin tone', 'clogged pores in the T-zone', 'slight dehydration'];
         const randomConcern = concerns[Math.floor(Math.random() * concerns.length)];
         const types = ['combination', 'oily', 'dry', 'sensitive'];
         const randomType = types[Math.floor(Math.random() * types.length)];
-        
+
         let mockResponse = `### 🔍 SkinGlow Deep Scan Analysis\n\n`;
         mockResponse += `**Visual Assessment:**\n`;
         mockResponse += `Based on the facial scan, I noticed signs of **${randomConcern}**. The overall skin profile appears to be **${randomType}**. It's important to focus on gentle hydration, balancing oil production, and protecting the skin barrier.\n\n`;
         mockResponse += `**Recommended Products from our Collection:**\n`;
-        
+
         if (products.length > 0) {
             const shuffled = products.sort(() => 0.5 - Math.random());
             const recs = shuffled.slice(0, 2);
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
         } else {
             mockResponse += `- *Please add some products to the database so I can recommend them!*`;
         }
-        
+
         mockResponse += `\n\n*Disclaimer: This analysis is powered by SkinGlow's internal heuristic engine. It is not medical advice. Consult a dermatologist for severe conditions.*`;
 
         return res.status(200).json({ analysis: mockResponse });

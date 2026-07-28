@@ -1,8 +1,8 @@
-import { tools } from './_tools.js';
 import prisma from '../_db.js';
 
 async function loadTools() {
-  return tools;
+  const mod = await import('./_tools.js');
+  return mod.tools;
 }
 
 const PLACE_ORDER_PATTERNS = [
@@ -268,15 +268,14 @@ async function resolveProductByName(query, orderDraft, context) {
     step: 'select_product',
   };
 
-  const findProduct = tools.findProduct;
-  const found = findProduct ? await findProduct({ query }) : null;
+  const t = await loadTools();
+  const found = t.findProduct ? await t.findProduct({ query }) : null;
 
   if (found && found.stock > 0) {
     return selectProductForOrder(found.id, baseDraft, context);
   }
 
-  const tools = await loadTools();
-  const results = await tools.searchProducts({ query });
+  const results = await t.searchProducts({ query });
   const inStock = Array.isArray(results) ? results.filter((p) => p.inStock) : [];
 
   if (inStock.length === 1) {

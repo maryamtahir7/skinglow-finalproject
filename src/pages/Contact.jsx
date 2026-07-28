@@ -43,7 +43,7 @@ export default function ContactPage() {
       icon: Mail,
       title: "Email Support",
       description: "For detailed inquiries.",
-      highlight: "glow@skinglow.com",
+      highlight: "skin.glow.skincare.pk@gmail.com",
       color: "text-stone-600",
       bg: "bg-stone-50"
     },

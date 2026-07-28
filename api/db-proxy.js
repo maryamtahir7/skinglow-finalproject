@@ -13,7 +13,7 @@ export default async function handler(req, res) {
             case 'signup': {
                 const existing = await prisma.user.findUnique({ where: { email: payload.email } });
                 if (existing) return res.status(400).json({ error: 'Email already in use' });
-                
+
                 const role = payload.email === 'skin.glow.skincare.pk@gmail.com' ? 'ADMIN' : 'CUSTOMER';
                 const user = await prisma.user.create({ data: { email: payload.email, password: payload.password, name: payload.name, role } });
                 return res.status(200).json(user);
@@ -21,12 +21,12 @@ export default async function handler(req, res) {
             case 'login': {
                 let user = await prisma.user.findUnique({ where: { email: payload.email } });
                 if (!user || user.password !== payload.password) return res.status(401).json({ error: 'Invalid credentials' });
-                
+
                 // Auto upgrade to admin if it's the admin email
                 if (user.email === 'skin.glow.skincare.pk@gmail.com' && user.role !== 'ADMIN') {
                     user = await prisma.user.update({ where: { id: user.id }, data: { role: 'ADMIN' } });
                 }
-                
+
                 return res.status(200).json(user);
             }
             case 'getUsers': {
@@ -46,7 +46,7 @@ export default async function handler(req, res) {
                 const lowStockCount = await prisma.product.count({ where: { stock: { lt: 10 } } });
                 const pendingOrdersCount = await prisma.order.count({ where: { status: 'PENDING' } });
                 const totalCustomers = await prisma.user.count({ where: { role: 'CUSTOMER' } });
-                
+
                 const deliveredOrders = await prisma.order.findMany({
                     where: { status: { in: ['PAID', 'SHIPPED', 'DELIVERED'] } }
                 });
@@ -209,11 +209,11 @@ export default async function handler(req, res) {
             }
             case 'addReview': {
                 const created = await prisma.review.create({
-                    data: { 
-                        userId: payload.userId || payload.userid, 
-                        productId: payload.productId, 
-                        rating: payload.rating, 
-                        comment: payload.comment || payload.review 
+                    data: {
+                        userId: payload.userId || payload.userid,
+                        productId: payload.productId,
+                        rating: payload.rating,
+                        comment: payload.comment || payload.review
                     }
                 });
                 return res.status(200).json(created);

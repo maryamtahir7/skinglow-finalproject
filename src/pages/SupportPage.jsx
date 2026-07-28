@@ -23,7 +23,7 @@ export default function SupportPage() {
         },
         {
             q: "Can I change my order after placing it?",
-            a: "We process orders fast! Email glow@skinglow.com within 1 hour of placing your order and we will do our best to modify it."
+            a: "We process orders fast! Email skin.glow.skincare.pk@gmail.com within 1 hour of placing your order and we will do our best to modify it."
         }
     ];
 

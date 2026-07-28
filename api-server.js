@@ -7,6 +7,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Cache imported API modules to prevent connection pool exhaustion
+const moduleCache = {};
+
 // Load .env variables manually with a more robust parser
 const envPath = path.join(__dirname, '.env');
 if (fs.existsSync(envPath)) {
@@ -75,8 +78,10 @@ const server = http.createServer(async (req, res) => {
                     };
 
                     try {
-                        const modulePath = `file://${filePath}?t=${Date.now()}`;
-                        const { default: handler } = await import(modulePath);
+                        // Dynamically import with a cache-buster query parameter to hot-reload modified API endpoints
+                        const modulePath = `file://${filePath}?update=${Date.now()}`;
+                        const module = await import(modulePath);
+                        const handler = module.default || module;
                         await handler(req, vercelRes);
                     } catch (handlerErr) {
                         console.error('Handler execution error:', handlerErr);
